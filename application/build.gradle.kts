@@ -9,11 +9,13 @@ plugins {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
-
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.springframework:spring-aop")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation(project(":components:kafka"))
-    implementation(project(":components:mqtt"))
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    runtimeOnly("org.springframework:spring-aspects")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
@@ -39,6 +41,7 @@ testing {
                 implementation("org.springframework.boot:spring-boot-starter-test")
                 implementation("org.springframework.kafka:spring-kafka-test")
                 implementation("org.testcontainers:kafka:1.17.6")
+                implementation("org.springframework.ws:spring-ws-test")
             }
         }
     }

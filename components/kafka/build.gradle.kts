@@ -1,9 +1,12 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
+plugins {
+    id("org.jetbrains.kotlin.kapt")
+}
 
 dependencies {
-    implementation(project(":components:avro"))
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-starter-logging")
