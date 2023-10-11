@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-rootProject.name = "crest-device-service"
+rootProject.name = "sng-crest-device-service"
 
 include("application")
 include("components:kafka")

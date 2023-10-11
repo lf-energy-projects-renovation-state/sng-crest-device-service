@@ -3,5 +3,5 @@ spring:
     bootstrap-servers: ${spring.embedded.kafka.brokers}
 
 kafka:
-  id: "gxf-crest-device-service"
+  id: "gxf-sng-crest-device-service"
   topicName: "topic"
