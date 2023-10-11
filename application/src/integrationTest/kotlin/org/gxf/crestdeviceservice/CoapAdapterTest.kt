@@ -4,7 +4,7 @@
 
 package org.gxf.crestdeviceservice
 
-import org.gxf.crestdeviceservice.adapter.CoapMessageAdapter
+import org.gxf.crestdeviceservice.controller.CoapMessageController
 import org.gxf.crestdeviceservice.service.MessageService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,8 +14,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-
-@WebMvcTest(CoapMessageAdapter::class)
+@WebMvcTest(CoapMessageController::class)
 class CoapAdapterTest {
 
     @Autowired
