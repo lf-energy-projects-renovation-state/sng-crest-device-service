@@ -21,7 +21,7 @@ version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "d
 sonarqube {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.projectKey", "OSGP_gxf-service-template")
+        property("sonar.projectKey", "OSGP_sng-crest-device-service")
         property("sonar.organization", "gxf")
     }
 }
