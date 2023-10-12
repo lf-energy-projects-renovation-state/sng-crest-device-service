@@ -98,7 +98,7 @@ class OAuthAuthenticateCallbackHandler : AuthenticateCallbackHandler {
     /** Retrieves a new JWT token from Azure Active Directory. */
     private fun getToken(): OAuthBearerToken {
         try {
-            logger.debug("Retrieving Kafka OAuth Token")
+            logger.debug { "Retrieving Kafka OAuth Token" }
             val token = readTokenFile(tokenFilePath)
             val credential = ClientCredentialFactory.createFromClientAssertion(token)
             val aadParameters = ClientCredentialParameters.builder(scopes).build()

@@ -24,7 +24,6 @@ dependencies {
     implementation("com.microsoft.azure:msal4j:1.13.10")
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    runtimeOnly("org.springframework:spring-aspects")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

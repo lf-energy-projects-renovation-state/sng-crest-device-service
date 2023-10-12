@@ -19,11 +19,9 @@ class CoapMessageController(private val messageService: MessageService) {
 
     @PostMapping("/{id}")
     fun post(@NonNull @PathVariable id: String, @NonNull @RequestBody body: JsonNode): ResponseEntity<String> {
-        logger.debug {
-            "Processing message $body"
-        }
+        logger.debug { "Processing message $body" }
         messageService.handleMessage(body)
-        logger.debug("Processed message")
+        logger.debug { "Processed message" }
         return ResponseEntity.ok("0")
     }
 }
