@@ -9,4 +9,4 @@ management:
 
 kafka:
   id: "gxf-sng-crest-device-service"
-  topicName: "topic"
+  topicName: "crest-message"
