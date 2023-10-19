@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/coap")
+@RequestMapping("\${crest-device-service.http.endpoint}")
 class CoapMessageController(private val messageService: MessageService) {
 
     private val logger = KotlinLogging.logger {}

@@ -8,6 +8,7 @@ import org.gxf.crestdeviceservice.controller.CoapMessageController
 import org.gxf.crestdeviceservice.service.MessageService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
@@ -16,6 +17,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @WebMvcTest(CoapMessageController::class)
 class CoapAdapterTest {
+
+    @Value("\${crest-device-service.http.endpoint}")
+    private lateinit var endpoint: String
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -26,7 +30,7 @@ class CoapAdapterTest {
     @Test
     fun shouldReturn0WhenNoConfigurationIsAvailable() {
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/coap/{id}", 1)
+                MockMvcRequestBuilders.post("/$endpoint/{id}", 1)
                         .contentType("application/json").content("{}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.content().string("0")

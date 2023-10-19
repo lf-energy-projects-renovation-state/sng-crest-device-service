@@ -1,12 +1,5 @@
-server:
-  port: 8180
-
 management:
   endpoints:
     web:
       exposure:
         include: "prometheus"
-
-kafka:
-  id: "gxf-sng-crest-device-service"
-  topicName: "crest-message"
