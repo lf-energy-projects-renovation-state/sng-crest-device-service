@@ -18,9 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @WebMvcTest(CoapMessageController::class)
 class CoapAdapterTest {
 
-    @Value("\${crest-device-service.http.endpoint}")
-    private lateinit var endpoint: String
-
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -30,7 +27,7 @@ class CoapAdapterTest {
     @Test
     fun shouldReturn0WhenNoConfigurationIsAvailable() {
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/$endpoint/{id}", 1)
+                MockMvcRequestBuilders.post("/sng/{id}", 1)
                         .contentType("application/json").content("{}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.content().string("0")

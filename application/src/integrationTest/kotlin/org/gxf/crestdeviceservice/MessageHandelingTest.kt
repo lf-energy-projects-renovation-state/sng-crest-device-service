@@ -21,11 +21,9 @@ import java.time.Duration
         topics = ["\${crest-device-service.kafka.topic-name}"],
 )
 class MessageHandelingTest {
+
     @Value("\${crest-device-service.kafka.topic-name}")
     private lateinit var crestMessageTopicName: String
-
-    @Value("\${crest-device-service.http.endpoint}")
-    private lateinit var endpoint: String
 
     @Autowired
     private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
@@ -39,7 +37,7 @@ class MessageHandelingTest {
         val request: HttpEntity<String> = HttpEntity<String>(getFileContentAsString("message.json"), headers)
 
         val consumer = createKafkaConsumer(embeddedKafkaBroker, crestMessageTopicName)
-        val response = testRestTemplate.postForEntity("/$endpoint/1", request, String::class.java)
+        val response = testRestTemplate.postForEntity("/sng/1", request, String::class.java)
 
         Assertions.assertEquals("0", response.body)
 

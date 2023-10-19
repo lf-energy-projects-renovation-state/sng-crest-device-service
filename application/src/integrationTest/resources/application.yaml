@@ -6,5 +6,3 @@ crest-device-service:
   kafka:
     id: "gxf-sng-crest-device-service"
     topic-name: "topic"
-  http:
-    endpoint: "coap"
