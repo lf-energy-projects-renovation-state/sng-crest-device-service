@@ -16,6 +16,6 @@ class ProxyErrorsController {
 
     @PostMapping
     fun post(@NonNull @RequestBody error: ProxyError) {
-        logger.error { "Recieved error from the proxy with message: ${error.errorMessage} and stacktrace: ${error.stackTrace}" }
+        logger.error { "Received error from the proxy with message: ${error.errorMessage} and stacktrace: ${error.stackTrace}" }
     }
 }
