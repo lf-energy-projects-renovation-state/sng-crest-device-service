@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 class KafkaConsumer {
     private val logger = KotlinLogging.logger {}
 
-    @KafkaListener(topics = ["\${kafka.topicName}"], id = "\${kafka.id}")
+    @KafkaListener(topics = ["\${crest-device-service.kafka.topic-name}"], id = "\${crest-device-service.kafka.id}")
     fun consumeMessage(message: ConsumerRecord<String, String>) {
         val jsonNode = ObjectMapper().readTree(message.value())
         logger.info { "Consuming: ${jsonNode.get("ID")}" }

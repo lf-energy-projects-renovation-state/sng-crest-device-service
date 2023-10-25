@@ -26,7 +26,7 @@ class CoapAdapterTest {
     @Test
     fun shouldReturn0WhenNoConfigurationIsAvailable() {
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/coap/{id}", 1)
+                MockMvcRequestBuilders.post("/sng/{id}", 1)
                         .contentType("application/json").content("{}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.content().string("0")

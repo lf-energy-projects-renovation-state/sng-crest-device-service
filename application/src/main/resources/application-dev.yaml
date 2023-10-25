@@ -4,3 +4,8 @@ spring:
 
 server:
   port: 9000
+
+crest-device-service:
+  kafka:
+    id: "gxf-sng-crest-device-service"
+    topic-name: "crest-message"

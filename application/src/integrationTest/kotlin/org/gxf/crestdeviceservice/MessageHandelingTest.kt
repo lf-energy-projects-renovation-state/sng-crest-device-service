@@ -18,10 +18,11 @@ import java.time.Duration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
-        topics = ["\${kafka.topicName}"],
+        topics = ["\${crest-device-service.kafka.topic-name}"],
 )
 class MessageHandelingTest {
-    @Value("\${kafka.topicName}")
+
+    @Value("\${crest-device-service.kafka.topic-name}")
     private lateinit var crestMessageTopicName: String
 
     @Autowired
@@ -36,7 +37,7 @@ class MessageHandelingTest {
         val request: HttpEntity<String> = HttpEntity<String>(getFileContentAsString("message.json"), headers)
 
         val consumer = createKafkaConsumer(embeddedKafkaBroker, crestMessageTopicName)
-        val response = testRestTemplate.postForEntity("/coap/1", request, String::class.java)
+        val response = testRestTemplate.postForEntity("/sng/1", request, String::class.java)
 
         Assertions.assertEquals("0", response.body)
 
