@@ -1,0 +1,21 @@
+package org.gxf.crestdeviceservice.controller
+
+import mu.KotlinLogging
+import org.gxf.crestdeviceservice.domain.ProxyError
+import org.springframework.lang.NonNull
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/error")
+class ProxyErrorsController {
+
+    private val logger = KotlinLogging.logger {}
+
+    @PostMapping
+    fun post(@NonNull @RequestBody error: ProxyError) {
+        logger.error { "Received error from the proxy with message: ${error.errorMessage} and stacktrace: ${error.stackTrace}" }
+    }
+}
