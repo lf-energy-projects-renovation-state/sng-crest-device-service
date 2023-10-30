@@ -23,6 +23,7 @@ sonarqube {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.projectKey", "OSGP_sng-crest-device-service")
         property("sonar.organization", "gxf")
+        property("sonar.gradle.skipCompile", true)
     }
 }
 tasks.sonar
@@ -33,6 +34,8 @@ subprojects {
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "eclipse")
     apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+    apply(plugin = "jacoco")
+    apply(plugin = "jacoco-report-aggregation")
 
     group = "org.gxf.template"
     version = rootProject.version
