@@ -23,6 +23,10 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("com.microsoft.azure:msal4j:1.13.10")
 
+    implementation("com.gxf.utilities:kafka-avro:0.2")
+    implementation("com.gxf.utilities:kafka-azure-oauth:0.2")
+    implementation(project(":components:avro"))
+
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -51,6 +55,8 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
+                implementation(project(":components:avro"))
+                implementation("com.gxf.utilities:kafka-avro:0.2")
                 implementation("org.springframework.kafka:spring-kafka")
                 implementation("org.springframework.boot:spring-boot-starter-test")
                 implementation("org.springframework.kafka:spring-kafka-test")

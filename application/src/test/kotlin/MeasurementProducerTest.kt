@@ -1,5 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.gxf.crestdeviceservice.kafka.KafkaProducer
+import org.gxf.crestdeviceservice.kafka.MeasurementProducer
 import org.gxf.crestdeviceservice.kafka.configuration.KafkaProperties
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.kafka.core.KafkaTemplate
 
 @ExtendWith(MockitoExtension::class)
-class KafkaProducerTest {
+class MeasurementProducerTest {
 
     @Mock
     private lateinit var mockedKafkaTemplate: KafkaTemplate<String, String>
@@ -21,7 +21,7 @@ class KafkaProducerTest {
     private lateinit var mockedKafkaProperties: KafkaProperties
 
     @InjectMocks
-    private lateinit var kafkaProducer: KafkaProducer
+    private lateinit var measurementProducer: MeasurementProducer
 
     @BeforeEach
     fun setup() {
@@ -31,7 +31,7 @@ class KafkaProducerTest {
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
         val jsonNode = ObjectMapper().readTree("{}")
-        kafkaProducer.produceMessage(jsonNode)
+        measurementProducer.produceMessage(jsonNode)
         Mockito.verify(mockedKafkaTemplate).send("topic", jsonNode.toString())
     }
 }
