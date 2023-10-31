@@ -5,4 +5,4 @@
 rootProject.name = "sng-crest-device-service"
 
 include("application")
-include("components:avro")
+include(":components:avro-measurement")

@@ -1,6 +1,6 @@
 {
   "name": "Measurement",
-  "namespace": "org.gxf.crestdeviceservice",
+  "namespace": "org.gxf.message",
   "type": "record",
   "fields": [
     {

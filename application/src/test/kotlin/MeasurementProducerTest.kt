@@ -1,6 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.gxf.crestdeviceservice.kafka.MeasurementProducer
-import org.gxf.crestdeviceservice.kafka.configuration.KafkaProperties
+import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -18,14 +18,14 @@ class MeasurementProducerTest {
     private lateinit var mockedKafkaTemplate: KafkaTemplate<String, String>
 
     @Mock
-    private lateinit var mockedKafkaProperties: KafkaProperties
+    private lateinit var mockedKafkaProducerProperties: KafkaProducerProperties
 
     @InjectMocks
     private lateinit var measurementProducer: MeasurementProducer
 
     @BeforeEach
     fun setup() {
-        `when`(mockedKafkaProperties.topicName).thenReturn("topic")
+        `when`(mockedKafkaProducerProperties.topicName).thenReturn("topic")
     }
 
     @Test

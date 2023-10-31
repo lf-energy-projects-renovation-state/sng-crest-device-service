@@ -6,8 +6,8 @@ package org.gxf.crestdeviceservice.kafka
 
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
-import org.gxf.crestdeviceservice.Measurement
-import org.gxf.crestdeviceservice.kafka.configuration.KafkaProperties
+import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
+import org.gxf.message.Measurement
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -15,13 +15,13 @@ import java.time.Instant
 @Service
 class MeasurementProducer(
         private val kafkaTemplate: KafkaTemplate<String, Measurement>,
-        private val kafkaProperties: KafkaProperties
+        private val kafkaProducerProperties: KafkaProducerProperties
 ) {
     private val logger = KotlinLogging.logger {}
 
     fun produceMessage(message: JsonNode) {
         logger.info { "Producing: ${message.get("ID")}" }
-        kafkaTemplate.send(kafkaProperties.topicName, Measurement().apply {
+        kafkaTemplate.send(kafkaProducerProperties.topicName, Measurement().apply {
             deviceId = message.get("ID").longValue()
             timestamp = Instant.now().toEpochMilli()
             payload = message.toString()

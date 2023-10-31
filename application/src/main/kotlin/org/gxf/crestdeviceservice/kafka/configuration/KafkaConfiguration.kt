@@ -8,7 +8,7 @@ import com.gxf.utilities.kafka.avro.AvroDeserializer
 import com.gxf.utilities.kafka.avro.AvroSerializer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
-import org.gxf.crestdeviceservice.Measurement
+import org.gxf.message.Measurement
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,7 +31,7 @@ class KafkaConfiguration(private val kafkaProperties: KafkaProperties) {
                     StringDeserializer(),
                     AvroDeserializer(Measurement.getDecoder())
             )
-    
+
     @Bean
     fun kafkaTemplate(producerFactory: ProducerFactory<String, Measurement>) =
             KafkaTemplate(producerFactory)
