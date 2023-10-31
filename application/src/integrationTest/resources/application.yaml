@@ -4,5 +4,9 @@ spring:
 
 crest-device-service:
   kafka:
-    id: "gxf-sng-crest-device-service"
-    topic-name: "topic"
+    configuration-consumer:
+      id: "gxf-sng-crest-device-service-maki"
+      topic-name: "maki"
+    message-producer:
+      id: "gxf-sng-crest-device-service"
+      topic-name: "topic"
