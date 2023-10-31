@@ -46,7 +46,7 @@ class MessageHandelingTest {
         Assertions.assertEquals(1, records.records(crestMessageTopicName).count())
 
         val expectedJsonNode = ObjectMapper().readTree(getFileContentAsString("message.json"))
-        val payloadJsonNode = ObjectMapper().readTree(records.records(crestMessageTopicName).first().value())
+        val payloadJsonNode = ObjectMapper().readTree(records.records(crestMessageTopicName).first().value().payload)
 
         Assertions.assertEquals(expectedJsonNode, payloadJsonNode)
     }
