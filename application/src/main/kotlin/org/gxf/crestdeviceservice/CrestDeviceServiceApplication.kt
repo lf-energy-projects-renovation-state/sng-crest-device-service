@@ -4,13 +4,12 @@
 
 package org.gxf.crestdeviceservice
 
-import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 
-@EnableConfigurationProperties(KafkaProducerProperties::class)
+@ConfigurationPropertiesScan
 @EnableScheduling
 @SpringBootApplication
 class CrestDeviceServiceApplication
