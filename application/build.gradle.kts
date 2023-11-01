@@ -31,6 +31,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 
     // Generate test and integration test reports
     jacocoAggregation(project(":application"))
