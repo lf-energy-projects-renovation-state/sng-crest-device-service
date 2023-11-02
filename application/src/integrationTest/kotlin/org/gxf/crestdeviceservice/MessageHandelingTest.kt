@@ -18,11 +18,11 @@ import java.time.Duration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
-        topics = ["\${crest-device-service.kafka.topic-name}"],
+        topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
 class MessageHandelingTest {
 
-    @Value("\${crest-device-service.kafka.topic-name}")
+    @Value("\${crest-device-service.kafka.message-producer.topic-name}")
     private lateinit var crestMessageTopicName: String
 
     @Autowired
@@ -46,7 +46,7 @@ class MessageHandelingTest {
         Assertions.assertEquals(1, records.records(crestMessageTopicName).count())
 
         val expectedJsonNode = ObjectMapper().readTree(getFileContentAsString("message.json"))
-        val payloadJsonNode = ObjectMapper().readTree(records.records(crestMessageTopicName).first().value())
+        val payloadJsonNode = ObjectMapper().readTree(records.records(crestMessageTopicName).first().value().payload)
 
         Assertions.assertEquals(expectedJsonNode, payloadJsonNode)
     }

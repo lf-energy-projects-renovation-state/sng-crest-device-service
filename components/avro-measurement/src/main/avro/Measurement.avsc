@@ -1,0 +1,19 @@
+{
+  "name": "Measurement",
+  "namespace": "org.gxf.message",
+  "type": "record",
+  "fields": [
+    {
+      "name": "timestamp",
+      "type": "long"
+    },
+    {
+      "name": "device_id",
+      "type": "long"
+    },
+    {
+      "name": "payload",
+      "type": "string"
+    }
+  ]
+}

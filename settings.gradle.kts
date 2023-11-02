@@ -5,4 +5,4 @@
 rootProject.name = "sng-crest-device-service"
 
 include("application")
-include("components:kafka")
+include(":components:avro-measurement")

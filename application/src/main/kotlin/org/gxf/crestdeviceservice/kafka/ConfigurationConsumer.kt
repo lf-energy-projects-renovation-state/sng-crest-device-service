@@ -4,19 +4,17 @@
 
 package org.gxf.crestdeviceservice.kafka
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 
 @Service
-class KafkaConsumer {
+class ConfigurationConsumer {
     private val logger = KotlinLogging.logger {}
 
-    @KafkaListener(topics = ["\${crest-device-service.kafka.topic-name}"], id = "\${crest-device-service.kafka.id}")
+    @KafkaListener(topics = ["\${crest-device-service.kafka.configuration-consumer.topic-name}"], id = "\${crest-device-service.kafka.configuration-consumer.id}")
     fun consumeMessage(message: ConsumerRecord<String, String>) {
-        val jsonNode = ObjectMapper().readTree(message.value())
-        logger.info { "Consuming: ${jsonNode.get("ID")}" }
+        logger.info { "Consuming maki message" }
     }
 }
