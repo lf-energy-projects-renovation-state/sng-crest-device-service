@@ -1,8 +1,23 @@
 spring:
+  flyway:
+    enabled: false
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
   kafka:
     bootstrap-servers: ${spring.embedded.kafka.brokers}
 
 crest-device-service:
+  database:
+    encryption-key: "super-secret-key"
+    dev-initial-psk: "ABCDEFGHIJKLMNOP" #Should be the same as the PSK in the simulator only relevant for dev
+    dev-device-identity: "867787050253370" #Should be the same as the identity in the simulator only relevant for dev
   kafka:
     configuration-consumer:
       id: "gxf-sng-crest-device-service-maki"

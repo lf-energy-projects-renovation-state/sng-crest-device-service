@@ -1,6 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.gxf.crestdeviceservice.coap.MessageService
 import org.gxf.crestdeviceservice.kafka.MeasurementProducer
-import org.gxf.crestdeviceservice.service.MessageService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks

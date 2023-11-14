@@ -1,0 +1,27 @@
+package org.gxf.crestdeviceservice.psk
+
+import mu.KotlinLogging
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/psk")
+class PskController(private val pskService: PskService) {
+
+    private val logger = KotlinLogging.logger {}
+
+    @GetMapping
+    fun getPsk(@RequestHeader("x-device-identity") identity: String): ResponseEntity<String> {
+        val currentPsk = pskService.getCurrentPsk(identity)
+
+        if (currentPsk == null) {
+            logger.error { "No psk found for device $identity" }
+            return ResponseEntity.notFound().build()
+        }
+
+        return ResponseEntity.ok(currentPsk)
+    }
+}

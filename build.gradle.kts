@@ -40,6 +40,7 @@ subprojects {
     group = "org.gxf.template"
     version = rootProject.version
 
+
     repositories {
         mavenCentral()
         maven {

@@ -1,4 +1,4 @@
-package org.gxf.crestdeviceservice.controller
+package org.gxf.crestdeviceservice.remotelogging
 
 import mu.KotlinLogging
 import org.springframework.lang.NonNull
