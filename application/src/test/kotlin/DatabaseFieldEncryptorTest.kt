@@ -8,7 +8,7 @@ class DatabaseFieldEncryptorTest {
 
     @Test
     fun shouldEncryptInputData() {
-        val expected = "pq+bgx2cDcgGCYikWQnJ7g=="
+        val expected = "8fmtjU1emOIC+Rn9Dv/7ppdmH14q9p/jWsNI+xI9xEzvQJNgp1Y6H0y3wonsw/0Z"
         val result = databaseFieldEncryptor.convertToDatabaseColumn("data")
 
         assertEquals(expected, result)

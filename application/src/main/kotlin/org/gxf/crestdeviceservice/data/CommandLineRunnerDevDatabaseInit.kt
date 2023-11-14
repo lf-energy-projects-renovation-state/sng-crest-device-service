@@ -28,7 +28,6 @@ class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
      */
     override fun run(vararg args: String?) {
         val flyway = Flyway.configure()
-                .locations("db/migrations")
                 .dataSource(dataSourceProperties.url, dataSourceProperties.username, dataSourceProperties.password)
                 .load()
 
