@@ -13,7 +13,7 @@ import java.time.Instant
 
 private const val IDENTITY = "identity"
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
         topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
