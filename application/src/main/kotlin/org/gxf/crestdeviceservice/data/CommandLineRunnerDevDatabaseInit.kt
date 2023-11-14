@@ -24,7 +24,7 @@ class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
     /***
      * Setup function for local development.
      * Runs flyway migrations manual, because the CommandLineRunner is run before spring runs the flyway migrations automatically.
-     * Sets the psk for the simulator if it doesn't exist.
+     * Sets the psk used by the simulator if it doesn't exist.
      */
     override fun run(vararg args: String?) {
         val flyway = Flyway.configure()
