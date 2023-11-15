@@ -9,7 +9,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - ~/apps/postgres:/var/lib/postgresql/data-device
     environment:
       - POSTGRES_PASSWORD=1234
       - POSTGRES_USER=postgres
