@@ -12,7 +12,7 @@ class DownlinkService(private val pskService: PskService) {
     fun getDownlinkForIdentity(identity: String): String {
 
         if (pskService.hasDefaultKey(identity)) {
-            logger.info { "Device $identity has default key creating new key " }
+            logger.info { "Device $identity has default key creating new key" }
 
             val newKey = pskService.generateAndSetNewKeyForIdentity(identity)
 
@@ -22,7 +22,5 @@ class DownlinkService(private val pskService: PskService) {
         return "0"
     }
 
-    private fun constructSetPskCommand(key: String): String {
-        return "PSK:${key};PSK:${key}SET"
-    }
+    private fun constructSetPskCommand(key: String) = "PSK:${key};PSK:${key}SET"
 }

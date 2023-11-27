@@ -13,7 +13,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=1234
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=crest-device-service-test
+      - POSTGRES_DB=crest-device-service-dev
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     environment:

@@ -1,5 +1,6 @@
+package org.gxf.crestdeviceservice.coap
+
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.gxf.crestdeviceservice.coap.MessageService
 import org.gxf.crestdeviceservice.kafka.MeasurementProducer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

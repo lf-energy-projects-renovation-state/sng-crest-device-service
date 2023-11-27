@@ -3,7 +3,7 @@ package org.gxf.crestdeviceservice
 import org.gxf.crestdeviceservice.psk.PskController
 import org.gxf.crestdeviceservice.psk.PskService
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -13,30 +13,32 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @WebMvcTest(PskController::class)
-class PskControllerTest {
+class PreSharedKeyControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @MockBean
-    private lateinit var mock: PskService
+    private lateinit var pskService: PskService
 
     @Test
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
-        Mockito.`when`(mock.getCurrentPsk(any())).thenReturn(null)
+        `when`(pskService.getCurrentPsk(any())).thenReturn(null)
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/psk")
+                MockMvcRequestBuilders
+                        .get("/psk")
                         .header("x-device-identity", "identity"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
     @Test
     fun shouldReturnKeyForIdentity() {
-        Mockito.`when`(mock.getCurrentPsk(any())).thenReturn("key")
+        `when`(pskService.getCurrentPsk(any())).thenReturn("key")
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/psk")
+                MockMvcRequestBuilders
+                        .get("/psk")
                         .header("x-device-identity", "identity"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.content().string("key"))

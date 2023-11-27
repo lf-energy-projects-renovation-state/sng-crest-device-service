@@ -1,14 +1,14 @@
 package org.gxf.crestdeviceservice.psk
 
-import org.gxf.crestdeviceservice.data.entity.Psk
-import org.gxf.crestdeviceservice.data.entity.PskKey
+import org.gxf.crestdeviceservice.data.entity.PreSharedKey
+import org.gxf.crestdeviceservice.data.entity.PreSharedKeyCompositeKey
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface PskRepository : CrudRepository<Psk, PskKey> {
+interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey> {
 
-    fun findFirstByIdentityOrderByRevisionTimeStampDesc(identity: String): Psk?
+    fun findFirstByIdentityOrderByRevisionTimeDesc(identity: String): PreSharedKey?
 
     fun countPsksByIdentity(identity: String): Long
 }

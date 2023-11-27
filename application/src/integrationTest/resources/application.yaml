@@ -16,8 +16,10 @@ spring:
 crest-device-service:
   database:
     encryption-key: "super-secret-key"
-    dev-initial-psk: "ABCDEFGHIJKLMNOP" #Should be the same as the PSK in the simulator only relevant for dev
-    dev-device-identity: "867787050253370" #Should be the same as the identity in the simulator only relevant for dev
+    #Should be the same as the PSK in the simulator only relevant for dev
+    dev-initial-psk: "ABCDEFGHIJKLMNOP"
+    #Should be the same as the identity in the simulator only relevant for dev
+    dev-device-identity: "867787050253370"
   kafka:
     configuration-consumer:
       id: "gxf-sng-crest-device-service-maki"

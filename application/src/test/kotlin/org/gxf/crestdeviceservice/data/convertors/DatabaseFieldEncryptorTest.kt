@@ -1,5 +1,7 @@
-import org.gxf.crestdeviceservice.data.convertors.DatabaseFieldEncryptor
+package org.gxf.crestdeviceservice.data.convertors
+
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 
 class DatabaseFieldEncryptorTest {
@@ -11,6 +13,8 @@ class DatabaseFieldEncryptorTest {
         val expected = "data"
         val encrypted = databaseFieldEncryptor.convertToDatabaseColumn(expected)
         val decrypted = databaseFieldEncryptor.convertToEntityAttribute(encrypted)
+
+        assertNotEquals("data", encrypted)
         assertEquals(expected, decrypted)
     }
 }

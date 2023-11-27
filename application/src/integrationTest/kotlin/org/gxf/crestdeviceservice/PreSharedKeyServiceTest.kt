@@ -1,6 +1,6 @@
 package org.gxf.crestdeviceservice
 
-import org.gxf.crestdeviceservice.data.entity.Psk
+import org.gxf.crestdeviceservice.data.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.PskRepository
 import org.gxf.crestdeviceservice.psk.PskService
 import org.junit.jupiter.api.Assertions.*
@@ -11,13 +11,15 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.kafka.test.context.EmbeddedKafka
 import java.time.Instant
 
-private const val IDENTITY = "identity"
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
         topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
-class PskServiceTest {
+class PreSharedKeyServiceTest {
+
+    companion object {
+        private const val IDENTITY = "identity"
+    }
 
     @Autowired
     private lateinit var pskService: PskService
@@ -28,24 +30,24 @@ class PskServiceTest {
     @BeforeEach
     fun setup() {
         pskRepository.deleteAll()
-        pskRepository.save(Psk(IDENTITY, Instant.MIN, "123"))
+        pskRepository.save(PreSharedKey(IDENTITY, Instant.MIN, "123"))
     }
 
     @Test
     fun shouldRetrieveLatestPskWhenThereAreMultiple() {
         val expectedKey = "1234"
-        pskRepository.save(Psk(IDENTITY, Instant.MAX, expectedKey))
+        pskRepository.save(PreSharedKey(IDENTITY, Instant.MAX, expectedKey))
 
-        val currentPks = pskService.getCurrentPsk(IDENTITY)
+        val currentPsk = pskService.getCurrentPsk(IDENTITY)
 
-        assertEquals(expectedKey, currentPks)
+        assertEquals(expectedKey, currentPsk)
     }
 
     @Test
     fun shouldCreateAndSaveNewPsk() {
         val newKey = pskService.generateAndSetNewKeyForIdentity(IDENTITY)
 
-        val savedKey = pskRepository.findFirstByIdentityOrderByRevisionTimeStampDesc(IDENTITY)
+        val savedKey = pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(IDENTITY)
 
         // There should be a key in the database
         assertTrue(savedKey != null)
@@ -63,7 +65,7 @@ class PskServiceTest {
 
     @Test
     fun hasDefaultKeyShouldReturnFalseWhenThereAreMoreThanOneKeyForIdentity() {
-        pskRepository.save(Psk(IDENTITY, Instant.now(), "123"))
+        pskRepository.save(PreSharedKey(IDENTITY, Instant.now(), "123"))
 
         val result = pskService.hasDefaultKey(IDENTITY)
 

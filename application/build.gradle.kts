@@ -9,6 +9,8 @@ plugins {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework:spring-aop")
@@ -17,7 +19,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.5.4")
     implementation("org.flywaydb:flyway-core:9.22.3")
 
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.5")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-starter-logging")
