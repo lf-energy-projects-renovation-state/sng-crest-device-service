@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 class PreSharedKeyControllerTest {
 
     @Autowired
-    private lateinit var mockMvc: MockMvc
+    private lateinit var mvcRequest: MockMvc
 
     @MockBean
     private lateinit var pskService: PskService
@@ -25,7 +25,7 @@ class PreSharedKeyControllerTest {
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
         `when`(pskService.getCurrentPsk(any())).thenReturn(null)
 
-        mockMvc.perform(
+        mvcRequest.perform(
                 MockMvcRequestBuilders
                         .get("/psk")
                         .header("x-device-identity", "identity"))
@@ -36,7 +36,7 @@ class PreSharedKeyControllerTest {
     fun shouldReturnKeyForIdentity() {
         `when`(pskService.getCurrentPsk(any())).thenReturn("key")
 
-        mockMvc.perform(
+        mvcRequest.perform(
                 MockMvcRequestBuilders
                         .get("/psk")
                         .header("x-device-identity", "identity"))
