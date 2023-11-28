@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.test.annotation.DirtiesContext
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 import java.time.Duration
 
@@ -24,6 +25,7 @@ import java.time.Duration
 @EmbeddedKafka(
         topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class MessageHandelingTest {
 
     @Value("\${crest-device-service.kafka.message-producer.topic-name}")
