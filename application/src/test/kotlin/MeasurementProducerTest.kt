@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.check
@@ -39,7 +39,7 @@ class MeasurementProducerTest {
             }
         """)
         measurementProducer.produceMessage(jsonNode)
-        Mockito.verify(mockedKafkaTemplate).send(
+        verify(mockedKafkaTemplate).send(
                 check { assertEquals("topic", it) }, check { assertEquals(jsonNode.toString(), it.payload) })
     }
 }

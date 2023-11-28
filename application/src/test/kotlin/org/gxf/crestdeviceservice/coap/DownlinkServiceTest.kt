@@ -1,6 +1,7 @@
-import org.gxf.crestdeviceservice.coap.DownlinkService
+package org.gxf.crestdeviceservice.coap
+
+import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.psk.PskService
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -24,7 +25,7 @@ class DownlinkServiceTest {
 
         val result = downLinkService.getDownlinkForIdentity("identity")
 
-        assertEquals("0", result)
+        assertThat("0").isEqualTo(result)
     }
 
     @Test
@@ -35,6 +36,6 @@ class DownlinkServiceTest {
         val result = downLinkService.getDownlinkForIdentity("identity")
 
         // Psk command is formatted as: PSK:[Key];PSK:[Key]SET
-        assertEquals("PSK:key;PSK:keySET", result)
+        assertThat("PSK:key;PSK:keySET").isEqualTo(result)
     }
 }

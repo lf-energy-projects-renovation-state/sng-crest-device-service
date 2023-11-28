@@ -1,8 +1,12 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.gxf.crestdeviceservice
 
+import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.IntegrationTestHelper.createKafkaConsumer
 import org.gxf.crestdeviceservice.IntegrationTestHelper.getFileContentAsString
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -32,22 +36,23 @@ class MessageHandelingTest {
     private lateinit var testRestTemplate: TestRestTemplate
 
     @Test
-    fun produceMessageTest() {
+    fun shouldProduceMessageForValidRequest() {
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-        val request: HttpEntity<String> = HttpEntity<String>(getFileContentAsString("message.json"), headers)
+        val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
 
         val consumer = createKafkaConsumer(embeddedKafkaBroker, crestMessageTopicName)
         val response = testRestTemplate.postForEntity("/sng/1", request, String::class.java)
 
-        Assertions.assertEquals("0", response.body)
+        assertThat("0").isEqualTo(response.body)
 
         val records = consumer.poll(Duration.ofSeconds(1))
 
-        Assertions.assertEquals(1, records.records(crestMessageTopicName).count())
+        assertThat(records.records(crestMessageTopicName)).hasSize(1)
+
 
         val expectedJsonNode = ObjectMapper().readTree(getFileContentAsString("message.json"))
         val payloadJsonNode = ObjectMapper().readTree(records.records(crestMessageTopicName).first().value().payload)
 
-        Assertions.assertEquals(expectedJsonNode, payloadJsonNode)
+        assertThat(expectedJsonNode).isEqualTo(payloadJsonNode)
     }
 }
