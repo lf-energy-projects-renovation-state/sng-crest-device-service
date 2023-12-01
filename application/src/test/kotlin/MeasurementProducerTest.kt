@@ -1,7 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.gxf.crestdeviceservice.kafka.MeasurementProducer
 import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
-import org.gxf.message.Measurement
+import org.gxf.sng.avro.DeviceMessage
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,7 +18,7 @@ import org.springframework.kafka.core.KafkaTemplate
 class MeasurementProducerTest {
 
     @Mock
-    private lateinit var mockedKafkaTemplate: KafkaTemplate<String, Measurement>
+    private lateinit var mockedKafkaTemplate: KafkaTemplate<String, DeviceMessage>
 
     @Mock
     private lateinit var mockedKafkaProducerProperties: KafkaProducerProperties

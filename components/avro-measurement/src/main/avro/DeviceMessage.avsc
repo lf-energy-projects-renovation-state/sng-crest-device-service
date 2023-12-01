@@ -1,14 +1,14 @@
 {
-  "name": "Measurement",
-  "namespace": "org.gxf.message",
+  "name": "DeviceMessage",
   "type": "record",
+  "namespace": "org.gxf.sng.avro",
   "fields": [
     {
-      "name": "timestamp",
-      "type": "long"
+      "name": "deviceId",
+      "type": "string"
     },
     {
-      "name": "device_id",
+      "name": "timestamp",
       "type": "long"
     },
     {
