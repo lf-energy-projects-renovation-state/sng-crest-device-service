@@ -2,26 +2,27 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.gxf.crestdeviceservice.controller
+package org.gxf.crestdeviceservice.coap
 
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
-import org.gxf.crestdeviceservice.service.MessageService
 import org.springframework.http.ResponseEntity
 import org.springframework.lang.NonNull
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/sng")
-class CoapMessageController(private val messageService: MessageService) {
+class CoapMessageController(private val messageService: MessageService, private val downlinkService: DownlinkService) {
 
     private val logger = KotlinLogging.logger {}
 
-    @PostMapping("/{id}")
-    fun post(@NonNull @PathVariable id: String, @NonNull @RequestBody body: JsonNode): ResponseEntity<String> {
+    @PostMapping("/{identity}")
+    fun post(@NonNull @PathVariable identity: String, @NonNull @RequestBody body: JsonNode): ResponseEntity<String> {
+
         logger.debug { "Processing message $body" }
         messageService.handleMessage(body)
         logger.debug { "Processed message" }
-        return ResponseEntity.ok("0")
+
+        return ResponseEntity.ok(downlinkService.getDownlinkForIdentity(identity))
     }
 }

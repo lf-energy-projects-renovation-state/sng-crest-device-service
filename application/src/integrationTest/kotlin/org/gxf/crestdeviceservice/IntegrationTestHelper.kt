@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.gxf.crestdeviceservice
 
 import com.gxf.utilities.kafka.avro.AvroDeserializer

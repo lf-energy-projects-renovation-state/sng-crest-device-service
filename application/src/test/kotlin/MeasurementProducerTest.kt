@@ -1,14 +1,14 @@
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.kafka.MeasurementProducer
 import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
 import org.gxf.sng.avro.DeviceMessage
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.check
@@ -39,7 +39,7 @@ class MeasurementProducerTest {
             }
         """)
         measurementProducer.produceMessage(jsonNode)
-        Mockito.verify(mockedKafkaTemplate).send(
-                check { assertEquals("topic", it) }, check { assertEquals(jsonNode.toString(), it.payload) })
+        verify(mockedKafkaTemplate).send(
+                check { assertThat(it).isEqualTo("topic") }, check { assertThat(it.payload).isEqualTo(jsonNode.toString()) })
     }
 }

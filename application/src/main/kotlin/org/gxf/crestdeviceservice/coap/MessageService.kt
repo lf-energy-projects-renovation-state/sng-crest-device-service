@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.gxf.crestdeviceservice.service
+package org.gxf.crestdeviceservice.coap
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.gxf.crestdeviceservice.kafka.MeasurementProducer

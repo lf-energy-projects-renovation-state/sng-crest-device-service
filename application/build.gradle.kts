@@ -9,29 +9,33 @@ plugins {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework:spring-aop")
-    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    implementation(libs.logging)
 
+    implementation(libs.bundles.data)
+
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-starter-logging")
 
     implementation("org.springframework:spring-aspects")
-    implementation("org.springframework:spring-aop")
 
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("com.microsoft.azure:msal4j:1.13.10")
+    implementation(libs.microsoftMsal)
+    implementation(libs.bundles.gxfUtils)
 
-    implementation("com.gxf.utilities:kafka-avro:0.2")
-    implementation("com.gxf.utilities:kafka-azure-oauth:0.2")
     implementation(project(":components:avro-measurement"))
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    testImplementation(libs.mockitoKotlin)
 
     // Generate test and integration test reports
     jacocoAggregation(project(":application"))
@@ -57,12 +61,15 @@ testing {
             dependencies {
                 implementation(project())
                 implementation(project(":components:avro-measurement"))
-                implementation("com.gxf.utilities:kafka-avro:0.2")
+                implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+                implementation(libs.kafkaAvro)
                 implementation("org.springframework.kafka:spring-kafka")
                 implementation("org.springframework.boot:spring-boot-starter-test")
                 implementation("org.springframework.kafka:spring-kafka-test")
-                implementation("org.testcontainers:kafka:1.17.6")
+                implementation(integrationTestLibs.kafkaTestContainers)
                 implementation("org.springframework.ws:spring-ws-test")
+                runtimeOnly(integrationTestLibs.h2)
+                implementation(libs.mockitoKotlin)
             }
         }
     }
