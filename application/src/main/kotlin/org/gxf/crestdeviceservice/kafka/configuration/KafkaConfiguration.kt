@@ -8,7 +8,7 @@ import com.gxf.utilities.kafka.avro.AvroDeserializer
 import com.gxf.utilities.kafka.avro.AvroSerializer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
-import org.gxf.message.Measurement
+import org.gxf.sng.avro.DeviceMessage
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -20,27 +20,27 @@ import org.springframework.kafka.core.*
 class KafkaConfiguration(private val kafkaProperties: KafkaProperties) {
 
     @Bean
-    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<String, Measurement>): ConcurrentKafkaListenerContainerFactory<String, Measurement> =
-            ConcurrentKafkaListenerContainerFactory<String, Measurement>()
+    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<String, DeviceMessage>): ConcurrentKafkaListenerContainerFactory<String, DeviceMessage> =
+            ConcurrentKafkaListenerContainerFactory<String, DeviceMessage>()
                     .apply { this.consumerFactory = consumerFactory }
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, Measurement> =
+    fun consumerFactory(): ConsumerFactory<String, DeviceMessage> =
             DefaultKafkaConsumerFactory(
                     kafkaProperties.buildConsumerProperties(),
                     StringDeserializer(),
-                    AvroDeserializer(Measurement.getDecoder())
+                    AvroDeserializer(DeviceMessage.getDecoder())
             )
 
     @Bean
-    fun kafkaTemplate(producerFactory: ProducerFactory<String, Measurement>) =
+    fun kafkaTemplate(producerFactory: ProducerFactory<String, DeviceMessage>) =
             KafkaTemplate(producerFactory)
 
     @Bean
-    fun producerFactory(): ProducerFactory<String, Measurement> =
+    fun producerFactory(): ProducerFactory<String, DeviceMessage> =
             DefaultKafkaProducerFactory(
                     kafkaProperties.buildProducerProperties(),
                     StringSerializer(),
-                    AvroSerializer(Measurement.getEncoder())
+                    AvroSerializer(DeviceMessage.getEncoder())
             )
 }

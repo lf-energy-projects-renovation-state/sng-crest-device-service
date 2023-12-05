@@ -15,4 +15,3 @@ class CrestDeviceServiceApplication
 fun main(args: Array<String>) {
     runApplication<CrestDeviceServiceApplication>(*args)
 }
-
