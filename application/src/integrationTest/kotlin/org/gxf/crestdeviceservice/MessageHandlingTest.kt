@@ -10,7 +10,6 @@ import org.gxf.crestdeviceservice.IntegrationTestHelper.getFileContentAsString
 import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -30,9 +29,6 @@ import java.time.Duration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EnableConfigurationProperties(KafkaProducerProperties::class)
 class MessageHandlingTest {
-
-    @Value("\${crest-device-service.kafka.message-producer.topic-name}")
-    private lateinit var crestMessageTopicName: String
 
     @Autowired
     private lateinit var kafkaProducerProperties: KafkaProducerProperties
