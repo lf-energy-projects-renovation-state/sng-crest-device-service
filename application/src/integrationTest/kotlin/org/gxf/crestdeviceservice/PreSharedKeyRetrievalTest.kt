@@ -25,7 +25,7 @@ import java.time.Instant
 @EmbeddedKafka(
         topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
-class PreSharedKeyRetrieveTest {
+class PreSharedKeyRetrievalTest {
 
     companion object {
         private const val IDENTITY = "1234"
@@ -57,7 +57,7 @@ class PreSharedKeyRetrieveTest {
         val result = restTemplate.exchange("/psk",
                 HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
 
-        assertThat("0000111122223333").isEqualTo(result.body)
+        assertThat(result.body).isEqualTo("0000111122223333")
     }
 
     @Test
@@ -66,6 +66,6 @@ class PreSharedKeyRetrieveTest {
         val result = restTemplate.exchange("/psk",
                 HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
 
-        assertThat(HttpStatus.NOT_FOUND).isEqualTo(result.statusCode)
+        assertThat(result.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
 }

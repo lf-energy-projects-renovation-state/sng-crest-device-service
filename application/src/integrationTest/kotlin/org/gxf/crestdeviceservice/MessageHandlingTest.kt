@@ -7,9 +7,11 @@ package org.gxf.crestdeviceservice
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.IntegrationTestHelper.createKafkaConsumer
 import org.gxf.crestdeviceservice.IntegrationTestHelper.getFileContentAsString
+import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
@@ -26,10 +28,14 @@ import java.time.Duration
         topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class MessageHandelingTest {
+@EnableConfigurationProperties(KafkaProducerProperties::class)
+class MessageHandlingTest {
 
     @Value("\${crest-device-service.kafka.message-producer.topic-name}")
     private lateinit var crestMessageTopicName: String
+
+    @Autowired
+    private lateinit var kafkaProducerProperties: KafkaProducerProperties
 
     @Autowired
     private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
@@ -42,19 +48,19 @@ class MessageHandelingTest {
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
 
-        val consumer = createKafkaConsumer(embeddedKafkaBroker, crestMessageTopicName)
+        val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.topicName)
         val response = testRestTemplate.postForEntity("/sng/1", request, String::class.java)
 
-        assertThat("0").isEqualTo(response.body)
+        assertThat(response.body).isEqualTo("0")
 
         val records = consumer.poll(Duration.ofSeconds(1))
 
-        assertThat(records.records(crestMessageTopicName)).hasSize(1)
+        assertThat(records.records(kafkaProducerProperties.topicName)).hasSize(1)
 
 
         val expectedJsonNode = ObjectMapper().readTree(getFileContentAsString("message.json"))
-        val payloadJsonNode = ObjectMapper().readTree(records.records(crestMessageTopicName).first().value().payload)
+        val payloadJsonNode = ObjectMapper().readTree(records.records(kafkaProducerProperties.topicName).first().value().payload)
 
-        assertThat(expectedJsonNode).isEqualTo(payloadJsonNode)
+        assertThat(payloadJsonNode).isEqualTo(expectedJsonNode)
     }
 }

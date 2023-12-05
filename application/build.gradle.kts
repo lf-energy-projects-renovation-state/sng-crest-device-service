@@ -36,7 +36,7 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(libs.mockitoKotlin)
-    testImplementation(libs.assertJ)
+
     // Generate test and integration test reports
     jacocoAggregation(project(":application"))
 }

@@ -13,7 +13,7 @@ class DatabaseFieldEncryptorTest {
         val encrypted = databaseFieldEncryptor.convertToDatabaseColumn(expected)
         val decrypted = databaseFieldEncryptor.convertToEntityAttribute(encrypted)
 
-        assertThat("data").isNotEqualTo(encrypted)
-        assertThat(expected).isEqualTo(decrypted)
+        assertThat(encrypted).isNotEqualTo("data")
+        assertThat(decrypted).isEqualTo(expected)
     }
 }

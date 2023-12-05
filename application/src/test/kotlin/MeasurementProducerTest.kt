@@ -1,8 +1,8 @@
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.kafka.MeasurementProducer
 import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
 import org.gxf.message.Measurement
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,6 +40,6 @@ class MeasurementProducerTest {
         """)
         measurementProducer.produceMessage(jsonNode)
         verify(mockedKafkaTemplate).send(
-                check { assertEquals("topic", it) }, check { assertEquals(jsonNode.toString(), it.payload) })
+                check { assertThat(it).isEqualTo("topic") }, check { assertThat(it.payload).isEqualTo(jsonNode.toString()) })
     }
 }
