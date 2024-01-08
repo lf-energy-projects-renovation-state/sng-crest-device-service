@@ -5,13 +5,13 @@ import org.gxf.crestdeviceservice.data.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.PskRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.time.Instant
 
 @Component
-@Profile("dev")
+@ConditionalOnProperty(prefix = "crest-device-service.database", name = ["set-initial-psk"])
 class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
                                        private val dataSourceProperties: DataSourceProperties) : CommandLineRunner {
 
