@@ -1,6 +1,6 @@
 package org.gxf.crestdeviceservice.coap
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.psk.PskService
 import org.springframework.stereotype.Service
 
