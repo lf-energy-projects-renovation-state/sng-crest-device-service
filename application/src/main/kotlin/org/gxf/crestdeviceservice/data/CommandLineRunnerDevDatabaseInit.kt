@@ -6,12 +6,10 @@ import org.gxf.crestdeviceservice.psk.PskRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.time.Instant
 
 @Component
-@Profile("dev")
 class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
                                        private val dataSourceProperties: DataSourceProperties) : CommandLineRunner {
 
