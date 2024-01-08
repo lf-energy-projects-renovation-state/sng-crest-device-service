@@ -15,6 +15,7 @@ server:
 
 crest-device-service:
   database:
+    set-initial-psk: true
     encryption-key: "super-secret-key"
     #Should be the same as the PSK in the simulator only relevant for dev
     dev-initial-psk: "ABCDEFGHIJKLMNOP"
