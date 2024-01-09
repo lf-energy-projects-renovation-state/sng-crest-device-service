@@ -5,7 +5,7 @@
 package org.gxf.crestdeviceservice.kafka
 
 import com.fasterxml.jackson.databind.JsonNode
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
 import org.gxf.sng.avro.DeviceMessage
 import org.springframework.kafka.core.KafkaTemplate

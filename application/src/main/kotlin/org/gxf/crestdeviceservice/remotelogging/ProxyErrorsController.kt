@@ -1,6 +1,6 @@
 package org.gxf.crestdeviceservice.remotelogging
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.lang.NonNull
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

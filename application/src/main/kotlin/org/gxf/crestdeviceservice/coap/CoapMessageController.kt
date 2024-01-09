@@ -5,7 +5,7 @@
 package org.gxf.crestdeviceservice.coap
 
 import com.fasterxml.jackson.databind.JsonNode
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.lang.NonNull
 import org.springframework.web.bind.annotation.*
