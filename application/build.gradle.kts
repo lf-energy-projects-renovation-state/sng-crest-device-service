@@ -4,6 +4,7 @@
 
 plugins {
     id("org.springframework.boot")
+    id("com.github.davidmc24.gradle.plugin.avro")
 }
 
 dependencies {
@@ -17,6 +18,7 @@ dependencies {
     implementation(libs.logging)
 
     implementation(libs.bundles.data)
+    implementation(libs.bundles.gxfUtils)
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
@@ -27,12 +29,10 @@ dependencies {
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation(libs.microsoftMsal)
-    implementation(libs.bundles.gxfUtils)
 
-    implementation(project(":components:avro-measurement"))
+    api(libs.avro)
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(libs.mockitoKotlin)
@@ -60,7 +60,6 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
-                implementation(project(":components:avro-measurement"))
                 implementation("org.springframework.boot:spring-boot-starter-data-jpa")
                 implementation(libs.kafkaAvro)
                 implementation("org.springframework.kafka:spring-kafka")
@@ -68,8 +67,8 @@ testing {
                 implementation("org.springframework.kafka:spring-kafka-test")
                 implementation(integrationTestLibs.kafkaTestContainers)
                 implementation("org.springframework.ws:spring-ws-test")
-                runtimeOnly(integrationTestLibs.h2)
                 implementation(libs.mockitoKotlin)
+                runtimeOnly(integrationTestLibs.h2)
             }
         }
     }

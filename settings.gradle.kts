@@ -5,7 +5,6 @@
 rootProject.name = "sng-crest-device-service"
 
 include("application")
-include(":components:avro-measurement")
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -15,6 +14,8 @@ dependencyResolutionManagement {
             bundle("data", listOf("postgresql", "flyway"))
 
             library("logging", "io.github.oshai", "kotlin-logging-jvm").version("6.0.1")
+
+            library("avro", "org.apache.avro", "avro").version("1.11.3")
 
             version("utilities", "0.2")
             library("kafkaAvro", "com.gxf.utilities", "kafka-avro").versionRef("utilities")
