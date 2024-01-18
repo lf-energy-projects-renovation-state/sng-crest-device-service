@@ -18,6 +18,7 @@ crest-device-service:
     encryption-key: "super-secret-key"
     #Should be the same as the PSK in the simulator only relevant for dev
     dev-initial-psk: "ABCDEFGHIJKLMNOP"
+    dev-initial-secret: "123456"
     #Should be the same as the identity in the simulator only relevant for dev
     dev-device-identity: "867787050253370"
   kafka:

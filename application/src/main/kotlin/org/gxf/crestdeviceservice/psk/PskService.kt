@@ -18,7 +18,8 @@ class PskService(private val pskRepository: PskRepository) {
 
     fun generateAndSetNewKeyForIdentity(identity: String): String {
         val newKey = generatePsk()
-        pskRepository.save(PreSharedKey(identity, Instant.now(), newKey))
+        val secret = pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(identity)!!.secret
+        pskRepository.save(PreSharedKey(identity, Instant.now(), newKey, secret))
         return newKey
     }
 

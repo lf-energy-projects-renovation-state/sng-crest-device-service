@@ -18,6 +18,9 @@ class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
     @Value("\${crest-device-service.database.dev-initial-psk}")
     private lateinit var initialPsk: String
 
+    @Value("\${crest-device-service.database.dev-initial-secret}")
+    private lateinit var initialSecret: String
+
     @Value("\${crest-device-service.database.dev-device-identity}")
     private lateinit var deviceIdentity: String
 
@@ -37,7 +40,7 @@ class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
         val count = pskRepository.countPsksByIdentity(deviceIdentity)
 
         if (count == 0L) {
-            pskRepository.save(PreSharedKey(deviceIdentity, Instant.now(), initialPsk))
+            pskRepository.save(PreSharedKey(deviceIdentity, Instant.now(), initialPsk, initialSecret))
         }
     }
 }
