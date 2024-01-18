@@ -14,7 +14,14 @@ class PskService(private val pskRepository: PskRepository) {
     }
 
     fun getCurrentPsk(identity: String) =
-            pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(identity)?.preSharedKey
+        pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(identity)?.preSharedKey
+
+    fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
+        if (pskRepository.countPsksByIdentity(identity) != 0L) {
+            throw Exception("Key already exists for identity. Key cannot be overridden")
+        }
+        pskRepository.save(PreSharedKey(identity, Instant.now(), psk, secret))
+    }
 
     fun generateAndSetNewKeyForIdentity(identity: String): String {
         val newKey = generatePsk()
@@ -30,6 +37,7 @@ class PskService(private val pskRepository: PskRepository) {
     private fun generatePsk(): String {
         val secureRandom = SecureRandom.getInstanceStrong()
 
-        return secureRandom.ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length).toArray().fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
+        return secureRandom.ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length).toArray()
+            .fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
     }
 }

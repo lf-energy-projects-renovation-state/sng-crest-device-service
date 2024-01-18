@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -45,7 +46,7 @@ class MessageHandlingTest {
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
 
         val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.topicName)
-        val response = testRestTemplate.postForEntity("/sng/1", request, String::class.java)
+        val response = testRestTemplate.postForEntity<String>("/sng/1", request)
 
         assertThat(response.body).isEqualTo("0")
 

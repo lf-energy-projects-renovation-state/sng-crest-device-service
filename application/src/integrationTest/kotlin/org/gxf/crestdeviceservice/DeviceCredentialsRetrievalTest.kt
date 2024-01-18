@@ -25,7 +25,7 @@ import java.time.Instant
 @EmbeddedKafka(
         topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
-class PreSharedKeyRetrievalTest {
+class DeviceCredentialsRetrievalTest {
 
     companion object {
         private const val IDENTITY = "1234"

@@ -11,6 +11,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.security:spring-security-core")
 
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -29,6 +30,7 @@ dependencies {
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation(libs.microsoftMsal)
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
 
     api(libs.avro)
 
