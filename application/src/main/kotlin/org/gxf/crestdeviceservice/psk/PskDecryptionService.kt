@@ -22,7 +22,7 @@ class PskDecryptionService(private val pskDecryptionConfiguration: PskDecryption
         val publicKey = pskDecryptionConfiguration.publicKey[keyRef]
             ?: throw UnknownKeyRefException("Keyref not found in configuration")
 
-        return Cipher.getInstance("RSA")
+        return Cipher.getInstance("RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING")
             .apply { init(Cipher.DECRYPT_MODE, publicKey) }
     }
 }
