@@ -1,8 +1,8 @@
-package org.gxf.crestdeviceservice.data
+package org.gxf.crestdeviceservice.psk
 
 import org.flywaydb.core.Flyway
-import org.gxf.crestdeviceservice.data.entity.PreSharedKey
-import org.gxf.crestdeviceservice.psk.PskRepository
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PskRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -12,7 +12,7 @@ import java.time.Instant
 
 @Component
 @ConditionalOnProperty(prefix = "crest-device-service.database", name = ["set-initial-psk"])
-class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
+class DevDatabaseInitCommandLineRunner(private val pskRepository: PskRepository,
                                        private val dataSourceProperties: DataSourceProperties) : CommandLineRunner {
 
     @Value("\${crest-device-service.database.dev-initial-psk}")

@@ -1,4 +1,4 @@
-package org.gxf.crestdeviceservice.psk.decryption
+package org.gxf.crestdeviceservice.psk.configuration
 
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding
 import org.springframework.core.convert.converter.Converter
@@ -7,12 +7,13 @@ import org.springframework.stereotype.Component
 import java.io.ByteArrayInputStream
 import java.security.interfaces.RSAPrivateKey
 
-
+/**
+ * Decodes a pkcs8 RSA Private key string to an object
+ */
 @Component
 @ConfigurationPropertiesBinding
 class RSAPrivateKeyConverter : Converter<String, RSAPrivateKey> {
-    override fun convert(from: String): RSAPrivateKey {
-        return RsaKeyConverters.pkcs8().convert(ByteArrayInputStream(from.toByteArray()))!!
-        
-    }
+    override fun convert(from: String): RSAPrivateKey =
+        RsaKeyConverters.pkcs8()
+            .convert(ByteArrayInputStream(from.toByteArray()))!!
 }

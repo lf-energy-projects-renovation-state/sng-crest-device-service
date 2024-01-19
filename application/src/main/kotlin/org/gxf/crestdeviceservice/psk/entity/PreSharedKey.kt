@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.gxf.crestdeviceservice.data.entity
+package org.gxf.crestdeviceservice.psk.entity
 
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.IdClass
-import org.gxf.crestdeviceservice.data.convertors.DatabaseFieldEncryptor
+import org.gxf.crestdeviceservice.psk.entity.convertors.DatabaseFieldEncryptor
 import java.time.Instant
 
 @Entity

@@ -1,4 +1,4 @@
-package org.gxf.crestdeviceservice.data.entity
+package org.gxf.crestdeviceservice.psk.entity
 
 import java.io.Serializable
 import java.time.Instant

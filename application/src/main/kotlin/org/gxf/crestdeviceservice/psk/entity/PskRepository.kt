@@ -1,7 +1,7 @@
-package org.gxf.crestdeviceservice.psk
+package org.gxf.crestdeviceservice.psk.entity
 
-import org.gxf.crestdeviceservice.data.entity.PreSharedKey
-import org.gxf.crestdeviceservice.data.entity.PreSharedKeyCompositeKey
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyCompositeKey
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 

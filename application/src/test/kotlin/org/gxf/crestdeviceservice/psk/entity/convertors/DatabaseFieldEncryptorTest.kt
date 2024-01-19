@@ -1,4 +1,4 @@
-package org.gxf.crestdeviceservice.data.convertors
+package org.gxf.crestdeviceservice.psk.entity.convertors
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

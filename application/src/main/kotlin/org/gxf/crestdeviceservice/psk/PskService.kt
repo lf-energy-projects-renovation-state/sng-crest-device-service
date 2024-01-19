@@ -1,6 +1,8 @@
 package org.gxf.crestdeviceservice.psk
 
-import org.gxf.crestdeviceservice.data.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PskRepository
+import org.gxf.crestdeviceservice.psk.exception.InitialKeySetException
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
 import java.time.Instant
@@ -18,7 +20,7 @@ class PskService(private val pskRepository: PskRepository) {
 
     fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
         if (pskRepository.countPsksByIdentity(identity) != 0L) {
-            throw Exception("Key already exists for identity. Key cannot be overridden")
+            throw InitialKeySetException("Key already exists for identity. Key cannot be overridden")
         }
         pskRepository.save(PreSharedKey(identity, Instant.now(), psk, secret))
     }

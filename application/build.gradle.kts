@@ -30,7 +30,6 @@ dependencies {
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation(libs.microsoftMsal)
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
 
     api(libs.avro)
 

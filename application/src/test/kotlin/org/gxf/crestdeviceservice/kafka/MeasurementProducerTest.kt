@@ -1,6 +1,7 @@
+package org.gxf.crestdeviceservice.kafka
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
-import org.gxf.crestdeviceservice.kafka.MeasurementProducer
 import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
 import org.gxf.sng.avro.DeviceMessage
 import org.junit.jupiter.api.BeforeEach

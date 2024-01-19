@@ -5,8 +5,8 @@
 package org.gxf.crestdeviceservice
 
 import org.assertj.core.api.Assertions.assertThat
-import org.gxf.crestdeviceservice.data.entity.PreSharedKey
-import org.gxf.crestdeviceservice.psk.PskRepository
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PskRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
