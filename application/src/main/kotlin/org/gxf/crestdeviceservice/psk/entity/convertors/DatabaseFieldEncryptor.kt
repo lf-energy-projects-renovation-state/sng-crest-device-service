@@ -1,4 +1,4 @@
-package org.gxf.crestdeviceservice.data.convertors
+package org.gxf.crestdeviceservice.psk.entity.convertors
 
 import jakarta.persistence.AttributeConverter
 import org.springframework.beans.factory.annotation.Value

@@ -5,8 +5,8 @@
 package org.gxf.crestdeviceservice
 
 import org.assertj.core.api.Assertions.assertThat
-import org.gxf.crestdeviceservice.data.entity.PreSharedKey
-import org.gxf.crestdeviceservice.psk.PskRepository
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PskRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,11 +25,12 @@ import java.time.Instant
 @EmbeddedKafka(
         topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
-class PreSharedKeyRetrievalTest {
+class DeviceCredentialsRetrievalTest {
 
     companion object {
         private const val IDENTITY = "1234"
         private const val PRE_SHARED_KEY = "1234567890123456"
+        private const val SECRET = "123456789"
     }
 
     @Autowired
@@ -40,7 +41,7 @@ class PreSharedKeyRetrievalTest {
 
     @BeforeEach
     fun setup() {
-        pskRepository.save(PreSharedKey(IDENTITY, Instant.MIN, PRE_SHARED_KEY))
+        pskRepository.save(PreSharedKey(IDENTITY, Instant.MIN, PRE_SHARED_KEY, SECRET))
     }
 
     @AfterEach
@@ -51,7 +52,7 @@ class PreSharedKeyRetrievalTest {
     @Test
     fun shouldReturnTheLatestPskWhenThereAreMoreFoundForIdentity() {
         // create second PSK for identity this one should be returned
-        pskRepository.save(PreSharedKey(IDENTITY, Instant.now(), "0000111122223333"))
+        pskRepository.save(PreSharedKey(IDENTITY, Instant.now(), "0000111122223333", SECRET))
 
         val headers = HttpHeaders().apply { add("x-device-identity", IDENTITY) }
         val result = restTemplate.exchange("/psk",

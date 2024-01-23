@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @WebMvcTest(PskController::class)
-class PreSharedKeyControllerTest {
+class DeviceCredentialsControllerTest {
 
     @Autowired
     private lateinit var mvcRequest: MockMvc

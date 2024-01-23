@@ -4,6 +4,7 @@
 
 package org.gxf.crestdeviceservice.kafka.configuration
 
+import com.alliander.sng.DeviceCredentials
 import com.gxf.utilities.kafka.avro.AvroDeserializer
 import com.gxf.utilities.kafka.avro.AvroSerializer
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -14,23 +15,27 @@ import org.springframework.boot.ssl.SslBundles
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
-import org.springframework.kafka.core.*
+import org.springframework.kafka.core.ConsumerFactory
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.core.DefaultKafkaProducerFactory
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.core.ProducerFactory
 
 
 @Configuration
 class KafkaConfiguration(private val kafkaProperties: KafkaProperties, private val sslBundles: SslBundles) {
 
     @Bean
-    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<String, DeviceMessage>): ConcurrentKafkaListenerContainerFactory<String, DeviceMessage> =
-            ConcurrentKafkaListenerContainerFactory<String, DeviceMessage>()
+    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<String, DeviceCredentials>): ConcurrentKafkaListenerContainerFactory<String, DeviceCredentials> =
+            ConcurrentKafkaListenerContainerFactory<String, DeviceCredentials>()
                     .apply { this.consumerFactory = consumerFactory }
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, DeviceMessage> =
+    fun consumerFactory(): ConsumerFactory<String, DeviceCredentials> =
             DefaultKafkaConsumerFactory(
                     kafkaProperties.buildConsumerProperties(sslBundles),
                     StringDeserializer(),
-                    AvroDeserializer(DeviceMessage.getDecoder())
+                    AvroDeserializer(DeviceCredentials.getDecoder())
             )
 
     @Bean

@@ -1,8 +1,9 @@
-package org.gxf.crestdeviceservice.data
+package org.gxf.crestdeviceservice.psk
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.flywaydb.core.Flyway
-import org.gxf.crestdeviceservice.data.entity.PreSharedKey
-import org.gxf.crestdeviceservice.psk.PskRepository
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PskRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -11,12 +12,17 @@ import org.springframework.stereotype.Component
 import java.time.Instant
 
 @Component
-@ConditionalOnProperty(prefix = "crest-device-service.database", name = ["set-initial-psk"])
-class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
+@ConditionalOnProperty(name = ["crest-device-service.database.set-initial-psk"], havingValue = "true")
+class DevDatabaseInitCommandLineRunner(private val pskRepository: PskRepository,
                                        private val dataSourceProperties: DataSourceProperties) : CommandLineRunner {
+
+    private val logger = KotlinLogging.logger {}
 
     @Value("\${crest-device-service.database.dev-initial-psk}")
     private lateinit var initialPsk: String
+
+    @Value("\${crest-device-service.database.dev-initial-secret}")
+    private lateinit var initialSecret: String
 
     @Value("\${crest-device-service.database.dev-device-identity}")
     private lateinit var deviceIdentity: String
@@ -37,7 +43,8 @@ class CommandLineRunnerDevDatabaseInit(private val pskRepository: PskRepository,
         val count = pskRepository.countPsksByIdentity(deviceIdentity)
 
         if (count == 0L) {
-            pskRepository.save(PreSharedKey(deviceIdentity, Instant.now(), initialPsk))
+            logger.warn { "Creating Pre Shared Key for identity: $deviceIdentity" }
+            pskRepository.save(PreSharedKey(deviceIdentity, Instant.now(), initialPsk, initialSecret))
         }
     }
 }
