@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/sng")
-class CoapMessageController(private val messageService: MessageService, private val downlinkService: DownlinkService) {
+class MessageController(private val messageService: MessageService, private val downlinkService: DownlinkService) {
 
     private val logger = KotlinLogging.logger {}
 

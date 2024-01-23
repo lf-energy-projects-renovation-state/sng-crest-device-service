@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.gxf.crestdeviceservice.coap
 
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -16,11 +20,9 @@ class DownlinkService(private val pskService: PskService) {
 
             val newKey = pskService.generateAndSetNewKeyForIdentity(identity)
 
-            return constructSetPskCommand(newKey)
+            return PskCommandCreator.createPskSetCommand(newKey)
         }
 
         return "0"
     }
-
-    private fun constructSetPskCommand(key: String) = "PSK:${key};PSK:${key}SET"
 }

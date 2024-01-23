@@ -16,7 +16,7 @@ class PskService(private val pskRepository: PskRepository) {
     }
 
     fun getCurrentPsk(identity: String) =
-        pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(identity)?.preSharedKey
+            pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(identity)?.preSharedKey
 
     fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
         if (pskRepository.countPsksByIdentity(identity) != 0L) {
@@ -25,11 +25,10 @@ class PskService(private val pskRepository: PskRepository) {
         pskRepository.save(PreSharedKey(identity, Instant.now(), psk, secret))
     }
 
-    fun generateAndSetNewKeyForIdentity(identity: String): String {
+    fun generateAndSetNewKeyForIdentity(identity: String): PreSharedKey {
         val newKey = generatePsk()
         val secret = pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(identity)!!.secret
-        pskRepository.save(PreSharedKey(identity, Instant.now(), newKey, secret))
-        return newKey
+        return pskRepository.save(PreSharedKey(identity, Instant.now(), newKey, secret))
     }
 
     fun hasDefaultKey(identity: String): Boolean {
@@ -40,6 +39,6 @@ class PskService(private val pskRepository: PskRepository) {
         val secureRandom = SecureRandom.getInstanceStrong()
 
         return secureRandom.ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length).toArray()
-            .fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
+                .fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
     }
 }

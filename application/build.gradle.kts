@@ -31,6 +31,8 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation(libs.microsoftMsal)
 
+    implementation(libs.commonsCodec)
+
     api(libs.avro)
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
