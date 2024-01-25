@@ -25,6 +25,6 @@ class PskCommandCreatorTest {
         val result = PskCommandCreator.createPskSetCommand(preSharedKey)
 
         // Psk command is formatted as: PSK:[Key][Hash];PSK:[Key][Hash]SET
-        Assertions.assertThat(result).isEqualTo("PSK:${key}${expectedHash};PSK:${key}${expectedHash}SET!")
+        Assertions.assertThat(result).isEqualTo("!PSK:${key}${expectedHash};PSK:${key}${expectedHash}SET")
     }
 }
