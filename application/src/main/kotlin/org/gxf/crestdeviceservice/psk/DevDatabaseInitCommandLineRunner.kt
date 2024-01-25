@@ -1,5 +1,6 @@
 package org.gxf.crestdeviceservice.psk
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.flywaydb.core.Flyway
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PskRepository
@@ -11,9 +12,11 @@ import org.springframework.stereotype.Component
 import java.time.Instant
 
 @Component
-@ConditionalOnProperty(prefix = "crest-device-service.database", name = ["set-initial-psk"])
+@ConditionalOnProperty(name = ["crest-device-service.database.set-initial-psk"], havingValue = "true")
 class DevDatabaseInitCommandLineRunner(private val pskRepository: PskRepository,
                                        private val dataSourceProperties: DataSourceProperties) : CommandLineRunner {
+
+    private val logger = KotlinLogging.logger {}
 
     @Value("\${crest-device-service.database.dev-initial-psk}")
     private lateinit var initialPsk: String
@@ -40,6 +43,7 @@ class DevDatabaseInitCommandLineRunner(private val pskRepository: PskRepository,
         val count = pskRepository.countPsksByIdentity(deviceIdentity)
 
         if (count == 0L) {
+            logger.warn { "Creating Pre Shared Key for identity: $deviceIdentity" }
             pskRepository.save(PreSharedKey(deviceIdentity, Instant.now(), initialPsk, initialSecret))
         }
     }
