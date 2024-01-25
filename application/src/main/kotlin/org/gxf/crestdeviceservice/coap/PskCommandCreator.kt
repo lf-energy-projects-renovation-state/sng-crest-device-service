@@ -13,6 +13,6 @@ object PskCommandCreator {
         val key = preSharedKey.preSharedKey
         val secret = preSharedKey.secret
         val hash = DigestUtils.sha256Hex("$secret$key")
-        return "PSK:${key}${hash};PSK:${key}${hash}SET!"
+        return "!PSK:${key}${hash};PSK:${key}${hash}SET"
     }
 }
