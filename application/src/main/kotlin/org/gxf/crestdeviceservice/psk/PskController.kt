@@ -1,6 +1,7 @@
 package org.gxf.crestdeviceservice.psk
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.gxf.crestdeviceservice.metrics.MetricService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestHeader
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/psk")
-class PskController(private val pskService: PskService) {
+class PskController(private val pskService: PskService, private val metricService: MetricService) {
 
     private val logger = KotlinLogging.logger {}
 
@@ -19,6 +20,7 @@ class PskController(private val pskService: PskService) {
 
         if (currentPsk == null) {
             logger.error { "No psk found for device $identity" }
+            metricService.incrementPskInvalidCounter()
             return ResponseEntity.notFound().build()
         }
 
