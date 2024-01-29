@@ -1,5 +1,6 @@
 package org.gxf.crestdeviceservice
 
+import org.gxf.crestdeviceservice.metrics.MetricService
 import org.gxf.crestdeviceservice.psk.PskController
 import org.gxf.crestdeviceservice.psk.PskService
 import org.junit.jupiter.api.Test
@@ -20,6 +21,9 @@ class DeviceCredentialsControllerTest {
 
     @MockBean
     private lateinit var pskService: PskService
+
+    @MockBean
+    private lateinit var metricService: MetricService
 
     @Test
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
