@@ -1,7 +1,9 @@
 package org.gxf.crestdeviceservice.psk
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.gxf.crestdeviceservice.psk.configuration.PskDecryptionConfiguration
+import org.gxf.crestdeviceservice.psk.exception.UnknownKeyRefException
 import org.junit.jupiter.api.Test
 
 import java.security.KeyPair
@@ -33,6 +35,26 @@ class PskDecryptionServiceTest {
         val decryptedSecret = decryptionService.decryptSecret(encryptedSecret, keyRef)
 
         assertThat(decryptedSecret).isEqualTo(secret)
+    }
+
+    @Test
+    fun decryptSecretUnknownRef() {
+        val keyRef = "1"
+        val secret = "12345"
+
+        // Create keys and encrypt the test secret
+        val keyPair = generateKeyPair()
+        val encryptedSecret = createSecret(secret, keyPair.public)
+
+        // Create the testing decryption service
+        val decryptionService = PskDecryptionService(
+            PskDecryptionConfiguration(
+                mapOf(keyRef to keyPair.private as RSAPrivateKey)
+            )
+        )
+
+        assertThatThrownBy { decryptionService.decryptSecret(encryptedSecret, "2") }
+            .isInstanceOf(UnknownKeyRefException::class.java)
     }
 
     private fun generateKeyPair(): KeyPair =
