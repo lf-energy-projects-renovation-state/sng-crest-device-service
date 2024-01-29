@@ -11,10 +11,10 @@ class MetricService(meterRegistry: MeterRegistry) {
         const val METRIC_PREFIX = "deviceservice"
     }
 
-    private val pskInvalidCounter = Counter
-            .builder("$METRIC_PREFIX.psk.incorrect")
-            .description("Counts the number of times a device tried to connect with a wrong/unknown PSK")
+    private val identityInvalidCounter = Counter
+            .builder("$METRIC_PREFIX.psk.notfound")
+            .description("Counts the number of times a device tried to connect with a wrong/unknown Identity")
             .register(meterRegistry)
 
-    fun incrementPskInvalidCounter() = pskInvalidCounter.increment()
+    fun incrementIdentityInvalidCounter() = identityInvalidCounter.increment()
 }

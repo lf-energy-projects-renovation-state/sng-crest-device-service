@@ -20,7 +20,7 @@ class PskController(private val pskService: PskService, private val metricServic
 
         if (currentPsk == null) {
             logger.error { "No psk found for device $identity" }
-            metricService.incrementPskInvalidCounter()
+            metricService.incrementIdentityInvalidCounter()
             return ResponseEntity.notFound().build()
         }
 
