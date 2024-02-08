@@ -16,7 +16,7 @@ class PskService(private val pskRepository: PskRepository) {
     }
 
     fun getCurrentPsk(identity: String) =
-            pskRepository.findFirstByIdentityOrderByVersionDesc(identity)?.preSharedKey
+            pskRepository.findFirstByIdentityOrderByRevisionDesc(identity)?.preSharedKey
 
     fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
         if (pskRepository.countPsksByIdentity(identity) != 0L) {
@@ -27,8 +27,8 @@ class PskService(private val pskRepository: PskRepository) {
 
     fun generateAndSetNewKeyForIdentity(identity: String): PreSharedKey {
         val newKey = generatePsk()
-        val previousPSK = pskRepository.findFirstByIdentityOrderByVersionDesc(identity)!!
-        val newVersion = previousPSK.version + 1
+        val previousPSK = pskRepository.findFirstByIdentityOrderByRevisionDesc(identity)!!
+        val newVersion = previousPSK.revision + 1
         return pskRepository.save(PreSharedKey(identity, newVersion, Instant.now(), newKey, previousPSK.secret))
     }
 
