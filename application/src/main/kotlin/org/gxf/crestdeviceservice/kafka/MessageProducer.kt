@@ -13,14 +13,14 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
-class MeasurementProducer(
+class MessageProducer(
         private val kafkaTemplate: KafkaTemplate<String, DeviceMessage>,
         private val kafkaProducerProperties: KafkaProducerProperties
 ) {
     private val logger = KotlinLogging.logger {}
 
     fun produceMessage(message: JsonNode) {
-        logger.info { "Producing: ${message.get("ID")}" }
+        logger.info { "Producing message for: ${message.get("ID")}" }
         kafkaTemplate.send(kafkaProducerProperties.topicName, DeviceMessage().apply {
             deviceId = message.get("ID").toString()
             timestamp = Instant.now().toEpochMilli()
