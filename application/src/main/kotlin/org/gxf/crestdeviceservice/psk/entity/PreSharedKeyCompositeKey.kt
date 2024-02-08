@@ -4,6 +4,6 @@ import java.io.Serializable
 import java.time.Instant
 
 class PreSharedKeyCompositeKey(val identity: String?,
-                               val revisionTime: Instant?) : Serializable {
+                               val version: Int?) : Serializable {
     constructor() : this(null, null)
 }

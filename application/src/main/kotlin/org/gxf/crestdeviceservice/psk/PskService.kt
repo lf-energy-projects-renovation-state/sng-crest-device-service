@@ -16,19 +16,20 @@ class PskService(private val pskRepository: PskRepository) {
     }
 
     fun getCurrentPsk(identity: String) =
-            pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(identity)?.preSharedKey
+            pskRepository.findFirstByIdentityOrderByVersionDesc(identity)?.preSharedKey
 
     fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
         if (pskRepository.countPsksByIdentity(identity) != 0L) {
             throw InitialKeySetException("Key already exists for identity. Key cannot be overridden")
         }
-        pskRepository.save(PreSharedKey(identity, Instant.now(), psk, secret))
+        pskRepository.save(PreSharedKey(identity, 0, Instant.now(), psk, secret))
     }
 
     fun generateAndSetNewKeyForIdentity(identity: String): PreSharedKey {
         val newKey = generatePsk()
-        val secret = pskRepository.findFirstByIdentityOrderByRevisionTimeDesc(identity)!!.secret
-        return pskRepository.save(PreSharedKey(identity, Instant.now(), newKey, secret))
+        val previousPSK = pskRepository.findFirstByIdentityOrderByVersionDesc(identity)!!
+        val newVersion = previousPSK.version + 1
+        return pskRepository.save(PreSharedKey(identity, newVersion, Instant.now(), newKey, previousPSK.secret))
     }
 
     fun hasDefaultKey(identity: String): Boolean {
