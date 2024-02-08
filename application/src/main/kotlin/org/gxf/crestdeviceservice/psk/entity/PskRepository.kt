@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey> {
 
-    fun findFirstByIdentityOrderByRevisionTimeDesc(identity: String): PreSharedKey?
+    fun findFirstByIdentityOrderByRevisionDesc(identity: String): PreSharedKey?
 
     fun countPsksByIdentity(identity: String): Long
 }

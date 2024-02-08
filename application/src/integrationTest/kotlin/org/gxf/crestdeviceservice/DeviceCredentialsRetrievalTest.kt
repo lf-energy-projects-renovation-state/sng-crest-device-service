@@ -41,7 +41,7 @@ class DeviceCredentialsRetrievalTest {
 
     @BeforeEach
     fun setup() {
-        pskRepository.save(PreSharedKey(IDENTITY, Instant.MIN, PRE_SHARED_KEY, SECRET))
+        pskRepository.save(PreSharedKey(IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY, SECRET))
     }
 
     @AfterEach
@@ -52,7 +52,7 @@ class DeviceCredentialsRetrievalTest {
     @Test
     fun shouldReturnTheLatestPskWhenThereAreMoreFoundForIdentity() {
         // create second PSK for identity this one should be returned
-        pskRepository.save(PreSharedKey(IDENTITY, Instant.now(), "0000111122223333", SECRET))
+        pskRepository.save(PreSharedKey(IDENTITY, 1, Instant.MIN, "0000111122223333", SECRET))
 
         val headers = HttpHeaders().apply { add("x-device-identity", IDENTITY) }
         val result = restTemplate.exchange("/psk",

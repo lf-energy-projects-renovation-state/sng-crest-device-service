@@ -43,7 +43,7 @@ class CoapMessageHandlingTest {
 
     @BeforeEach
     fun setup() {
-        pskRepository.save(PreSharedKey(IDENTITY, Instant.MIN, PRE_SHARED_KEY, SECRET))
+        pskRepository.save(PreSharedKey(IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY, SECRET))
     }
 
     @AfterEach
@@ -64,7 +64,7 @@ class CoapMessageHandlingTest {
     @Test
     fun shouldNotReturnADownLinkContainingAPskSetCommandWhenTheKeyHasNotChangedYet() {
         // Set second PreSharedKey for device
-        pskRepository.save(PreSharedKey(IDENTITY, Instant.now(), PRE_SHARED_KEY, SECRET))
+        pskRepository.save(PreSharedKey(IDENTITY,1, Instant.now(), PRE_SHARED_KEY, SECRET))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)

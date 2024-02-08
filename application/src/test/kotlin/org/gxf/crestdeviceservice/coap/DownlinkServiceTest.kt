@@ -36,7 +36,7 @@ class DownlinkServiceTest {
         val expectedHash = "ad165b11320bc91501ab08613cc3a48a62a6caca4d5c8b14ca82cc313b3b96cd"
 
         `when`(pskService.hasDefaultKey(any())).thenReturn(true)
-        `when`(pskService.generateAndSetNewKeyForIdentity(any())).thenReturn(PreSharedKey("identity", Instant.now(), expectedKey, "secret"))
+        `when`(pskService.generateAndSetNewKeyForIdentity(any())).thenReturn(PreSharedKey("identity", 0, Instant.now(), expectedKey, "secret"))
 
         val result = downLinkService.getDownlinkForIdentity("identity")
 

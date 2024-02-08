@@ -5,11 +5,11 @@
 package org.gxf.crestdeviceservice.coap
 
 import com.fasterxml.jackson.databind.JsonNode
-import org.gxf.crestdeviceservice.kafka.MeasurementProducer
+import org.gxf.crestdeviceservice.kafka.MessageProducer
 import org.springframework.stereotype.Service
 
 @Service
-class MessageService(private val messageProducer: MeasurementProducer) {
+class MessageService(private val messageProducer: MessageProducer) {
     fun handleMessage(message: JsonNode) {
         messageProducer.produceMessage(message)
     }

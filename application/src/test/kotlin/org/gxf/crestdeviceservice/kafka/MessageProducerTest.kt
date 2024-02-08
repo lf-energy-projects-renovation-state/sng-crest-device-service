@@ -16,7 +16,7 @@ import org.mockito.kotlin.check
 import org.springframework.kafka.core.KafkaTemplate
 
 @ExtendWith(MockitoExtension::class)
-class MeasurementProducerTest {
+class MessageProducerTest {
 
     @Mock
     private lateinit var mockedKafkaTemplate: KafkaTemplate<String, DeviceMessage>
@@ -25,7 +25,7 @@ class MeasurementProducerTest {
     private lateinit var mockedKafkaProducerProperties: KafkaProducerProperties
 
     @InjectMocks
-    private lateinit var measurementProducer: MeasurementProducer
+    private lateinit var messageProducer: MessageProducer
 
     @BeforeEach
     fun setup() {
@@ -39,7 +39,7 @@ class MeasurementProducerTest {
                 "ID":12345
             }
         """)
-        measurementProducer.produceMessage(jsonNode)
+        messageProducer.produceMessage(jsonNode)
         verify(mockedKafkaTemplate).send(
                 check { assertThat(it).isEqualTo("topic") }, check { assertThat(it.payload).isEqualTo(jsonNode.toString()) })
     }

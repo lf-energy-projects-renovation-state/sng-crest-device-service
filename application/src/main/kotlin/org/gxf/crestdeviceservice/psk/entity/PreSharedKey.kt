@@ -14,7 +14,8 @@ import java.time.Instant
 @Entity
 @IdClass(PreSharedKeyCompositeKey::class)
 class PreSharedKey(@Id val identity: String,
-                   @Id val revisionTime: Instant,
+                   @Id val revision: Int,
+                   val revisionTime: Instant,
                    @Convert(converter = DatabaseFieldEncryptor::class) val preSharedKey: String,
                    @Convert(converter = DatabaseFieldEncryptor::class) val secret: String
 )
