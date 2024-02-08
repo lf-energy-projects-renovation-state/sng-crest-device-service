@@ -1,9 +1,3 @@
 spring:
   flyway:
-    locations: classpath:db/migration,classpath:db/migration/test-data
-
-crest-device-service:
-  database:
-    # This key was used to encrypt the data in db/migration/test-data/V3__test_data.sql
-    # If this is changed the test data also needs to be updated.
-    encryption-key: "super-secret-key"
+    locations: classpath:db/migration,classpath:db/test-data

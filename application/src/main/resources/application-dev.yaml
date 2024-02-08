@@ -14,6 +14,10 @@ server:
   port: 9000
 
 crest-device-service:
+  database:
+    # This key was used to encrypt the data in db/migration/test-data/V3__test_data.sql
+    # If this is changed the test data also needs to be updated.
+    encryption-key: "super-secret-key"
   kafka:
     pre-shared-key-consumer:
       id: "gxf-sng-crest-device-service"
