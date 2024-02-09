@@ -5,6 +5,7 @@
 package org.gxf.crestdeviceservice.coap
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.transaction.Transactional
 import org.gxf.crestdeviceservice.psk.PskService
 import org.springframework.stereotype.Service
 
@@ -13,6 +14,7 @@ class DownlinkService(private val pskService: PskService) {
 
     private val logger = KotlinLogging.logger {}
 
+    @Transactional
     fun getDownlinkForIdentity(identity: String): String {
 
         if (pskService.hasDefaultKey(identity)) {

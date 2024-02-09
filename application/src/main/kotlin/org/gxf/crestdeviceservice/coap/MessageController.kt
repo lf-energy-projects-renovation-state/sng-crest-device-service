@@ -16,6 +16,12 @@ class MessageController(private val messageService: MessageService, private val 
 
     private val logger = KotlinLogging.logger {}
 
+    private val locks: MutableMap<String, Any> = mutableMapOf()
+
+    /**
+     * This endpoint handles incoming crest device messages.
+     * Responses are generated synchronously to avoid sending the same downlink twice.
+     */
     @PostMapping("/{identity}")
     fun post(@NonNull @PathVariable identity: String, @NonNull @RequestBody body: JsonNode): ResponseEntity<String> {
 
@@ -23,6 +29,12 @@ class MessageController(private val messageService: MessageService, private val 
         messageService.handleMessage(body)
         logger.debug { "Processed message" }
 
-        return ResponseEntity.ok(downlinkService.getDownlinkForIdentity(identity))
+        synchronized(lock(identity)) {
+            return ResponseEntity.ok(downlinkService.getDownlinkForIdentity(identity))
+        }
     }
+
+    @Synchronized
+    private fun lock(substationIdentification: String) = locks.computeIfAbsent(substationIdentification) { _ -> Any() }
+
 }
