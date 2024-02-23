@@ -23,24 +23,33 @@ class PskServiceTest {
     private lateinit var pskService: PskService
 
     @Test
-    fun needsKeyChange() {
+    fun needsKeyChangeSetInitialPskTrueAnd1Identity() {
         // If change initial psk is true, and we only have one key the key should be changed
         `when`(pskRepository.countPsksByIdentity(any())).thenReturn(1L)
         `when`(pskConfiguration.changeInitialPsk).thenReturn(true)
 
         assertThat(pskService.needsKeyChange("123")).isTrue()
+    }
 
-        // If change initial psk we shouldn't change the key
+    @Test
+    fun needsKeyChangeSetInitialPskFalseAnd1Identity() {
+        // If change initial psk is false we shouldn't change the key
         `when`(pskConfiguration.changeInitialPsk).thenReturn(false)
 
         assertThat(pskService.needsKeyChange("123")).isFalse()
+    }
 
+    @Test
+    fun needsKeyChangeSetInitialPskTrueAnd0Identity() {
         // If we have 0 keys we shouldn't generate a new key
         `when`(pskRepository.countPsksByIdentity(any())).thenReturn(0L)
         `when`(pskConfiguration.changeInitialPsk).thenReturn(true)
 
         assertThat(pskService.needsKeyChange("123")).isFalse()
+    }
 
+    @Test
+    fun needsKeyChangeSetInitialPskTrueAnd2Identity() {
         // If we have more than one key we shouldn't generate a new key
         `when`(pskRepository.countPsksByIdentity(any())).thenReturn(2L)
         `when`(pskConfiguration.changeInitialPsk).thenReturn(true)
