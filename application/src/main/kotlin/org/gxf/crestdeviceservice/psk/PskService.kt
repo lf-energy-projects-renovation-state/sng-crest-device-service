@@ -8,7 +8,7 @@ import java.security.SecureRandom
 import java.time.Instant
 
 @Service
-class PskService(private val pskRepository: PskRepository) {
+class PskService(private val pskRepository: PskRepository, private val pskConfiguration: PskConfiguration) {
 
     companion object {
         private const val KEY_LENGTH = 16L
@@ -16,7 +16,7 @@ class PskService(private val pskRepository: PskRepository) {
     }
 
     fun getCurrentPsk(identity: String) =
-            pskRepository.findFirstByIdentityOrderByRevisionDesc(identity)?.preSharedKey
+        pskRepository.findFirstByIdentityOrderByRevisionDesc(identity)?.preSharedKey
 
     fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
         if (pskRepository.countPsksByIdentity(identity) != 0L) {
@@ -32,14 +32,15 @@ class PskService(private val pskRepository: PskRepository) {
         return pskRepository.save(PreSharedKey(identity, newVersion, Instant.now(), newKey, previousPSK.secret))
     }
 
-    fun hasDefaultKey(identity: String): Boolean {
-        return pskRepository.countPsksByIdentity(identity) == 1L
-    }
+    fun needsKeyChange(identity: String) =
+        pskConfiguration.changeInitialPsk &&
+                pskRepository.countPsksByIdentity(identity) == 1L
+
 
     private fun generatePsk(): String {
         val secureRandom = SecureRandom.getInstanceStrong()
 
         return secureRandom.ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length).toArray()
-                .fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
+            .fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
     }
 }

@@ -17,7 +17,7 @@ class DownlinkService(private val pskService: PskService) {
     @Transactional
     fun getDownlinkForIdentity(identity: String): String {
 
-        if (pskService.hasDefaultKey(identity)) {
+        if (pskService.needsKeyChange(identity)) {
             logger.info { "Device $identity has default key creating new key" }
 
             val newKey = pskService.generateAndSetNewKeyForIdentity(identity)
