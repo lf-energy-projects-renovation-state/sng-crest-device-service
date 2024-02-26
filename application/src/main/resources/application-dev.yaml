@@ -23,9 +23,9 @@ crest-device-service:
       id: "gxf-sng-crest-device-service"
       topic-name: "pre-shared-key"
     message-producer:
-      id: "gxf-sng-crest-device-service"
       topic-name: "crest-message"
   psk:
+    change-initial-psk: false
     decryption:
       private-key:
         1: |-
