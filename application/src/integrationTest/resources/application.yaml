@@ -30,6 +30,7 @@ crest-device-service:
       topic-name: "crest-message"
   psk:
     decryption:
+      method: "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING"
       private-key:
         1: |-
           -----BEGIN PRIVATE KEY-----
