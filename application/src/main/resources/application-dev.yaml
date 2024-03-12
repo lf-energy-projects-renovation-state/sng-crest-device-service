@@ -27,6 +27,7 @@ crest-device-service:
   psk:
     change-initial-psk: false
     decryption:
+      method: "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING"
       private-key:
         1: |-
           -----BEGIN PRIVATE KEY-----
