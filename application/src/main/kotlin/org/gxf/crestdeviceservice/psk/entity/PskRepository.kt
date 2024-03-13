@@ -22,6 +22,15 @@ interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey>
         """)
     fun findLatestPsk(identity: String): PreSharedKey?
 
+    @Query(
+        """
+        select psk from PreSharedKey psk 
+        where psk.identity = ?1 
+        order by psk.revision asc
+        """
+    )
+    fun findOldestPsk(identity: String): PreSharedKey?
+
     @Query("""
         select count(psk) from PreSharedKey psk 
         where psk.identity = ?1

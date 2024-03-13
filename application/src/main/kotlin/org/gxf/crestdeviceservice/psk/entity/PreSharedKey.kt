@@ -4,12 +4,7 @@
 
 package org.gxf.crestdeviceservice.psk.entity
 
-import jakarta.persistence.Convert
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.Id
-import jakarta.persistence.IdClass
+import jakarta.persistence.*
 import org.gxf.crestdeviceservice.psk.entity.convertors.DatabaseFieldEncryptor
 import java.time.Instant
 
@@ -27,5 +22,6 @@ class PreSharedKey(
 enum class PreSharedKeyStatus {
     ACTIVE,
     INACTIVE,
+    PENDING,
     FAILED
 }

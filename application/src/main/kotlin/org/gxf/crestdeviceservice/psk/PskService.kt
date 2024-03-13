@@ -37,9 +37,19 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         )
     }
 
-    fun needsKeyChange(identity: String) =
+    fun needsKeyChange(identity: String): Boolean =
         pskConfiguration.changeInitialPsk &&
-                pskRepository.countActiveAndInactivePSKs(identity) == 1L
+                (pskRepository.countActiveAndInactivePSKs(identity) == 1L ||
+                        multiplePsksWithOldestPskActiveAndNoneInProgress(identity))
+
+    fun multiplePsksWithOldestPskActiveAndNoneInProgress(identity: String) =
+        pskRepository.countActiveAndInactivePSKs(identity) > 1L &&
+                pskRepository.findOldestPsk(identity)?.status?.equals(PreSharedKeyStatus.ACTIVE) == true &&
+                anyPsksHaveStatus(PreSharedKeyStatus.INACTIVE) &&
+                !anyPsksHaveStatus(PreSharedKeyStatus.PENDING)
+
+    fun anyPsksHaveStatus(status: PreSharedKeyStatus) =
+        pskRepository.findAll().any { psk -> psk.status == status }
 
     fun setLastKeyAsActive(identity: String) =
         setStatus(identity, PreSharedKeyStatus.ACTIVE)
