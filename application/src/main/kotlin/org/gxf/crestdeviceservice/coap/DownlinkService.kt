@@ -8,9 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.gxf.crestdeviceservice.psk.PskService
-import org.springframework.lang.NonNull
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.RequestBody
 
 @Service
 class DownlinkService(private val pskService: PskService) {
@@ -33,7 +32,7 @@ class DownlinkService(private val pskService: PskService) {
         val urcs = body[URC_FIELD].map { it.toString() }
 
         if (pskService.needsKeyChange(identity)) {
-            logger.info { "Device $identity has default key creating new key" }
+            logger.info { "Creating new key for device $identity" }
 
             val newKey = pskService.generateAndSetNewKeyForIdentity(identity)
 
@@ -42,9 +41,11 @@ class DownlinkService(private val pskService: PskService) {
         }
 
         if(urcs.contains(URC_PSK_SUCCESS)) {
-            pskService.setLastKeyAsActive(identity)
+            pskService.setLastKeyStatus(identity, PreSharedKeyStatus.ACTIVE)
+            // todo oude psk op inactive zetten
         } else if(urcs.contains(URC_PSK_ERROR)) {
-            pskService.setLastKeyAsFailed(identity)
+            pskService.setLastKeyStatus(identity, PreSharedKeyStatus.INVALID)
+            // todo alert naar maki?
         }
 
         return RESPONSE_SUCCESS

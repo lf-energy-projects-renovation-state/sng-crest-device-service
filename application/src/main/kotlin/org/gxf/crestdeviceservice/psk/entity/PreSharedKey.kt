@@ -23,5 +23,5 @@ enum class PreSharedKeyStatus {
     ACTIVE,
     INACTIVE,
     PENDING,
-    FAILED
+    INVALID
 }
