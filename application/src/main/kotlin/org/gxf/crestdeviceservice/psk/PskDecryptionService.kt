@@ -14,15 +14,15 @@ class PskDecryptionService(private val pskDecryptionConfiguration: PskDecryption
         val decodedSecret: ByteArray = Base64.getDecoder().decode(encryptedSecret)
 
         return cypherForKeyRef(keyRef)
-            .doFinal(decodedSecret)
-            .decodeToString()
+                .doFinal(decodedSecret)
+                .decodeToString()
     }
 
     private fun cypherForKeyRef(keyRef: String): Cipher {
         val privateKey = pskDecryptionConfiguration.privateKey[keyRef]
-            ?: throw UnknownKeyRefException("Keyref not found in configuration")
+                ?: throw UnknownKeyRefException("Keyref not found in configuration")
 
-        return Cipher.getInstance("RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING")
-            .apply { init(Cipher.DECRYPT_MODE, privateKey) }
+        return Cipher.getInstance(pskDecryptionConfiguration.method)
+                .apply { init(Cipher.DECRYPT_MODE, privateKey) }
     }
 }
