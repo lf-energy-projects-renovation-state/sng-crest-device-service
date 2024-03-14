@@ -34,9 +34,8 @@ interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey>
     @Query("""
         select count(psk) from PreSharedKey psk 
         where psk.identity = ?1
-         and (psk.status = org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus.ACTIVE 
-           or psk.status = org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus.INACTIVE)
-        order by psk.revision desc
+         and (psk.status = 'ACTIVE'
+           or psk.status = 'INACTIVE')
         """)
     fun countActiveAndInactivePSKs(identity: String): Long
 }
