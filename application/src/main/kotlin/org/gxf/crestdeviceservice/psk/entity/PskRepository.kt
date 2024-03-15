@@ -10,7 +10,7 @@ interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey>
     @Query("""
         select psk from  PreSharedKey psk 
         where psk.identity = ?1 
-          and psk.status = org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus.ACTIVE 
+          and psk.status = 'ACTIVE'
         order by psk.revision desc
         """)
     fun findLatestActivePsk(identity: String): PreSharedKey?
