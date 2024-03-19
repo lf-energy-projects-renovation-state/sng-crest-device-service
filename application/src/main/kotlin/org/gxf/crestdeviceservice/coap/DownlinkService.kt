@@ -23,26 +23,33 @@ class DownlinkService(private val pskService: PskService) {
     private val logger = KotlinLogging.logger {}
 
     @Transactional
-    fun getDownlinkForIdentity(identity: String, body: JsonNode): String {
-
-        // Retrieve URCs from the message body
-        val urc = body[URC_FIELD]
-            .filter { it.isTextual }
-            .map { it.asText() }
-
+    fun getDownlinkForIdentity(identity: String, messageBody: JsonNode): String {
         if (pskService.needsKeyChange(identity)) {
             logger.info { "Creating new key for device $identity" }
 
             val newKey = pskService.generateAndSetNewKeyForIdentity(identity)
 
-            // After setting a new psk the device will send a new message if the psk set was successful
+            // After setting a new psk, the device will send a new message if the psk set was successful
             return PskCommandCreator.createPskSetCommand(newKey)
         }
 
+        interpretURCInMessage(identity, messageBody)
+
+        return RESPONSE_SUCCESS
+    }
+
+    private fun interpretURCInMessage(identity: String, messageBody: JsonNode) {
+        // Retrieve URCs from the message body
+        val urc = messageBody[URC_FIELD]
+            .filter { it.isTextual }
+            .map { it.asText() }
+
         val pendingPsk = pskService.getCurrentPskWithStatus(identity, PreSharedKeyStatus.PENDING)
         check(pendingPsk != null) { "There is no known pending PSK for id $identity" }
+
         val successMessage = PskCommandCreator.createPskSetCommand(pendingPsk)
         val errorMessage = PskCommandCreator.createPskErrorCommand(pendingPsk)
+
         when {
             urc.contains(successMessage) -> {
                 pskService.changeActiveKey(identity)
@@ -61,7 +68,5 @@ class DownlinkService(private val pskService: PskService) {
                 error("Cannot interpret this URC: $urc")
             }
         }
-
-        return RESPONSE_SUCCESS
     }
 }
