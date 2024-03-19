@@ -23,7 +23,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         pskRepository.findLatestActivePsk(identity)?.preSharedKey
 
     fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
-        if (pskRepository.countActiveAndInactivePSKs(identity) != 0L) {
+        if (pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {
             throw InitialKeySetException("Key already exists for identity. Key cannot be overridden")
         }
         pskRepository.save(PreSharedKey(identity, 0, Instant.now(), psk, secret, PreSharedKeyStatus.ACTIVE))
@@ -47,18 +47,8 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     fun needsKeyChange(identity: String): Boolean =
         pskConfiguration.changeInitialPsk &&
-                (pskRepository.countActiveAndInactivePSKs(identity) == 1L ||
-                        multiplePsksWithOldestPskActiveAndNoneInProgress(identity))
-
-    // todo moet het echt de oudste zijn die active is?
-    fun multiplePsksWithOldestPskActiveAndNoneInProgress(identity: String) =
-        pskRepository.countActiveAndInactivePSKs(identity) > 1L &&
-                pskRepository.findOldestPsk(identity)?.status?.equals(PreSharedKeyStatus.ACTIVE) == true &&
-                anyPsksHaveStatus(PreSharedKeyStatus.INACTIVE) &&
-                !anyPsksHaveStatus(PreSharedKeyStatus.PENDING)
-
-    fun anyPsksHaveStatus(status: PreSharedKeyStatus) =
-        pskRepository.findAll().any { psk -> psk.status == status }
+                pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.ACTIVE) >= 1L &&
+                pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.PENDING) == 0L
 
     fun setLastKeyStatus(identity: String, status: PreSharedKeyStatus) {
         val psk = pskRepository.findLatestPsk(identity)

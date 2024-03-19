@@ -34,8 +34,7 @@ interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey>
     @Query("""
         select count(psk) from PreSharedKey psk 
         where psk.identity = ?1
-         and (psk.status = 'ACTIVE'
-           or psk.status = 'INACTIVE')
+         and psk.status = ?2
         """)
-    fun countActiveAndInactivePSKs(identity: String): Long
+    fun countPSKsForIdWithStatus(identity: String, status: PreSharedKeyStatus): Long
 }
