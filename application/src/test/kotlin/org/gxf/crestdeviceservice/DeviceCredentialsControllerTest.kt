@@ -3,6 +3,7 @@ package org.gxf.crestdeviceservice
 import org.gxf.crestdeviceservice.metrics.MetricService
 import org.gxf.crestdeviceservice.psk.PskController
 import org.gxf.crestdeviceservice.psk.PskService
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
@@ -27,7 +28,12 @@ class DeviceCredentialsControllerTest {
 
     @Test
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
-        `when`(pskService.getCurrentPsk(any())).thenReturn(null)
+        `when`(
+            pskService.getCurrentKeyWithStatus(
+                any<String>(),
+                any<PreSharedKeyStatus>()
+            )
+        ).thenReturn(null)
 
         mvcRequest.perform(
                 MockMvcRequestBuilders
@@ -38,7 +44,12 @@ class DeviceCredentialsControllerTest {
 
     @Test
     fun shouldReturnKeyForIdentity() {
-        `when`(pskService.getCurrentPsk(any())).thenReturn("key")
+        `when`(
+            pskService.getCurrentKeyWithStatus(
+                any<String>(),
+                any<PreSharedKeyStatus>()
+            )
+        ).thenReturn("key")
 
         mvcRequest.perform(
                 MockMvcRequestBuilders

@@ -15,4 +15,11 @@ object PskCommandCreator {
         val hash = DigestUtils.sha256Hex("$secret$key")
         return "!PSK:${key}:${hash};PSK:${key}:${hash}SET"
     }
+
+    fun createPskErrorCommand(preSharedKey: PreSharedKey): String {
+        val key = preSharedKey.preSharedKey
+        val secret = preSharedKey.secret
+        val hash = DigestUtils.sha256Hex("$secret$key")
+        return "!PSK:${key}:${hash};PSK:${key}:${hash}EQER"
+    }
 }

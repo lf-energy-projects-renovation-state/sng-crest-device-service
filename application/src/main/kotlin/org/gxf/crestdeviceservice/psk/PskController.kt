@@ -2,6 +2,7 @@ package org.gxf.crestdeviceservice.psk
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.metrics.MetricService
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestHeader
@@ -16,7 +17,7 @@ class PskController(private val pskService: PskService, private val metricServic
 
     @GetMapping
     fun getPsk(@RequestHeader("x-device-identity") identity: String): ResponseEntity<String> {
-        val currentPsk = pskService.getCurrentPsk(identity)
+        val currentPsk = pskService.getCurrentKeyWithStatus(identity, PreSharedKeyStatus.ACTIVE)
 
         if (currentPsk == null) {
             logger.error { "No psk found for device $identity" }

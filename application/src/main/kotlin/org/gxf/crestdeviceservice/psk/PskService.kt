@@ -19,11 +19,14 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     private val secureRandom: SecureRandom = SecureRandom.getInstanceStrong()
 
-    fun getCurrentPsk(identity: String) =
+    fun getCurrentPskWithStatus(identity: String, status: PreSharedKeyStatus) =
         pskRepository.findLatestPskForIdentityWithStatus(
             identity,
-            PreSharedKeyStatus.ACTIVE
-        )?.preSharedKey
+            status
+        )
+
+    fun getCurrentKeyWithStatus(identity: String, status: PreSharedKeyStatus) =
+        getCurrentPskWithStatus(identity, status)?.preSharedKey
 
     fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
         if (pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {

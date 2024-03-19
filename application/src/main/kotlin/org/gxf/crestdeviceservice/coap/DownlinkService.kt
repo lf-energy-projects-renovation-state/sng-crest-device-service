@@ -16,10 +16,6 @@ class DownlinkService(private val pskService: PskService) {
 
     companion object{
         private const val URC_FIELD = "URC"
-
-        private const val URC_PSK_SUCCESS = "PSK:SET"
-        private const val URC_PSK_ERROR = "PSK:EQER"
-
         private const val RESPONSE_SUCCESS = "0"
     }
 
@@ -42,13 +38,17 @@ class DownlinkService(private val pskService: PskService) {
             return PskCommandCreator.createPskSetCommand(newKey)
         }
 
-        if (urc.contains(URC_PSK_SUCCESS)) {
+        val pendingPsk = pskService.getCurrentPskWithStatus(identity, PreSharedKeyStatus.PENDING)
+        check(pendingPsk != null) { "There is no known pending PSK for id $identity" }
+        val successMessage = PskCommandCreator.createPskSetCommand(pendingPsk)
+        val errorMessage = PskCommandCreator.createPskErrorCommand(pendingPsk)
+        if (urc.contains(successMessage)) {
             pskService.changeActiveKey(identity)
-        } else if (urc.contains(URC_PSK_ERROR)) {
+        } else if (urc.contains(errorMessage)) {
             pskService.setLastKeyStatus(identity, PreSharedKeyStatus.INVALID)
             // todo alert naar maki?
         } else {
-            error("what did we receive? URC: $urc")
+            error("Cannot interpret this URC: $urc")
         }
 
         return RESPONSE_SUCCESS
