@@ -10,10 +10,13 @@ interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey>
     @Query("""
         select psk from  PreSharedKey psk 
         where psk.identity = ?1 
-          and psk.status = 'ACTIVE'
+          and psk.status = ?2
         order by psk.revision desc
         """)
-    fun findLatestActivePsk(identity: String): PreSharedKey?
+    fun findLatestPskForIdentityWithStatus(
+        identity: String,
+        status: PreSharedKeyStatus
+    ): PreSharedKey?
 
     @Query("""
         select psk from PreSharedKey psk 

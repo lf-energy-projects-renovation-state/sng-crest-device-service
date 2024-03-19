@@ -20,7 +20,10 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
     private val secureRandom: SecureRandom = SecureRandom.getInstanceStrong()
 
     fun getCurrentPsk(identity: String) =
-        pskRepository.findLatestActivePsk(identity)?.preSharedKey
+        pskRepository.findLatestPskForIdentityWithStatus(
+            identity,
+            PreSharedKeyStatus.ACTIVE
+        )?.preSharedKey
 
     fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
         if (pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {
@@ -31,7 +34,8 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     fun generateAndSetNewKeyForIdentity(identity: String): PreSharedKey {
         val newKey = generatePsk()
-        val previousPSK = pskRepository.findLatestActivePsk(identity)!!
+        val previousPSK =
+            pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.ACTIVE)!!
         val newVersion = previousPSK.revision + 1
         return pskRepository.save(
             PreSharedKey(
@@ -60,4 +64,19 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
     private fun generatePsk(): String =
         secureRandom.ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length).toArray()
             .fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
+
+    fun changeActiveKey(identity: String) {
+        val currentPsk =
+            pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.ACTIVE)
+        val newPsk =
+            pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.PENDING)
+
+        check(currentPsk != null && newPsk != null) { "No current or new psk, impossible to change active key" }
+
+        // todo zorgen dat dit altijd allemaal of helemaal niet gebeurt
+        currentPsk.status = PreSharedKeyStatus.INACTIVE
+        newPsk.status = PreSharedKeyStatus.ACTIVE
+        pskRepository.save(currentPsk)
+        pskRepository.save(newPsk)
+    }
 }

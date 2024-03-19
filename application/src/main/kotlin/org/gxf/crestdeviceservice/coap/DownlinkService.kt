@@ -40,10 +40,9 @@ class DownlinkService(private val pskService: PskService) {
             return PskCommandCreator.createPskSetCommand(newKey)
         }
 
-        if(urcs.contains(URC_PSK_SUCCESS)) {
-            pskService.setLastKeyStatus(identity, PreSharedKeyStatus.ACTIVE)
-            // todo oude psk op inactive zetten
-        } else if(urcs.contains(URC_PSK_ERROR)) {
+        if (urc.contains(URC_PSK_SUCCESS)) {
+            pskService.changeActiveKey(identity)
+        } else if (urc.contains(URC_PSK_ERROR)) {
             pskService.setLastKeyStatus(identity, PreSharedKeyStatus.INVALID)
             // todo alert naar maki?
         }
