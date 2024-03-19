@@ -29,7 +29,9 @@ class DownlinkService(private val pskService: PskService) {
     fun getDownlinkForIdentity(identity: String, body: JsonNode): String {
 
         // Retrieve URCs from the message body
-        val urcs = body[URC_FIELD].map { it.toString() }
+        val urc = body[URC_FIELD]
+            .filter { it.isTextual }
+            .map { it.asText() }
 
         if (pskService.needsKeyChange(identity)) {
             logger.info { "Creating new key for device $identity" }
@@ -45,6 +47,8 @@ class DownlinkService(private val pskService: PskService) {
         } else if (urc.contains(URC_PSK_ERROR)) {
             pskService.setLastKeyStatus(identity, PreSharedKeyStatus.INVALID)
             // todo alert naar maki?
+        } else {
+            error("what did we receive? URC: $urc")
         }
 
         return RESPONSE_SUCCESS
