@@ -1,6 +1,7 @@
 package org.gxf.crestdeviceservice.psk
 
 import org.assertj.core.api.Assertions.assertThat
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.gxf.crestdeviceservice.psk.entity.PskRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -25,7 +26,9 @@ class PskServiceTest {
     @Test
     fun needsKeyChangeSetInitialPskTrueAnd1Identity() {
         // If change initial psk is true, and we only have one key the key should be changed
-        `when`(pskRepository.countPsksByIdentity(any())).thenReturn(1L)
+        `when`(pskRepository.countPSKsForIdWithStatus(any(), PreSharedKeyStatus.ACTIVE)).thenReturn(
+            1L
+        )
         `when`(pskConfiguration.changeInitialPsk).thenReturn(true)
 
         assertThat(pskService.needsKeyChange("123")).isTrue()
@@ -42,7 +45,9 @@ class PskServiceTest {
     @Test
     fun needsKeyChangeSetInitialPskTrueAnd0Identity() {
         // If we have 0 keys we shouldn't generate a new key
-        `when`(pskRepository.countPsksByIdentity(any())).thenReturn(0L)
+        `when`(pskRepository.countPSKsForIdWithStatus(any(), PreSharedKeyStatus.ACTIVE)).thenReturn(
+            0L
+        )
         `when`(pskConfiguration.changeInitialPsk).thenReturn(true)
 
         assertThat(pskService.needsKeyChange("123")).isFalse()
@@ -51,7 +56,9 @@ class PskServiceTest {
     @Test
     fun needsKeyChangeSetInitialPskTrueAnd2Identity() {
         // If we have more than one key we shouldn't generate a new key
-        `when`(pskRepository.countPsksByIdentity(any())).thenReturn(2L)
+        `when`(pskRepository.countPSKsForIdWithStatus(any(), PreSharedKeyStatus.ACTIVE)).thenReturn(
+            2L
+        )
         `when`(pskConfiguration.changeInitialPsk).thenReturn(true)
 
         assertThat(pskService.needsKeyChange("123")).isFalse()

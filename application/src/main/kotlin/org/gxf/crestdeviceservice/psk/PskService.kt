@@ -76,7 +76,6 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
         check(currentPsk != null && newPsk != null) { "No current or new psk, impossible to change active key" }
 
-        // todo zorgen dat dit altijd allemaal of helemaal niet gebeurt
         currentPsk.status = PreSharedKeyStatus.INACTIVE
         newPsk.status = PreSharedKeyStatus.ACTIVE
         pskRepository.save(currentPsk)
