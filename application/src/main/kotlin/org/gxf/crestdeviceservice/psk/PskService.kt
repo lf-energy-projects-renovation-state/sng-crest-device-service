@@ -52,7 +52,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         )
     }
 
-    fun needsKeyChange(identity: String): Boolean =
+    fun needsKeyChange(identity: String) =
         pskConfiguration.changeInitialPsk &&
                 pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.ACTIVE) >= 1L &&
                 pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.PENDING) == 0L
