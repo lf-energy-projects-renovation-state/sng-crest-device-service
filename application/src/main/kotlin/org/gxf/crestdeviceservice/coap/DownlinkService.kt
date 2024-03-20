@@ -63,7 +63,9 @@ class DownlinkService(private val pskService: PskService) {
             }
 
             urc.contains(INIT_MESSAGE) -> {
-                logger.warn { "Received regular alarm message while PSK is pending, still waiting for success or error message" }
+                logger.warn { "Received regular alarm message while PSK is pending, setting pending key to invalid" }
+                pskService.setLastKeyStatus(identity, PreSharedKeyStatus.INVALID)
+                // todo alert naar maki?
             }
 
             else -> {
