@@ -24,12 +24,12 @@ class DownlinkService(private val pskService: PskService) {
     @Transactional
     fun getDownlinkForIdentity(identity: String, urcList: JsonNode): String {
         if (pskService.needsKeyChange(identity)) {
-            val newKey = pskService.getNewKeyForIdentityAsPending(identity)
+            val newKey = pskService.saveReadyKeyForIdentityAsPending(identity)
             // After setting a new psk, the device will send a new message if the psk set was successful
             return PskCommandCreator.createPskSetCommand(newKey)
-        } else if (pskService.pendingKeyPresent(identity)) {
-            interpretURCInMessage(identity, urcList)
         }
+
+        interpretURCInMessage(identity, urcList)
 
         return RESPONSE_SUCCESS
     }
@@ -42,13 +42,15 @@ class DownlinkService(private val pskService: PskService) {
 
         when {
             urc.contains(URC_PSK_SUCCESS) -> {
-                logger.info { "PSK set successful, changing active key" }
+                check(pskService.pendingKeyPresent(identity)) { "Success URC received, but no pending key present to set as active" }
+                logger.info { "PSK set successfully, changing active key" }
                 pskService.changeActiveKey(identity)
             }
 
             urc.contains(URC_PSK_ERROR) -> {
+                check(pskService.pendingKeyPresent(identity)) { "Failure URC received, but no pending key present to set as invalid" }
                 logger.warn { "Error received for set PSK command, setting pending key to invalid" }
-                pskService.setLastKeyInvalid(identity)
+                pskService.setPendingKeyAsInvalid(identity)
             }
         }
     }
