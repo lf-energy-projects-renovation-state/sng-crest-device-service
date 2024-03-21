@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.gxf.crestdeviceservice.psk.PskService
-import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -41,9 +40,6 @@ class DownlinkService(private val pskService: PskService) {
             .filter { it.isTextual }
             .map { it.asText() }
 
-        val pendingPsk = pskService.getCurrentPskWithStatus(identity, PreSharedKeyStatus.PENDING)
-        check(pendingPsk != null) { "There is no known pending PSK for id $identity" }
-
         when {
             urc.contains(URC_PSK_SUCCESS) -> {
                 logger.info { "PSK set successful, changing active key" }
@@ -52,7 +48,7 @@ class DownlinkService(private val pskService: PskService) {
 
             urc.contains(URC_PSK_ERROR) -> {
                 logger.warn { "Error received for set PSK command, setting pending key to invalid" }
-                pskService.setLastKeyStatus(identity, PreSharedKeyStatus.INVALID)
+                pskService.setLastKeyInvalid(identity)
             }
         }
     }

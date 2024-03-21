@@ -19,16 +19,24 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     private val secureRandom: SecureRandom = SecureRandom.getInstanceStrong()
 
-    fun getCurrentPskWithStatus(identity: String, status: PreSharedKeyStatus) =
+    fun getCurrentActiveKey(identity: String) =
+        getCurrentActivePsk(identity)?.preSharedKey
+
+    private fun getCurrentActivePsk(identity: String) =
         pskRepository.findLatestPskForIdentityWithStatus(
             identity,
-            status
+            PreSharedKeyStatus.ACTIVE
         )
 
-    fun getCurrentKeyWithStatus(identity: String, status: PreSharedKeyStatus) =
-        getCurrentPskWithStatus(identity, status)?.preSharedKey
+    fun pendingKeyPresent(identity: String) = getCurrentPendingKey(identity) != null
 
-    fun setInitialKeyForIdentify(identity: String, psk: String, secret: String) {
+    private fun getCurrentPendingKey(identity: String) =
+        pskRepository.findLatestPskForIdentityWithStatus(
+            identity,
+            PreSharedKeyStatus.PENDING
+        )
+
+    fun setInitialKeyForIdentity(identity: String, psk: String, secret: String) {
         if (pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {
             throw InitialKeySetException("Key already exists for identity. Key cannot be overridden")
         }
@@ -59,11 +67,6 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         return pskRepository.save(readyPsk)
     }
 
-    fun pendingKeyPresent(identity: String) = pskRepository.findLatestPskForIdentityWithStatus(
-        identity,
-        PreSharedKeyStatus.PENDING
-    ) != null
-
     fun needsKeyChange(identity: String) =
         changeInitialPsk() &&
                 pskRepository.findLatestPskForIdentityWithStatus(
@@ -73,10 +76,10 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     fun changeInitialPsk() = pskConfiguration.changeInitialPsk
 
-    fun setLastKeyStatus(identity: String, status: PreSharedKeyStatus) {
+    fun setLastKeyInvalid(identity: String) {
         val psk = pskRepository.findLatestPsk(identity)
             ?: throw NoExistingPskException("No key exists yet")
-        psk.status = status
+        psk.status = PreSharedKeyStatus.INVALID
         pskRepository.save(psk)
     }
 
