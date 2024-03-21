@@ -17,7 +17,6 @@ class DownlinkService(private val pskService: PskService) {
     companion object{
         private const val URC_PSK_SUCCESS = "PSK:SET"
         private const val URC_PSK_ERROR = "PSK:EQER"
-        private const val DL_FIELD = "DL"
         private const val RESPONSE_SUCCESS = "0"
     }
 
@@ -25,16 +24,18 @@ class DownlinkService(private val pskService: PskService) {
 
     @Transactional
     fun getDownlinkForIdentity(identity: String, urcList: JsonNode): String {
-        if (pskService.needsKeyChange(identity)) {
-            logger.info { "Creating new key for device $identity" }
+        if (pskService.changeInitialPsk()) {
+            if (pskService.needsKeyChange(identity)) {
+                logger.info { "Creating new key for device $identity" }
 
-            val newKey = pskService.generateAndSetNewKeyForIdentity(identity)
+                val newKey = pskService.generateAndSetNewKeyForIdentity(identity)
 
-            // After setting a new psk, the device will send a new message if the psk set was successful
-            return PskCommandCreator.createPskSetCommand(newKey)
+                // After setting a new psk, the device will send a new message if the psk set was successful
+                return PskCommandCreator.createPskSetCommand(newKey)
+            }
+
+            interpretURCInMessage(identity, urcList)
         }
-
-        interpretURCInMessage(identity, urcList)
 
         return RESPONSE_SUCCESS
     }
@@ -45,27 +46,18 @@ class DownlinkService(private val pskService: PskService) {
             .filter { it.isTextual }
             .map { it.asText() }
 
-        val dl = urcList
-            .filter { it.isPojo }
-            .map { it[DL_FIELD]?.asText() }
-
         val pendingPsk = pskService.getCurrentPskWithStatus(identity, PreSharedKeyStatus.PENDING)
         check(pendingPsk != null) { "There is no known pending PSK for id $identity" }
 
-        val pskSetCommand = PskCommandCreator.createPskSetCommand(pendingPsk)
+        when {
+            urc.contains(URC_PSK_SUCCESS) -> {
+                logger.info { "PSK set successful, changing active key" }
+                pskService.changeActiveKey(identity)
+            }
 
-        if (dl.contains(pskSetCommand)) {
-            when {
-                urc.contains(URC_PSK_SUCCESS) -> {
-                    logger.info { "PSK set successful, changing active key" }
-                    pskService.changeActiveKey(identity)
-                }
-
-                urc.contains(URC_PSK_ERROR) -> {
-                    logger.warn { "Error received for set PSK command, setting pending key to invalid" }
-                    pskService.setLastKeyStatus(identity, PreSharedKeyStatus.INVALID)
-                    // todo alert naar maki
-                }
+            urc.contains(URC_PSK_ERROR) -> {
+                logger.warn { "Error received for set PSK command, setting pending key to invalid" }
+                pskService.setLastKeyStatus(identity, PreSharedKeyStatus.INVALID)
             }
         }
     }
