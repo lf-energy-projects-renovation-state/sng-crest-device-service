@@ -20,8 +20,9 @@ class PreSharedKey(
 )
 
 enum class PreSharedKeyStatus {
+    READY,
+    PENDING,
     ACTIVE,
     INACTIVE,
-    PENDING,
     INVALID
 }

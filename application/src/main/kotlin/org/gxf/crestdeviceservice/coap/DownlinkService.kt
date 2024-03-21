@@ -24,16 +24,11 @@ class DownlinkService(private val pskService: PskService) {
 
     @Transactional
     fun getDownlinkForIdentity(identity: String, urcList: JsonNode): String {
-        if (pskService.changeInitialPsk()) {
-            if (pskService.needsKeyChange(identity)) {
-                logger.info { "Creating new key for device $identity" }
-
-                val newKey = pskService.generateAndSetNewKeyForIdentity(identity)
-
-                // After setting a new psk, the device will send a new message if the psk set was successful
-                return PskCommandCreator.createPskSetCommand(newKey)
-            }
-
+        if (pskService.needsKeyChange(identity)) {
+            val newKey = pskService.getNewKeyForIdentityAsPending(identity)
+            // After setting a new psk, the device will send a new message if the psk set was successful
+            return PskCommandCreator.createPskSetCommand(newKey)
+        } else if (pskService.pendingKeyPresent(identity)) {
             interpretURCInMessage(identity, urcList)
         }
 

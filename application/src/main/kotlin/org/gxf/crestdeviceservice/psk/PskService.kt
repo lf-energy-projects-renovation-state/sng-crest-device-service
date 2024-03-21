@@ -35,28 +35,43 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         pskRepository.save(PreSharedKey(identity, 0, Instant.now(), psk, secret, PreSharedKeyStatus.ACTIVE))
     }
 
-    fun generateAndSetNewKeyForIdentity(identity: String): PreSharedKey {
+    fun generateNewReadyKeyForIdentity(identity: String) {
         val newKey = generatePsk()
         val previousPSK =
             pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.ACTIVE)!!
         val newVersion = previousPSK.revision + 1
-        return pskRepository.save(
+        pskRepository.save(
             PreSharedKey(
                 identity,
                 newVersion,
                 Instant.now(),
                 newKey,
                 previousPSK.secret,
-                PreSharedKeyStatus.PENDING
+                PreSharedKeyStatus.READY
             )
         )
     }
 
-    fun changeInitialPsk() = pskConfiguration.changeInitialPsk
+    fun getNewKeyForIdentityAsPending(identity: String): PreSharedKey {
+        val readyPsk =
+            pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.READY)!!
+        readyPsk.status = PreSharedKeyStatus.PENDING
+        return pskRepository.save(readyPsk)
+    }
+
+    fun pendingKeyPresent(identity: String) = pskRepository.findLatestPskForIdentityWithStatus(
+        identity,
+        PreSharedKeyStatus.PENDING
+    ) != null
 
     fun needsKeyChange(identity: String) =
-        pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.ACTIVE) >= 1L &&
-                pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.PENDING) == 0L
+        changeInitialPsk() &&
+                pskRepository.findLatestPskForIdentityWithStatus(
+                    identity,
+                    PreSharedKeyStatus.READY
+                ) != null
+
+    fun changeInitialPsk() = pskConfiguration.changeInitialPsk
 
     fun setLastKeyStatus(identity: String, status: PreSharedKeyStatus) {
         val psk = pskRepository.findLatestPsk(identity)
