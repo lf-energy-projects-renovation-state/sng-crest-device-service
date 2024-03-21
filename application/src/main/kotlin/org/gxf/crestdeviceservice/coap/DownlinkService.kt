@@ -15,7 +15,7 @@ class DownlinkService(private val pskService: PskService) {
 
     companion object{
         private const val URC_PSK_SUCCESS = "PSK:SET"
-        private const val URC_PSK_ERROR = "PSK:EQER"
+        private const val URC_PSK_ERROR = "ER"
         private const val RESPONSE_SUCCESS = "0"
     }
 
