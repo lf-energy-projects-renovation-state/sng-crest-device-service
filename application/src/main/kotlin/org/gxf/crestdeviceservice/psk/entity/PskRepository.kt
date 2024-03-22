@@ -12,6 +12,7 @@ interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey>
         where psk.identity = ?1 
           and psk.status = ?2
         order by psk.revision desc
+        limit 1
         """)
     fun findLatestPskForIdentityWithStatus(
         identity: String,
