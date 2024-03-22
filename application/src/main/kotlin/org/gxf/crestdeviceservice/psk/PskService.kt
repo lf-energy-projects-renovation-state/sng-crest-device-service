@@ -80,10 +80,12 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     fun needsKeyChange(identity: String) =
         changeInitialPsk() &&
-                pskRepository.findLatestPskForIdentityWithStatus(
-                    identity,
-                    PreSharedKeyStatus.READY
-                ) != null
+                newKeyReady(identity)
+
+    private fun newKeyReady(identity: String) = pskRepository.findLatestPskForIdentityWithStatus(
+        identity,
+        PreSharedKeyStatus.READY
+    ) != null
 
     fun changeInitialPsk() = pskConfiguration.changeInitialPsk
 

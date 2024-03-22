@@ -28,10 +28,8 @@ class IncomingDeviceCredentialsService(
 
             pskService.setInitialKeyForIdentity(identity, decryptedPsk, decryptedSecret)
 
-            if (pskService.changeInitialPsk()) {
-                logger.info { "Creating new ready key for device $deviceCredentials.imei" }
-                pskService.generateNewReadyKeyForIdentity(identity)
-            }
+            logger.info { "Creating new ready key for device $deviceCredentials.imei" }
+            pskService.generateNewReadyKeyForIdentity(identity)
         } catch (e: Exception) {
             logger.error(e) { "Failed to set device credentials for $identity" }
         }
