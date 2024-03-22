@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
+import java.time.Instant
 
 object TestHelper {
     // Returns a JsonNode representation of: ["INIT", {"DL": "0"}]
@@ -40,4 +43,31 @@ object TestHelper {
         )
         return mapper.valueToTree(urcList)
     }
+
+    fun preSharedKeyReady(): PreSharedKey = PreSharedKey(
+        "identity",
+        1,
+        Instant.now(),
+        "key",
+        "secret",
+        PreSharedKeyStatus.READY
+    )
+
+    fun preSharedKeyActive(): PreSharedKey = PreSharedKey(
+        "identity",
+        1,
+        Instant.now(),
+        "key",
+        "secret",
+        PreSharedKeyStatus.ACTIVE
+    )
+
+    fun preSharedKeyPending(): PreSharedKey = PreSharedKey(
+        "identity",
+        1,
+        Instant.now(),
+        "key",
+        "secret",
+        PreSharedKeyStatus.PENDING
+    )
 }

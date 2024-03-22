@@ -30,6 +30,13 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     fun pendingKeyPresent(identity: String) = getCurrentPendingKey(identity) != null
 
+    fun setPendingKeyAsInvalid(identity: String) {
+        val psk = getCurrentPendingKey(identity)
+            ?: throw NoExistingPskException("No pending key exists to set as invalid")
+        psk.status = PreSharedKeyStatus.INVALID
+        pskRepository.save(psk)
+    }
+
     private fun getCurrentPendingKey(identity: String) =
         pskRepository.findLatestPskForIdentityWithStatus(
             identity,
@@ -60,6 +67,10 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         )
     }
 
+    private fun generatePsk(): String =
+        secureRandom.ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length).toArray()
+            .fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
+
     fun saveReadyKeyForIdentityAsPending(identity: String): PreSharedKey {
         val readyPsk =
             pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.READY)!!
@@ -75,17 +86,6 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
                 ) != null
 
     fun changeInitialPsk() = pskConfiguration.changeInitialPsk
-
-    fun setPendingKeyAsInvalid(identity: String) {
-        val psk = getCurrentPendingKey(identity)
-            ?: throw NoExistingPskException("No pending key exists to set as invalid")
-        psk.status = PreSharedKeyStatus.INVALID
-        pskRepository.save(psk)
-    }
-
-    private fun generatePsk(): String =
-        secureRandom.ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length).toArray()
-            .fold("") { acc, next -> acc + ALLOWED_CHARACTERS[next] }
 
     fun changeActiveKey(identity: String) {
         val currentPsk =
