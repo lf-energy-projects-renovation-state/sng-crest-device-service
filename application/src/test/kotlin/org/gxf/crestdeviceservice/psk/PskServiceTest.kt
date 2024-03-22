@@ -2,17 +2,14 @@ package org.gxf.crestdeviceservice.psk
 
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestHelper
-import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.gxf.crestdeviceservice.psk.entity.PskRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentCaptor
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -131,15 +128,8 @@ class PskServiceTest {
 
         pskService.changeActiveKey(identity)
 
-        val argument = ArgumentCaptor.forClass(
-            PreSharedKey::class.java
-        )
+        val psksToSave = listOf(currentPsk, newPsk)
 
-        verify(pskRepository, times(2)).save(argument.capture())
-
-        val values = argument.allValues
-
-        assertThat(values.contains(currentPsk)).isTrue()
-        assertThat(values.contains(newPsk)).isTrue()
+        verify(pskRepository).saveAll(psksToSave)
     }
 }

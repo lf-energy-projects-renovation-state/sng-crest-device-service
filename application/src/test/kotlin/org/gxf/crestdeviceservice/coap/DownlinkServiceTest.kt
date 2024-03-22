@@ -1,5 +1,6 @@
 package org.gxf.crestdeviceservice.coap
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.psk.PskService
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.springframework.util.ResourceUtils
 import java.time.Instant
 
 @ExtendWith(MockitoExtension::class)
@@ -23,6 +25,8 @@ class DownlinkServiceTest {
 
     @InjectMocks
     private lateinit var downLinkService: DownlinkService
+
+    val mapper = ObjectMapper()
 
     @Test
     fun shouldReturnPskDownlinkWhenThereIsANewPsk() {
@@ -41,8 +45,9 @@ class DownlinkServiceTest {
         whenever(pskService.needsKeyChange(any())).thenReturn(true)
         whenever(pskService.setReadyKeyForIdentityAsPending(any())).thenReturn(psk)
 
-        val urcNode = TestHelper.unsollicitedResultCodeInit()
-        val result = downLinkService.getDownlinkForIdentity(identity, urcNode)
+        val fileToUse = ResourceUtils.getFile("classpath:messages/message.json")
+        val message = mapper.readTree(fileToUse)
+        val result = downLinkService.getDownlinkForIdentity(identity, message)
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]SET
         println("!PSK:$expectedKey:$expectedHash;PSK:$expectedKey:${expectedHash}SET")
@@ -53,8 +58,9 @@ class DownlinkServiceTest {
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPsk() {
         whenever(pskService.needsKeyChange(any())).thenReturn(false)
 
-        val urcNode = TestHelper.unsollicitedResultCodeInit()
-        val result = downLinkService.getDownlinkForIdentity("identity", urcNode)
+        val fileToUse = ResourceUtils.getFile("classpath:messages/message.json")
+        val message = mapper.readTree(fileToUse)
+        val result = downLinkService.getDownlinkForIdentity("identity", message)
 
         assertThat(result).isEqualTo("0")
     }
@@ -67,7 +73,9 @@ class DownlinkServiceTest {
         whenever(pskService.needsKeyChange(any())).thenReturn(false)
         whenever(pskService.isPendingKeyPresent(any())).thenReturn(true)
 
-        downLinkService.getDownlinkForIdentity(identity, urcNode)
+        val fileToUse = ResourceUtils.getFile("classpath:messages/message_psk_set_success.json")
+        val message = mapper.readTree(fileToUse)
+        downLinkService.getDownlinkForIdentity(identity, message)
 
         verify(pskService).changeActiveKey(identity)
     }
@@ -80,7 +88,9 @@ class DownlinkServiceTest {
         whenever(pskService.needsKeyChange(any())).thenReturn(false)
         whenever(pskService.isPendingKeyPresent(any())).thenReturn(true)
 
-        downLinkService.getDownlinkForIdentity(identity, urcNode)
+        val fileToUse = ResourceUtils.getFile("classpath:messages/message_psk_set_failure.json")
+        val message = mapper.readTree(fileToUse)
+        downLinkService.getDownlinkForIdentity(identity, message)
 
         verify(pskService).setPendingKeyAsInvalid(identity)
     }
