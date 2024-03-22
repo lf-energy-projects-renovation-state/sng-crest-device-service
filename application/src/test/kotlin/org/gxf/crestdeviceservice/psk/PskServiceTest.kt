@@ -42,14 +42,14 @@ class PskServiceTest {
         val psk = TestHelper.preSharedKeyPending()
         whenever(pskRepository.findLatestPskForIdentityWithStatus(any(), any())).thenReturn(psk)
 
-        assertThat(pskService.pendingKeyPresent("identity")).isEqualTo(true)
+        assertThat(pskService.isPendingKeyPresent("identity")).isEqualTo(true)
     }
 
     @Test
     fun pendingKeyPresentFalse() {
         whenever(pskRepository.findLatestPskForIdentityWithStatus(any(), any())).thenReturn(null)
 
-        assertThat(pskService.pendingKeyPresent("identity")).isEqualTo(false)
+        assertThat(pskService.isPendingKeyPresent("identity")).isEqualTo(false)
     }
 
     @Test
@@ -77,7 +77,7 @@ class PskServiceTest {
         ).thenReturn(psk)
         whenever(pskRepository.save(psk)).thenReturn(psk)
 
-        assertThat(psk).isEqualTo(pskService.saveReadyKeyForIdentityAsPending("id123"))
+        assertThat(psk).isEqualTo(pskService.setReadyKeyForIdentityAsPending("id123"))
     }
 
     @Test

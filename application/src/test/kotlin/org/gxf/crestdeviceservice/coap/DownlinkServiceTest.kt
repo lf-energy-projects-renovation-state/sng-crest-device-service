@@ -39,7 +39,7 @@ class DownlinkServiceTest {
         )
 
         whenever(pskService.needsKeyChange(any())).thenReturn(true)
-        whenever(pskService.saveReadyKeyForIdentityAsPending(any())).thenReturn(psk)
+        whenever(pskService.setReadyKeyForIdentityAsPending(any())).thenReturn(psk)
 
         val urcNode = TestHelper.unsollicitedResultCodeInit()
         val result = downLinkService.getDownlinkForIdentity(identity, urcNode)
@@ -65,7 +65,7 @@ class DownlinkServiceTest {
         val identity = "identity"
 
         whenever(pskService.needsKeyChange(any())).thenReturn(false)
-        whenever(pskService.pendingKeyPresent(any())).thenReturn(true)
+        whenever(pskService.isPendingKeyPresent(any())).thenReturn(true)
 
         downLinkService.getDownlinkForIdentity(identity, urcNode)
 
@@ -78,7 +78,7 @@ class DownlinkServiceTest {
         val identity = "identity"
 
         whenever(pskService.needsKeyChange(any())).thenReturn(false)
-        whenever(pskService.pendingKeyPresent(any())).thenReturn(true)
+        whenever(pskService.isPendingKeyPresent(any())).thenReturn(true)
 
         downLinkService.getDownlinkForIdentity(identity, urcNode)
 

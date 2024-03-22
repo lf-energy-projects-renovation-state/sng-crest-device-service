@@ -9,8 +9,8 @@ Also, a new PSK will be generated and set to status `READY`.
 To test this flow locally:
 
 1. If you have previously run the crest device service with the `test-data` profile, and you wish to
-   test this new flow, run the service without the `test-data` profile and delete the flyway and
-   pre_shared_key tables from your local database.
+   test this new flow, delete the database container to clear the existing data, then run the
+   service without the `test-data` profile.
 2. Set `crest-device-service.psk.change-initial-psk` to `true`.
 3. Run the crest device service, the shipment file processor and maki connect light.
 4. Upload the `test_shipment_file.json` file to the shipment file processor.

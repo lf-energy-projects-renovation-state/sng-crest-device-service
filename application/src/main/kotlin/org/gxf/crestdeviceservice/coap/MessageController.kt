@@ -18,10 +18,6 @@ class MessageController(private val messageService: MessageService, private val 
 
     private val locks: MutableMap<String, Any> = mutableMapOf()
 
-    companion object {
-        private const val URC_FIELD = "URC"
-    }
-
     /**
      * This endpoint handles incoming crest device messages.
      * Responses are generated synchronously to avoid sending the same downlink twice.
@@ -34,8 +30,7 @@ class MessageController(private val messageService: MessageService, private val 
         logger.debug { "Processed message" }
 
         synchronized(lock(identity)) {
-            val urc = body[URC_FIELD]
-            return ResponseEntity.ok(downlinkService.getDownlinkForIdentity(identity, urc))
+            return ResponseEntity.ok(downlinkService.getDownlinkForIdentity(identity, body))
         }
     }
 

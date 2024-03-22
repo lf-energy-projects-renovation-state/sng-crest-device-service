@@ -17,46 +17,49 @@ class DownlinkService(private val pskService: PskService) {
         private const val URC_PSK_SUCCESS = "PSK:SET"
         private const val URC_PSK_ERROR = "ER"
         private const val RESPONSE_SUCCESS = "0"
+        private const val URC_FIELD = "URC"
     }
 
     private val logger = KotlinLogging.logger {}
 
     @Transactional
-    fun getDownlinkForIdentity(identity: String, urcList: JsonNode): String {
+    fun getDownlinkForIdentity(identity: String, body: JsonNode): String {
+        interpretURCInMessage(identity, body)
+
         if (pskService.needsKeyChange(identity)) {
-            val newKey = pskService.saveReadyKeyForIdentityAsPending(identity)
+            val newKey = pskService.setReadyKeyForIdentityAsPending(identity)
             // After setting a new psk, the device will send a new message if the psk set was successful
             return PskCommandCreator.createPskSetCommand(newKey)
         }
 
-        interpretURCInMessage(identity, urcList)
-
         return RESPONSE_SUCCESS
     }
 
-    private fun interpretURCInMessage(identity: String, urcList: JsonNode) {
+    private fun interpretURCInMessage(identity: String, body: JsonNode) {
         // Retrieve URCs from the message body
-        val urc = urcList
-            .filter { it.isTextual }
-            .map { it.asText() }
-            .firstOrNull()
+        val urc = getUrcFromMessage(body)
 
         if (urc != null) {
             logger.debug { "Received message with urc $urc" }
 
             when {
                 urc.contains(URC_PSK_SUCCESS) -> {
-                    check(pskService.pendingKeyPresent(identity)) { "Success URC received, but no pending key present to set as active" }
+                    check(pskService.isPendingKeyPresent(identity)) { "Success URC received, but no pending key present to set as active" }
                     logger.info { "PSK set successfully, changing active key" }
                     pskService.changeActiveKey(identity)
                 }
 
                 urc.contains(URC_PSK_ERROR) -> {
-                    check(pskService.pendingKeyPresent(identity)) { "Failure URC received, but no pending key present to set as invalid" }
+                    check(pskService.isPendingKeyPresent(identity)) { "Failure URC received, but no pending key present to set as invalid" }
                     logger.warn { "Error received for set PSK command, setting pending key to invalid" }
                     pskService.setPendingKeyAsInvalid(identity)
                 }
             }
         }
     }
+
+    private fun getUrcFromMessage(body: JsonNode) = body[URC_FIELD]
+        .filter { it.isTextual }
+        .map { it.asText() }
+        .firstOrNull()
 }
