@@ -39,18 +39,23 @@ class DownlinkService(private val pskService: PskService) {
         val urc = urcList
             .filter { it.isTextual }
             .map { it.asText() }
+            .firstOrNull()
 
-        when {
-            urc.contains(URC_PSK_SUCCESS) -> {
-                check(pskService.pendingKeyPresent(identity)) { "Success URC received, but no pending key present to set as active" }
-                logger.info { "PSK set successfully, changing active key" }
-                pskService.changeActiveKey(identity)
-            }
+        if (urc != null) {
+            logger.debug { "Received message with urc $urc" }
 
-            urc.contains(URC_PSK_ERROR) -> {
-                check(pskService.pendingKeyPresent(identity)) { "Failure URC received, but no pending key present to set as invalid" }
-                logger.warn { "Error received for set PSK command, setting pending key to invalid" }
-                pskService.setPendingKeyAsInvalid(identity)
+            when {
+                urc.contains(URC_PSK_SUCCESS) -> {
+                    check(pskService.pendingKeyPresent(identity)) { "Success URC received, but no pending key present to set as active" }
+                    logger.info { "PSK set successfully, changing active key" }
+                    pskService.changeActiveKey(identity)
+                }
+
+                urc.contains(URC_PSK_ERROR) -> {
+                    check(pskService.pendingKeyPresent(identity)) { "Failure URC received, but no pending key present to set as invalid" }
+                    logger.warn { "Error received for set PSK command, setting pending key to invalid" }
+                    pskService.setPendingKeyAsInvalid(identity)
+                }
             }
         }
     }

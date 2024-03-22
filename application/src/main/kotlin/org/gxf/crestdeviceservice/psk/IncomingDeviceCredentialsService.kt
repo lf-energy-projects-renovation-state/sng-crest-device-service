@@ -27,9 +27,9 @@ class IncomingDeviceCredentialsService(
             val decryptedSecret = pskDecryptionService.decryptSecret(deviceCredentials.secret, deviceCredentials.keyRef)
 
             pskService.setInitialKeyForIdentity(identity, decryptedPsk, decryptedSecret)
-            logger.info { "Creating new ready key for device $deviceCredentials.imei" }
 
             if (pskService.changeInitialPsk()) {
+                logger.info { "Creating new ready key for device $deviceCredentials.imei" }
                 pskService.generateNewReadyKeyForIdentity(identity)
             }
         } catch (e: Exception) {
