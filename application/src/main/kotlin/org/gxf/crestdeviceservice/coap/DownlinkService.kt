@@ -27,6 +27,8 @@ class DownlinkService(private val pskService: PskService) {
         interpretURCInMessage(identity, body)
 
         if (pskService.needsKeyChange(identity)) {
+            logger.info { "Device ${identity} needs key change" }
+
             val newKey = pskService.setReadyKeyForIdentityAsPending(identity)
             // After setting a new psk, the device will send a new message if the psk set was successful
             return PskCommandCreator.createPskSetCommand(newKey)
