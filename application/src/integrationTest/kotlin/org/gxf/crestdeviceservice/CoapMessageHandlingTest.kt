@@ -113,7 +113,7 @@ class CoapMessageHandlingTest {
 
     @Test
     fun shouldSetPendingKeyAsInvalidWhenFailureURCReceived() {
-        // pending response from device
+        // pending psk, waiting for URC in next message from device
         pskRepository.save(
             PreSharedKey(
                 IDENTITY,
