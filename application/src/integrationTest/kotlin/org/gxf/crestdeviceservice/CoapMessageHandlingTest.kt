@@ -85,7 +85,7 @@ class CoapMessageHandlingTest {
 
     @Test
     fun shouldChangeActiveKeyWhenTheKeyIsPendingAndSuccessURCReceived() {
-        // pending response from device
+        // pending psk, waiting for URC in next message from device
         pskRepository.save(
             PreSharedKey(
                 IDENTITY,
