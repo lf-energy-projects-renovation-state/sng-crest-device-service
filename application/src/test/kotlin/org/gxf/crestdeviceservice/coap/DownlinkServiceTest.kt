@@ -1,8 +1,10 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.coap
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
-import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.psk.PskService
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
@@ -11,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.util.ResourceUtils
@@ -26,7 +27,7 @@ class DownlinkServiceTest {
     @InjectMocks
     private lateinit var downLinkService: DownlinkService
 
-    val mapper = ObjectMapper()
+    private val mapper = ObjectMapper()
 
     @Test
     fun shouldReturnPskDownlinkWhenThereIsANewPsk() {
@@ -39,42 +40,44 @@ class DownlinkServiceTest {
             Instant.now(),
             expectedKey,
             "secret",
-            PreSharedKeyStatus.READY
+            PreSharedKeyStatus.PENDING
         )
 
-        whenever(pskService.needsKeyChange(any())).thenReturn(true)
-        whenever(pskService.setReadyKeyForIdentityAsPending(any())).thenReturn(psk)
+        whenever(pskService.needsKeyChange(identity)).thenReturn(true)
+        whenever(pskService.setReadyKeyForIdentityAsPending(identity)).thenReturn(psk)
 
         val fileToUse = ResourceUtils.getFile("classpath:messages/message.json")
         val message = mapper.readTree(fileToUse)
+
         val result = downLinkService.getDownlinkForIdentity(identity, message)
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]SET
-        println("!PSK:$expectedKey:$expectedHash;PSK:$expectedKey:${expectedHash}SET")
         assertThat(result).isEqualTo("!PSK:$expectedKey:$expectedHash;PSK:$expectedKey:${expectedHash}SET")
     }
 
     @Test
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPsk() {
-        whenever(pskService.needsKeyChange(any())).thenReturn(false)
+        val identity = "identity"
+        whenever(pskService.needsKeyChange(identity)).thenReturn(false)
 
         val fileToUse = ResourceUtils.getFile("classpath:messages/message.json")
         val message = mapper.readTree(fileToUse)
-        val result = downLinkService.getDownlinkForIdentity("identity", message)
+
+        val result = downLinkService.getDownlinkForIdentity(identity, message)
 
         assertThat(result).isEqualTo("0")
     }
 
     @Test
     fun shouldChangeActiveKeyWhenSuccessURCReceived() {
-        val urcNode = TestHelper.unsollicitedResultCodeSuccess()
         val identity = "identity"
 
-        whenever(pskService.needsKeyChange(any())).thenReturn(false)
-        whenever(pskService.isPendingKeyPresent(any())).thenReturn(true)
+        whenever(pskService.needsKeyChange(identity)).thenReturn(false)
+        whenever(pskService.isPendingKeyPresent(identity)).thenReturn(true)
 
         val fileToUse = ResourceUtils.getFile("classpath:messages/message_psk_set_success.json")
         val message = mapper.readTree(fileToUse)
+
         downLinkService.getDownlinkForIdentity(identity, message)
 
         verify(pskService).changeActiveKey(identity)
@@ -82,11 +85,10 @@ class DownlinkServiceTest {
 
     @Test
     fun shouldSetPendingKeyAsInvalidWhenFailureURCReceived() {
-        val urcNode = TestHelper.unsollicitedResultCodeFailure()
         val identity = "identity"
 
-        whenever(pskService.needsKeyChange(any())).thenReturn(false)
-        whenever(pskService.isPendingKeyPresent(any())).thenReturn(true)
+        whenever(pskService.needsKeyChange(identity)).thenReturn(false)
+        whenever(pskService.isPendingKeyPresent(identity)).thenReturn(true)
 
         val fileToUse = ResourceUtils.getFile("classpath:messages/message_psk_set_failure.json")
         val message = mapper.readTree(fileToUse)

@@ -27,7 +27,7 @@ class DownlinkService(private val pskService: PskService) {
         interpretURCInMessage(identity, body)
 
         if (pskService.needsKeyChange(identity)) {
-            logger.info { "Device ${identity} needs key change" }
+            logger.info { "Device $identity needs key change" }
 
             val newKey = pskService.setReadyKeyForIdentityAsPending(identity)
             // After setting a new psk, the device will send a new message if the psk set was successful
@@ -38,7 +38,6 @@ class DownlinkService(private val pskService: PskService) {
     }
 
     private fun interpretURCInMessage(identity: String, body: JsonNode) {
-        // Retrieve URCs from the message body
         val urc = getUrcFromMessage(body)
 
         if (urc != null) {

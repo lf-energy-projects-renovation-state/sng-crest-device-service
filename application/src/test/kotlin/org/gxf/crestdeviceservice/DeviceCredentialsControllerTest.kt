@@ -8,7 +8,6 @@ import org.gxf.crestdeviceservice.metrics.MetricService
 import org.gxf.crestdeviceservice.psk.PskController
 import org.gxf.crestdeviceservice.psk.PskService
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -31,31 +30,35 @@ class DeviceCredentialsControllerTest {
 
     @Test
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
+        val identity = "identity"
         whenever(
             pskService.getCurrentActiveKey(
-                any<String>()
+                identity
             )
         ).thenReturn(null)
 
         mvcRequest.perform(
                 MockMvcRequestBuilders
                         .get("/psk")
-                        .header("x-device-identity", "identity"))
+                    .header("x-device-identity", identity)
+        )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
     @Test
     fun shouldReturnKeyForIdentity() {
+        val identity = "identity"
         whenever(
             pskService.getCurrentActiveKey(
-                any<String>()
+                identity
             )
         ).thenReturn("key")
 
         mvcRequest.perform(
                 MockMvcRequestBuilders
                         .get("/psk")
-                        .header("x-device-identity", "identity"))
+                    .header("x-device-identity", identity)
+        )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.content().string("key"))
     }

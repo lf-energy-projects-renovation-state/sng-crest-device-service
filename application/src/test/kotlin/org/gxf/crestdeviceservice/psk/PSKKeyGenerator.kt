@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.psk
 
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -7,7 +10,7 @@ import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.PrivateKey
 import java.security.PublicKey
-import java.util.*
+import java.util.Base64
 import javax.crypto.Cipher
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
@@ -20,7 +23,7 @@ class PSKKeyGenerator {
 
     @Test
     fun generateKeyPair() {
-        val generator: KeyPairGenerator = KeyPairGenerator.getInstance(algorithm)
+        val generator = KeyPairGenerator.getInstance(algorithm)
             .apply { initialize(4096) }
 
         val keyPair: KeyPair = generator.generateKeyPair()

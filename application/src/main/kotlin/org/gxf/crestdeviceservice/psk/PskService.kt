@@ -17,7 +17,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         private const val ALLOWED_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     }
 
-    private val secureRandom: SecureRandom = SecureRandom.getInstanceStrong()
+    private val secureRandom = SecureRandom.getInstanceStrong()
 
     fun getCurrentActiveKey(identity: String) =
         getCurrentActivePsk(identity)?.preSharedKey
