@@ -14,9 +14,10 @@ import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import java.time.Instant
 
 object TestHelper {
+    val mapper = ObjectMapper()
+
     // Returns a JsonNode representation of: ["INIT", {"DL": "0"}]
     fun unsollicitedResultCodeInit(): ArrayNode {
-        val mapper = ObjectMapper()
         val urcList = listOf(
             TextNode("INIT"),
             ObjectNode(JsonNodeFactory.instance, mapOf("DL" to TextNode("0")))
@@ -25,7 +26,6 @@ object TestHelper {
     }
 
     fun unsollicitedResultCodeSuccess(): ArrayNode {
-        val mapper = ObjectMapper()
         val urcList = listOf(
             TextNode("PSK:SET"),
             ObjectNode(
@@ -37,7 +37,6 @@ object TestHelper {
     }
 
     fun unsollicitedResultCodeFailure(): ArrayNode {
-        val mapper = ObjectMapper()
         val urcList = listOf(
             TextNode("PSK:EQER"),
             ObjectNode(

@@ -23,7 +23,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         getCurrentActivePsk(identity)?.preSharedKey
 
     private fun getCurrentActivePsk(identity: String) =
-        pskRepository.findLatestPskForIdentityWithStatus(
+        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
             identity,
             PreSharedKeyStatus.ACTIVE
         )
@@ -38,7 +38,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
     }
 
     private fun getCurrentPendingKey(identity: String) =
-        pskRepository.findLatestPskForIdentityWithStatus(
+        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
             identity,
             PreSharedKeyStatus.PENDING
         )
@@ -53,7 +53,10 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
     fun generateNewReadyKeyForIdentity(identity: String) {
         val newKey = generatePsk()
         val previousPSK =
-            pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.ACTIVE)
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                identity,
+                PreSharedKeyStatus.ACTIVE
+            )
                 ?: throw NoExistingPskException("There is no active key present")
         val newVersion = previousPSK.revision + 1
         pskRepository.save(
@@ -74,7 +77,10 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     fun setReadyKeyForIdentityAsPending(identity: String): PreSharedKey {
         val readyPsk =
-            pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.READY)
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                identity,
+                PreSharedKeyStatus.READY
+            )
                 ?: throw NoExistingPskException("There is no new key ready to be set")
         readyPsk.status = PreSharedKeyStatus.PENDING
         return pskRepository.save(readyPsk)
@@ -85,7 +91,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
                 isNewKeyReady(identity)
 
     private fun isNewKeyReady(identity: String) =
-        pskRepository.findLatestPskForIdentityWithStatus(
+        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
             identity,
             PreSharedKeyStatus.READY
         ) != null
@@ -99,9 +105,15 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
      */
     fun changeActiveKey(identity: String) {
         val currentPsk =
-            pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.ACTIVE)
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                identity,
+                PreSharedKeyStatus.ACTIVE
+            )
         val newPsk =
-            pskRepository.findLatestPskForIdentityWithStatus(identity, PreSharedKeyStatus.PENDING)
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                identity,
+                PreSharedKeyStatus.PENDING
+            )
 
         check(currentPsk != null && newPsk != null) { "No current or new psk, impossible to change active key" }
 

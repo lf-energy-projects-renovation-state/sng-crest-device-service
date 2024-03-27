@@ -104,7 +104,7 @@ class CoapMessageHandlingTest {
         val result = restTemplate.postForEntity<String>("/sng/${IDENTITY}", request)
 
         val oldKey = pskRepository.findFirstByIdentityOrderByRevisionAsc(IDENTITY)!!
-        val newKey = pskRepository.findLatestPsk(IDENTITY)!!
+        val newKey = pskRepository.findFirstByIdentityOrderByRevisionDesc(IDENTITY)!!
 
         assertThat(result.body).isEqualTo("0")
         assertThat(oldKey.status).isEqualTo(PreSharedKeyStatus.INACTIVE)
@@ -133,7 +133,7 @@ class CoapMessageHandlingTest {
 
         assertThat(result.body).isEqualTo("0")
         val oldKey = pskRepository.findFirstByIdentityOrderByRevisionAsc(IDENTITY)!!
-        val newKey = pskRepository.findLatestPsk(IDENTITY)!!
+        val newKey = pskRepository.findFirstByIdentityOrderByRevisionDesc(IDENTITY)!!
 
         assertThat(result.body).isEqualTo("0")
         assertThat(oldKey.status).isEqualTo(PreSharedKeyStatus.ACTIVE)

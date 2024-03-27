@@ -29,7 +29,12 @@ class PskServiceTest {
     @Test
     fun getCurrentActiveKey() {
         val psk = TestHelper.preSharedKeyActive()
-        whenever(pskRepository.findLatestPskForIdentityWithStatus(any(), any())).thenReturn(psk)
+        whenever(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                any(),
+                any()
+            )
+        ).thenReturn(psk)
 
         assertThat(psk.preSharedKey).isEqualTo(pskService.getCurrentActiveKey("identity"))
     }
@@ -37,14 +42,24 @@ class PskServiceTest {
     @Test
     fun pendingKeyPresentTrue() {
         val psk = TestHelper.preSharedKeyPending()
-        whenever(pskRepository.findLatestPskForIdentityWithStatus(any(), any())).thenReturn(psk)
+        whenever(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                any(),
+                any()
+            )
+        ).thenReturn(psk)
 
         assertThat(pskService.isPendingKeyPresent("identity")).isEqualTo(true)
     }
 
     @Test
     fun pendingKeyPresentFalse() {
-        whenever(pskRepository.findLatestPskForIdentityWithStatus(any(), any())).thenReturn(null)
+        whenever(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                any(),
+                any()
+            )
+        ).thenReturn(null)
 
         assertThat(pskService.isPendingKeyPresent("identity")).isEqualTo(false)
     }
@@ -52,7 +67,12 @@ class PskServiceTest {
     @Test
     fun setPendingKeyAsInvalid() {
         val psk = TestHelper.preSharedKeyPending()
-        whenever(pskRepository.findLatestPskForIdentityWithStatus(any(), any())).thenReturn(psk)
+        whenever(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                any(),
+                any()
+            )
+        ).thenReturn(psk)
 
         psk.status = PreSharedKeyStatus.INVALID
 
@@ -67,7 +87,7 @@ class PskServiceTest {
         psk.status = PreSharedKeyStatus.PENDING
 
         whenever(
-            pskRepository.findLatestPskForIdentityWithStatus(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
                 any<String>(),
                 any<PreSharedKeyStatus>()
             )
@@ -80,7 +100,12 @@ class PskServiceTest {
     @Test
     fun needsKeyChangeSetInitialPskTrueAnd1ReadyIdentity() {
         // If change initial psk is true, and we have a ready key, the key should be changed
-        whenever(pskRepository.findLatestPskForIdentityWithStatus(any(), any())).thenReturn(
+        whenever(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                any(),
+                any()
+            )
+        ).thenReturn(
             TestHelper.preSharedKeyReady()
         )
         whenever(pskConfiguration.changeInitialPsk).thenReturn(true)
@@ -99,7 +124,12 @@ class PskServiceTest {
     @Test
     fun needsKeyChangeSetInitialPskTrueAnd0ReadyIdentity() {
         // If we have 0 keys we shouldn't generate a new key
-        whenever(pskRepository.findLatestPskForIdentityWithStatus(any(), any())).thenReturn(null)
+        whenever(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                any(),
+                any()
+            )
+        ).thenReturn(null)
         whenever(pskConfiguration.changeInitialPsk).thenReturn(true)
 
         assertThat(pskService.needsKeyChange("123")).isFalse()
@@ -111,13 +141,13 @@ class PskServiceTest {
         val currentPsk = TestHelper.preSharedKeyActive()
         val newPsk = TestHelper.preSharedKeyPending()
         whenever(
-            pskRepository.findLatestPskForIdentityWithStatus(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
                 identity,
                 PreSharedKeyStatus.ACTIVE
             )
         ).thenReturn(currentPsk)
         whenever(
-            pskRepository.findLatestPskForIdentityWithStatus(
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
                 identity,
                 PreSharedKeyStatus.PENDING
             )
