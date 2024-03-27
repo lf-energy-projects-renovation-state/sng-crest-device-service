@@ -11,20 +11,20 @@ import org.gxf.crestdeviceservice.psk.PskService
 import org.springframework.stereotype.Service
 
 @Service
-class DownlinkService(private val pskService: PskService) {
+class DownlinkService(
+    private val pskService: PskService,
+    private val urcService: URCService
+) {
 
     companion object{
-        private const val URC_PSK_SUCCESS = "PSK:SET"
-        private const val URC_PSK_ERROR = "ER"
         private const val RESPONSE_SUCCESS = "0"
-        private const val URC_FIELD = "URC"
     }
 
     private val logger = KotlinLogging.logger {}
 
     @Transactional
     fun getDownlinkForIdentity(identity: String, body: JsonNode): String {
-        interpretURCInMessage(identity, body)
+        urcService.interpretURCInMessage(identity, body)
 
         if (pskService.needsKeyChange(identity)) {
             logger.info { "Device $identity needs key change" }
@@ -36,31 +36,4 @@ class DownlinkService(private val pskService: PskService) {
 
         return RESPONSE_SUCCESS
     }
-
-    private fun interpretURCInMessage(identity: String, body: JsonNode) {
-        val urc = getUrcFromMessage(body)
-
-        if (urc != null) {
-            logger.debug { "Received message with urc $urc" }
-
-            when {
-                urc.contains(URC_PSK_SUCCESS) -> {
-                    check(pskService.isPendingKeyPresent(identity)) { "Success URC received, but no pending key present to set as active" }
-                    logger.info { "PSK set successfully, changing active key" }
-                    pskService.changeActiveKey(identity)
-                }
-
-                urc.contains(URC_PSK_ERROR) -> {
-                    check(pskService.isPendingKeyPresent(identity)) { "Failure URC received, but no pending key present to set as invalid" }
-                    logger.warn { "Error received for set PSK command, setting pending key to invalid" }
-                    pskService.setPendingKeyAsInvalid(identity)
-                }
-            }
-        }
-    }
-
-    private fun getUrcFromMessage(body: JsonNode) = body[URC_FIELD]
-        .filter { it.isTextual }
-        .map { it.asText() }
-        .firstOrNull()
 }
