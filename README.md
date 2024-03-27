@@ -17,7 +17,6 @@ To test this flow locally:
 5. There should be an active and a ready psk in the database.
 6. Run the coap-http proxy.
 7. Run the simulator.
-8. A psk set command will be sent to the device (simulator). The new key will be set to pending.
-    1. If a success response is received, the pending key will be set to active and the old key will
-       become inactive.
-    2. If a failure response is received, the pending key will be set to invalid.
+8. When the crest device service receives a message from the device (simulator), a psk set command will be sent in the downlink response to the device (simulator). The new key will be set to pending.
+    1. When the crest device service receives a success result code in the subsequent message from the device (simulator), the pending key will be set to active and the old key will become inactive.
+    2. When the crest device service receives a failure result code in the subsequent message from the device (simulator), the pending key will be set to invalid.
