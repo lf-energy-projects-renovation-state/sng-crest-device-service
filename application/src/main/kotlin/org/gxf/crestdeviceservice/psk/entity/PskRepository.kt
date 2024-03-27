@@ -7,17 +7,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey> {
 
-    @Query("""
-        select psk from  PreSharedKey psk 
-        where psk.identity = ?1 
-          and psk.status = ?2
-        order by psk.revision desc
-        limit 1
-        """)
-    fun findLatestPskForIdentityWithStatus(
-        identity: String,
-        status: PreSharedKeyStatus
-    ): PreSharedKey?
+    fun findFirstByIdentityAndStatusOrderByRevisionDesc(identity: String): PreSharedKey?
 
     fun findFirstByIdentityOrderByRevisionDesc(identity: String): PreSharedKey?
 
