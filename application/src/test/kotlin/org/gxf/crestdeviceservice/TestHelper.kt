@@ -47,30 +47,18 @@ object TestHelper {
         return mapper.valueToTree(urcList)
     }
 
-    fun preSharedKeyReady(): PreSharedKey = PreSharedKey(
-        "identity",
-        1,
-        Instant.now(),
-        "key",
-        "secret",
-        PreSharedKeyStatus.READY
-    )
+    fun preSharedKeyReady() = preSharedKeyWithStatus(PreSharedKeyStatus.READY)
 
-    fun preSharedKeyActive(): PreSharedKey = PreSharedKey(
-        "identity",
-        1,
-        Instant.now(),
-        "key",
-        "secret",
-        PreSharedKeyStatus.ACTIVE
-    )
+    fun preSharedKeyActive() = preSharedKeyWithStatus(PreSharedKeyStatus.ACTIVE)
 
-    fun preSharedKeyPending(): PreSharedKey = PreSharedKey(
+    fun preSharedKeyPending() = preSharedKeyWithStatus(PreSharedKeyStatus.PENDING)
+    
+    private fun preSharedKeyWithStatus(status: PreSharedKeyStatus) = PreSharedKey(
         "identity",
         1,
         Instant.now(),
         "key",
         "secret",
-        PreSharedKeyStatus.PENDING
+        status
     )
 }
