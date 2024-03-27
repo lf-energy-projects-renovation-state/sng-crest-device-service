@@ -44,7 +44,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         )
 
     fun setInitialKeyForIdentity(identity: String, psk: String, secret: String) {
-        if (pskRepository.countPSKsForIdWithStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {
+        if (pskRepository.countByIdentityAndStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {
             throw InitialKeySetException("Key already exists for identity. Key cannot be overridden")
         }
         pskRepository.save(PreSharedKey(identity, 0, Instant.now(), psk, secret, PreSharedKeyStatus.ACTIVE))
