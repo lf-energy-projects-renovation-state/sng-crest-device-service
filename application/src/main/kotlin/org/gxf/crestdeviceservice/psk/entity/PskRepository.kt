@@ -37,10 +37,5 @@ interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey>
     )
     fun findOldestPsk(identity: String): PreSharedKey?
 
-    @Query("""
-        select count(psk) from PreSharedKey psk 
-        where psk.identity = ?1
-          and psk.status = ?2
-        """)
-    fun countPSKsForIdWithStatus(identity: String, status: PreSharedKeyStatus): Long
+    fun countByIdentityAndStatus(identity: String, status: PreSharedKeyStatus): Long
 }
