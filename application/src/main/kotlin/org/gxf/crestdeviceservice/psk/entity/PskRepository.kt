@@ -19,13 +19,7 @@ interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey>
         status: PreSharedKeyStatus
     ): PreSharedKey?
 
-    @Query("""
-        select psk from PreSharedKey psk 
-        where psk.identity = ?1 
-        order by psk.revision desc
-        limit 1
-        """)
-    fun findLatestPsk(identity: String): PreSharedKey?
+    fun findFirstByIdentityOrderByRevisionDesc(identity: String): PreSharedKey?
 
     fun findFirstByIdentityOrderByRevisionAsc(identity: String): PreSharedKey?
 
