@@ -3,6 +3,7 @@ package org.gxf.crestdeviceservice.coap
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.psk.PskService
+import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.springframework.stereotype.Service
 
 @Service
@@ -25,13 +26,17 @@ class URCService(
 
             when {
                 urc.contains(URC_PSK_SUCCESS) -> {
-                    check(pskService.isPendingKeyPresent(identity)) { "Success URC received, but no pending key present to set as active" }
+                    if (!pskService.isPendingKeyPresent(identity)) {
+                        throw NoExistingPskException("Success URC received, but no pending key present to set as active")
+                    }
                     logger.info { "PSK set successfully, changing active key" }
                     pskService.changeActiveKey(identity)
                 }
 
                 urc.contains(URC_PSK_ERROR) -> {
-                    check(pskService.isPendingKeyPresent(identity)) { "Failure URC received, but no pending key present to set as invalid" }
+                    if (!pskService.isPendingKeyPresent(identity)) {
+                        throw NoExistingPskException("Failure URC received, but no pending key present to set as invalid")
+                    }
                     logger.warn { "Error received for set PSK command, setting pending key to invalid" }
                     pskService.setPendingKeyAsInvalid(identity)
                 }
