@@ -18,6 +18,7 @@ class URCService(
 
     private val logger = KotlinLogging.logger {}
 
+    @Throws(NoExistingPskException::class)
     fun interpretURCInMessage(identity: String, body: JsonNode) {
         val urc = getUrcFromMessage(body)
 

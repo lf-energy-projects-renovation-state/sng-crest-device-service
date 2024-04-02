@@ -6,3 +6,11 @@ management:
     web:
       exposure:
         include: "prometheus"
+
+logging:
+  level:
+    com:
+      alliander: info
+    org:
+      gxf: info
+    root: warn

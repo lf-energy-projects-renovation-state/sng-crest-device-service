@@ -38,6 +38,7 @@ class MessageController(private val messageService: MessageService, private val 
                 val downlink = downlinkService.getDownlinkForIdentity(identity, body)
                 return ResponseEntity.ok(downlink)
             } catch (e: Exception) {
+                logger.error { "Exception occurred while creating downlink for device $identity" }
                 return ResponseEntity.internalServerError().build()
             }
         }
