@@ -8,7 +8,11 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.lang.NonNull
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/sng")
@@ -30,7 +34,13 @@ class MessageController(private val messageService: MessageService, private val 
         logger.debug { "Processed message" }
 
         synchronized(lock(identity)) {
-            return ResponseEntity.ok(downlinkService.getDownlinkForIdentity(identity))
+            try {
+                val downlink = downlinkService.getDownlinkForIdentity(identity, body)
+                return ResponseEntity.ok(downlink)
+            } catch (e: Exception) {
+                logger.error { "Exception occurred while creating downlink for device $identity" }
+                return ResponseEntity.internalServerError().build()
+            }
         }
     }
 
