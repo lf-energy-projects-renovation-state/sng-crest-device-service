@@ -16,7 +16,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/sng")
-class MessageController(private val messageService: MessageService, private val downlinkService: DownlinkService) {
+class MessageController(
+    private val messageService: MessageService,
+    private val downlinkService: DownlinkService,
+    private val urcService: UrcService
+) {
 
     private val logger = KotlinLogging.logger {}
 
@@ -35,6 +39,7 @@ class MessageController(private val messageService: MessageService, private val 
 
         synchronized(lock(identity)) {
             try {
+                urcService.interpretURCInMessage(identity, body)
                 val downlink = downlinkService.getDownlinkForIdentity(identity, body)
                 return ResponseEntity.ok(downlink)
             } catch (e: Exception) {

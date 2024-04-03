@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.coap
 
 import com.fasterxml.jackson.databind.JsonNode
@@ -7,7 +10,7 @@ import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.springframework.stereotype.Service
 
 @Service
-class URCService(
+class UrcService(
     private val pskService: PskService
 ) {
     companion object {
