@@ -80,7 +80,7 @@ class CoapMessageHandlingTest {
 
         val result = restTemplate.postForEntity<String>("/sng/${IDENTITY}", request)
 
-        assertThat(result.body).contains("PSK:", "SET")
+        assertThat(result.body).contains("PSK:", ":SET")
     }
 
     @Test
