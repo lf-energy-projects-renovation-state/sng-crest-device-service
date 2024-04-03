@@ -43,7 +43,7 @@ class DownlinkServiceTest {
         val result = downLinkService.getDownlinkForIdentity(identity, message)
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]SET
-        assertThat(result).isEqualTo("!PSK:$expectedKey:$expectedHash;PSK:$expectedKey:${expectedHash}SET")
+        assertThat(result).isEqualTo("!PSK:$expectedKey:$expectedHash;PSK:$expectedKey:${expectedHash}:SET")
     }
 
     @Test
