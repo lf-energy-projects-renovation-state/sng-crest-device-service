@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class DownlinkService(
-    private val pskService: PskService,
-    private val urcService: URCService
+    private val pskService: PskService
 ) {
 
     companion object{
@@ -26,8 +25,6 @@ class DownlinkService(
     @Transactional
     @Throws(NoExistingPskException::class)
     fun getDownlinkForIdentity(identity: String, body: JsonNode): String {
-        urcService.interpretURCInMessage(identity, body)
-
         logger.debug { "Check if device $identity needs key change" }
         if (pskService.needsKeyChange(identity)) {
             logger.info { "Device $identity needs key change" }

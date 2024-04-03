@@ -17,8 +17,7 @@ import java.time.Instant
 
 class DownlinkServiceTest {
     private val pskService = mock<PskService>()
-    private val urcService = mock<URCService>()
-    private val downLinkService = DownlinkService(pskService, urcService)
+    private val downLinkService = DownlinkService(pskService)
     private val mapper = spy<ObjectMapper>()
 
     @Test

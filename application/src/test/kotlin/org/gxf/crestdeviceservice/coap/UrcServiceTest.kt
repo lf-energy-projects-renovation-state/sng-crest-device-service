@@ -12,9 +12,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.util.ResourceUtils
 
-class URCServiceTest {
+class UrcServiceTest {
     private val pskService = mock<PskService>()
-    private val urcService = URCService(pskService)
+    private val urcService = UrcService(pskService)
     private val mapper = spy<ObjectMapper>()
 
     @Test

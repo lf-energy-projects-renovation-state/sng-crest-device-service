@@ -124,14 +124,15 @@ class PskServiceTest {
 
     @Test
     fun needsKeyChangeReturnsTrueWhenChangeInitialPskIsTrueAndReadyKeyIsPresent() {
-        val identity = "123"
+        val psk = TestHelper.preSharedKeyReady()
+        val identity = psk.identity
         whenever(
             pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
                 identity,
                 PreSharedKeyStatus.READY
             )
         ).thenReturn(
-            TestHelper.preSharedKeyReady()
+            psk
         )
         whenever(pskConfiguration.changeInitialPsk).thenReturn(true)
 
