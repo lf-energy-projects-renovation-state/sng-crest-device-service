@@ -9,10 +9,9 @@ import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 
 object PskCommandCreator {
 
-    fun createPskSetCommand(preSharedKey: PreSharedKey): String {
-        val key = preSharedKey.preSharedKey
-        val secret = preSharedKey.secret
-        val hash = DigestUtils.sha256Hex("$secret$key")
-        return "!PSK:${key}:${hash};PSK:${key}:${hash}:SET"
+    fun createPskSetCommand(newPreSharedKey: PreSharedKey, oldKey: String): String {
+        val newKey = newPreSharedKey.preSharedKey
+        val hash = DigestUtils.sha256Hex("${newPreSharedKey.secret}${oldKey}")
+        return "!PSK:${newKey}:${hash};PSK:${newKey}:${hash}:SET"
     }
 }

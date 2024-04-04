@@ -24,7 +24,7 @@ class DownlinkServiceTest {
     fun shouldReturnPskDownlinkWhenThereIsANewPsk() {
         val identity = "identity"
         val expectedKey = "key"
-        val expectedHash = "ad165b11320bc91501ab08613cc3a48a62a6caca4d5c8b14ca82cc313b3b96cd"
+        val expectedHash = "238104b039438f9dcbbef1dd6e295aa3cf2f248406c01ba7f6034becfe1a53d9"
         val psk = PreSharedKey(
             identity,
             1,
@@ -34,6 +34,7 @@ class DownlinkServiceTest {
             PreSharedKeyStatus.PENDING
         )
 
+        whenever(pskService.getCurrentActiveKey(identity)).thenReturn("oldKey")
         whenever(pskService.needsKeyChange(identity)).thenReturn(true)
         whenever(pskService.setReadyKeyForIdentityAsPending(identity)).thenReturn(psk)
 
@@ -42,8 +43,8 @@ class DownlinkServiceTest {
 
         val result = downLinkService.getDownlinkForIdentity(identity, message)
 
-        // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]SET
-        assertThat(result).isEqualTo("!PSK:$expectedKey:$expectedHash;PSK:$expectedKey:${expectedHash}:SET")
+        // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]:SET
+        assertThat(result).isEqualTo("!PSK:${expectedKey}:${expectedHash};PSK:${expectedKey}:${expectedHash}:SET")
     }
 
     @Test
