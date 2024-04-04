@@ -23,27 +23,23 @@ class UrcService(
 
     @Throws(NoExistingPskException::class)
     fun interpretURCInMessage(identity: String, body: JsonNode) {
-        val urc = getUrcFromMessage(body)
+        val urcs = getUrcFromMessage(body)
 
-        if (urc != null) {
-            logger.debug { "Received message with urc $urc" }
+        if (urcs.isNotEmpty()) {
+            logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
 
-            when {
-                urc.contains(URC_PSK_SUCCESS) -> {
-                    if (!pskService.isPendingKeyPresent(identity)) {
-                        throw NoExistingPskException("Success URC received, but no pending key present to set as active")
-                    }
-                    logger.info { "PSK set successfully, changing active key" }
-                    pskService.changeActiveKey(identity)
+            if (urcs.any { urc -> urc.contains(URC_PSK_ERROR) }) {
+                if (!pskService.isPendingKeyPresent(identity)) {
+                    throw NoExistingPskException("Failure URC received, but no pending key present to set as invalid")
                 }
-
-                urc.contains(URC_PSK_ERROR) -> {
-                    if (!pskService.isPendingKeyPresent(identity)) {
-                        throw NoExistingPskException("Failure URC received, but no pending key present to set as invalid")
-                    }
-                    logger.warn { "Error received for set PSK command, setting pending key to invalid" }
-                    pskService.setPendingKeyAsInvalid(identity)
+                logger.warn { "Error received for set PSK command, setting pending key to invalid" }
+                pskService.setPendingKeyAsInvalid(identity)
+            } else if (urcs.any { urc -> urc.contains(URC_PSK_SUCCESS) }) {
+                if (!pskService.isPendingKeyPresent(identity)) {
+                    throw NoExistingPskException("Success URC received, but no pending key present to set as active")
                 }
+                logger.info { "PSK set successfully, changing active key" }
+                pskService.changeActiveKey(identity)
             }
         }
     }
@@ -51,5 +47,4 @@ class UrcService(
     private fun getUrcFromMessage(body: JsonNode) = body[URC_FIELD]
         .filter { it.isTextual }
         .map { it.asText() }
-        .firstOrNull()
 }
