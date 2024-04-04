@@ -31,12 +31,12 @@ class UrcService(
         logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
 
         when {
-            urcsContainsSuccess(urcs) -> {
-                handleSuccessUrc(identity)
-            }
-
             urcsContainsError(urcs) -> {
                 handleErrorUrc(identity)
+            }
+
+            urcsContainsSuccess(urcs) -> {
+                handleSuccessUrc(identity)
             }
         }
     }
@@ -44,17 +44,6 @@ class UrcService(
     private fun getUrcsFromMessage(body: JsonNode) = body[URC_FIELD]
         .filter { it.isTextual }
         .map { it.asText() }
-
-    private fun urcsContainsSuccess(urcs: List<String>) =
-        urcs.any { urc -> urc.contains(URC_PSK_SUCCESS) }
-
-    private fun handleSuccessUrc(identity: String) {
-        if (!pskService.isPendingKeyPresent(identity)) {
-            throw NoExistingPskException("Success URC received, but no pending key present to set as active")
-        }
-        logger.info { "PSK set successfully, changing active key" }
-        pskService.changeActiveKey(identity)
-    }
 
     private fun urcsContainsError(urcs: List<String>) =
         urcs.any { urc -> urc.contains(URC_PSK_ERROR) }
@@ -65,5 +54,16 @@ class UrcService(
         }
         logger.warn { "Error received for set PSK command, setting pending key to invalid" }
         pskService.setPendingKeyAsInvalid(identity)
+    }
+
+    private fun urcsContainsSuccess(urcs: List<String>) =
+        urcs.any { urc -> urc.contains(URC_PSK_SUCCESS) }
+
+    private fun handleSuccessUrc(identity: String) {
+        if (!pskService.isPendingKeyPresent(identity)) {
+            throw NoExistingPskException("Success URC received, but no pending key present to set as active")
+        }
+        logger.info { "PSK set successfully, changing active key" }
+        pskService.changeActiveKey(identity)
     }
 }
