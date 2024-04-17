@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import com.diffplug.gradle.spotless.SpotlessExtension
 import io.spring.gradle.dependencymanagement.internal.dsl.StandardDependencyManagementExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -14,6 +15,7 @@ plugins {
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1" apply false
     id("org.sonarqube") version "4.4.1.3373"
     id("eclipse")
+    id("com.diffplug.spotless") version "6.25.0"
 }
 
 version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "develop"
@@ -35,6 +37,7 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
     apply(plugin = "jacoco")
     apply(plugin = "jacoco-report-aggregation")
+    apply(plugin = "com.diffplug.spotless")
 
     group = "org.gxf.template"
     version = rootProject.version
@@ -59,6 +62,23 @@ subprojects {
     extensions.configure<StandardDependencyManagementExtension> {
         imports {
             mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+        }
+    }
+
+    extensions.configure<SpotlessExtension> {
+        kotlin {
+            // by default the target is every '.kt' and '.kts` file in the java source sets
+            ktfmt().dropboxStyle()
+            licenseHeader(
+                """
+                // SPDX-FileCopyrightText: Contributors to the GXF project
+                //
+                // SPDX-License-Identifier: Apache-2.0
+
+                """
+                    .trimIndent(),
+                "package ",
+            )
         }
     }
 
