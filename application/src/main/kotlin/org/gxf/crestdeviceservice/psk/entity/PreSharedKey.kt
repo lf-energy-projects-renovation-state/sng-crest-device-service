@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.crestdeviceservice.psk.entity
 
 import jakarta.persistence.Convert
@@ -10,8 +9,8 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.IdClass
-import org.gxf.crestdeviceservice.psk.entity.convertors.DatabaseFieldEncryptor
 import java.time.Instant
+import org.gxf.crestdeviceservice.psk.entity.convertors.DatabaseFieldEncryptor
 
 @Entity
 @IdClass(PreSharedKeyCompositeKey::class)

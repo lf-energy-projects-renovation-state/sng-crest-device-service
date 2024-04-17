@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.crestdeviceservice.psk
 
 import com.alliander.sng.DeviceCredentials
@@ -15,20 +14,22 @@ class IncomingDeviceCredentialsService(
     private val pskDecryptionService: PskDecryptionService
 ) {
 
-    private val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger {}
 
     @KafkaListener(
         topics = ["\${crest-device-service.kafka.pre-shared-key-consumer.topic-name}"],
-        id = "\${crest-device-service.kafka.pre-shared-key-consumer.id}"
-    )
+        id = "\${crest-device-service.kafka.pre-shared-key-consumer.id}")
     fun handleIncomingDeviceCredentials(deviceCredentials: DeviceCredentials) {
         logger.info { "Received key for ${deviceCredentials.imei}" }
 
         val identity = deviceCredentials.imei
 
         try {
-            val decryptedPsk = pskDecryptionService.decryptSecret(deviceCredentials.psk, deviceCredentials.keyRef)
-            val decryptedSecret = pskDecryptionService.decryptSecret(deviceCredentials.secret, deviceCredentials.keyRef)
+            val decryptedPsk =
+                pskDecryptionService.decryptSecret(deviceCredentials.psk, deviceCredentials.keyRef)
+            val decryptedSecret =
+                pskDecryptionService.decryptSecret(
+                    deviceCredentials.secret, deviceCredentials.keyRef)
 
             pskService.setInitialKeyForIdentity(identity, decryptedPsk, decryptedSecret)
 
@@ -38,5 +39,4 @@ class IncomingDeviceCredentialsService(
             logger.error(e) { "Failed to set device credentials for $identity" }
         }
     }
-
 }

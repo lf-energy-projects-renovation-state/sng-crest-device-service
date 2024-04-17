@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.crestdeviceservice
 
+import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.IntegrationTestHelper.getFileContentAsString
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
@@ -21,11 +21,10 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
-import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
-        topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
+    topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CoapMessageHandlingTest {
@@ -37,24 +36,15 @@ class CoapMessageHandlingTest {
         private const val SECRET = "123456789"
     }
 
-    @Autowired
-    private lateinit var restTemplate: TestRestTemplate
+    @Autowired private lateinit var restTemplate: TestRestTemplate
 
-    @Autowired
-    private lateinit var pskRepository: PskRepository
+    @Autowired private lateinit var pskRepository: PskRepository
 
     @BeforeEach
     fun setup() {
         pskRepository.save(
             PreSharedKey(
-                IDENTITY,
-                0,
-                Instant.MIN,
-                PRE_SHARED_KEY_FIRST,
-                SECRET,
-                PreSharedKeyStatus.ACTIVE
-            )
-        )
+                IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY_FIRST, SECRET, PreSharedKeyStatus.ACTIVE))
     }
 
     @AfterEach
@@ -66,14 +56,7 @@ class CoapMessageHandlingTest {
     fun shouldReturnADownLinkContainingAPskSetCommandWhenTheKeyHasNotChangedYet() {
         pskRepository.save(
             PreSharedKey(
-                IDENTITY,
-                1,
-                Instant.now(),
-                PRE_SHARED_KEY_NEW,
-                SECRET,
-                PreSharedKeyStatus.READY
-            )
-        )
+                IDENTITY, 1, Instant.now(), PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.READY))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
@@ -88,14 +71,7 @@ class CoapMessageHandlingTest {
         // pending psk, waiting for URC in next message from device
         pskRepository.save(
             PreSharedKey(
-                IDENTITY,
-                1,
-                Instant.now(),
-                PRE_SHARED_KEY_NEW,
-                SECRET,
-                PreSharedKeyStatus.PENDING
-            )
-        )
+                IDENTITY, 1, Instant.now(), PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.PENDING))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request =
@@ -116,14 +92,7 @@ class CoapMessageHandlingTest {
         // pending psk, waiting for URC in next message from device
         pskRepository.save(
             PreSharedKey(
-                IDENTITY,
-                1,
-                Instant.MIN,
-                PRE_SHARED_KEY_NEW,
-                SECRET,
-                PreSharedKeyStatus.PENDING
-            )
-        )
+                IDENTITY, 1, Instant.MIN, PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.PENDING))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request =
