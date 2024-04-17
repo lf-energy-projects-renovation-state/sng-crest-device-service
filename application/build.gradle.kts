@@ -56,6 +56,10 @@ tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
     }
 }
 
+tasks.compileKotlin {
+    dependsOn(tasks.generateTestAvroJava)
+}
+
 testing {
     suites {
         val integrationTest by registering(JvmTestSuite::class) {
