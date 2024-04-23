@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import com.diffplug.gradle.spotless.SpotlessExtension
-import com.github.davidmc24.gradle.plugin.avro.GenerateAvroJavaTask
 import io.spring.gradle.dependencymanagement.internal.dsl.StandardDependencyManagementExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -88,7 +87,6 @@ subprojects {
             freeCompilerArgs = listOf("-Xjsr305=strict")
             jvmTarget = "21"
         }
-        dependsOn(tasks.withType<GenerateAvroJavaTask>())
     }
 
     tasks.withType<Test> {
