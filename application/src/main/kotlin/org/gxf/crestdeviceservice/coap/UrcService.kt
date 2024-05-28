@@ -14,7 +14,9 @@ class UrcService(
     private val pskService: PskService
 ) {
     companion object {
-        private const val URC_PSK_SUCCESS = "PSK:SET"
+        private const val URC_PSK_PREFIX = "PSK:"
+        private const val URC_PSK_SUCCESS =  "${URC_PSK_PREFIX}SET"
+        private val URC_ERROR_CODES = listOf("DL:UNK", "[DL]:DLNA", "[DL]:DLER", "[DL]:#ERR", "[DL]:HSER", "[DL]:CSER", "SK:EQER", "SK:TMP")
         private const val URC_PSK_ERROR = "ER"
         private const val URC_FIELD = "URC"
     }
@@ -31,12 +33,11 @@ class UrcService(
         logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
 
         when {
-            urcsContainsError(urcs) -> {
-                handleErrorUrc(identity)
+            urcsContainsPSKError(urcs) -> {
+                handleErrorPSKUrc(identity)
             }
-
-            urcsContainsSuccess(urcs) -> {
-                handleSuccessUrc(identity)
+            urcsContainsPSKSuccess(urcs) -> {
+                handlePSKSuccessUrc(identity)
             }
         }
     }
@@ -45,10 +46,10 @@ class UrcService(
         .filter { it.isTextual }
         .map { it.asText() }
 
-    private fun urcsContainsError(urcs: List<String>) =
-        urcs.any { urc -> urc.contains(URC_PSK_ERROR) }
+    private fun urcsContainsPSKError(urcs: List<String>) =
+        urcs.any { urc -> urc.startsWith(URC_PSK_PREFIX) && urc.endsWith(URC_PSK_ERROR) }
 
-    private fun handleErrorUrc(identity: String) {
+    private fun handleErrorPSKUrc(identity: String) {
         if (!pskService.isPendingKeyPresent(identity)) {
             throw NoExistingPskException("Failure URC received, but no pending key present to set as invalid")
         }
@@ -56,10 +57,10 @@ class UrcService(
         pskService.setPendingKeyAsInvalid(identity)
     }
 
-    private fun urcsContainsSuccess(urcs: List<String>) =
-        urcs.any { urc -> urc.contains(URC_PSK_SUCCESS) }
+    private fun urcsContainsPSKSuccess(urcs: List<String>) =
+        urcs.any { urc -> urc.contains(URC_PSK_PREFIX + URC_PSK_SUCCESS) }
 
-    private fun handleSuccessUrc(identity: String) {
+    private fun handlePSKSuccessUrc(identity: String) {
         if (!pskService.isPendingKeyPresent(identity)) {
             throw NoExistingPskException("Success URC received, but no pending key present to set as active")
         }
