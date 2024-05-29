@@ -56,10 +56,10 @@ subprojects {
 
     extensions.configure<SpotlessExtension> {
         kotlin {
-            // by default the target is every '.kt' and '.kts` file in the java source sets
+            // by default the target is every '.kt' and '.kts' file in the java source sets
             ktfmt().dropboxStyle()
             licenseHeaderFile(
-                "../license-template.kt",
+                "${project.rootDir}/license-template.kt",
                 "package")
                 .updateYearWithLatest(false)
         }
