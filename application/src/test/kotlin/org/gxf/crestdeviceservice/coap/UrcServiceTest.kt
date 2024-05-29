@@ -45,7 +45,9 @@ class UrcServiceTest {
     }
 
     @ParameterizedTest(name = "should set pending key as invalid for {0}")
-    @ValueSource(strings = ["PSK:EQER", "DL:UNK", "[DL]:DLNA", "[DL]:DLER", "[DL]:#ERR", "[DL]:HSER", "[DL]:CSER"])
+    @ValueSource(
+        strings =
+            ["PSK:EQER", "DL:UNK", "[DL]:DLNA", "[DL]:DLER", "[DL]:#ERR", "[DL]:HSER", "[DL]:CSER"])
     fun shouldSetPendingKeyAsInvalidWhenFailureURCReceived(urc: String) {
         val identity = "identity"
 
@@ -54,7 +56,8 @@ class UrcServiceTest {
 
         val fileToUse = ResourceUtils.getFile("classpath:messages/message_psk_set_failure.json")
         val messageTemplate = mapper.readTree(fileToUse)
-        val receivedCommand = "!PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3;PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3:SET"
+        val receivedCommand =
+            "!PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3;PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3:SET"
         val message = updatePskCommandInMessage(messageTemplate, urc, receivedCommand)
 
         urcService.interpretURCInMessage(identity, message)
@@ -68,10 +71,10 @@ class UrcServiceTest {
         receivedCommand: String
     ): JsonNode {
         val newMessage = message as ObjectNode
-        val urcList = listOf(
-            TextNode(urc),
-            ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(receivedCommand)))
-        )
+        val urcList =
+            listOf(
+                TextNode(urc),
+                ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(receivedCommand))))
         val urcArray = mapper.valueToTree<ArrayNode>(urcList)
         newMessage.replace(URC_FIELD, urcArray)
         return newMessage

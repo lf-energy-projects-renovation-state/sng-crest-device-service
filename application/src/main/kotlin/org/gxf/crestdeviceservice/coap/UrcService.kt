@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 class UrcService(private val pskService: PskService) {
     companion object {
         private const val URC_FIELD = "URC"
-        private const val URC_PSK_SUCCESS =  "PSK:SET"
+        private const val URC_PSK_SUCCESS = "PSK:SET"
     }
 
     private val logger = KotlinLogging.logger {}
@@ -47,8 +47,9 @@ class UrcService(private val pskService: PskService) {
         PskOrDownlinkErrorUrc.entries.toTypedArray().contains(PskOrDownlinkErrorUrc.from(urc))
 
     private fun handlePskOrDownlinkErrors(identity: String, urcs: List<String>) {
-        urcs.stream()
-            .filter{ urc -> isPskOrDownlinkErrorURC(urc) }
+        urcs
+            .stream()
+            .filter { urc -> isPskOrDownlinkErrorURC(urc) }
             .forEach { urc -> handlePskOrDownlinkError(identity, urc) }
     }
 
@@ -57,16 +58,17 @@ class UrcService(private val pskService: PskService) {
             throw NoExistingPskException(
                 "Failure URC received, but no pending key present to set as invalid")
         }
-        val errorMessage = when (PskOrDownlinkErrorUrc.from(urc)) {
-            PskOrDownlinkErrorUrc.PSK_EQER -> "Set PSK does not equal earlier PSK"
-            PskOrDownlinkErrorUrc.DL_UNK -> "Downlink unknown"
-            PskOrDownlinkErrorUrc.DL_DLNA -> "Downlink not allowed"
-            PskOrDownlinkErrorUrc.DL_DLER -> "Downlink (syntax) error"
-            PskOrDownlinkErrorUrc.DL_ERR -> "Error processing (downlink) value"
-            PskOrDownlinkErrorUrc.DL_HSER -> "SHA256 hash error"
-            PskOrDownlinkErrorUrc.DL_CSER -> "Checksum error"
-            null -> "Unknown URC"
-        }
+        val errorMessage =
+            when (PskOrDownlinkErrorUrc.from(urc)) {
+                PskOrDownlinkErrorUrc.PSK_EQER -> "Set PSK does not equal earlier PSK"
+                PskOrDownlinkErrorUrc.DL_UNK -> "Downlink unknown"
+                PskOrDownlinkErrorUrc.DL_DLNA -> "Downlink not allowed"
+                PskOrDownlinkErrorUrc.DL_DLER -> "Downlink (syntax) error"
+                PskOrDownlinkErrorUrc.DL_ERR -> "Error processing (downlink) value"
+                PskOrDownlinkErrorUrc.DL_HSER -> "SHA256 hash error"
+                PskOrDownlinkErrorUrc.DL_CSER -> "Checksum error"
+                null -> "Unknown URC"
+            }
         logger.warn { "PSK set failed for device with id ${identity}: $errorMessage" }
         pskService.setPendingKeyAsInvalid(identity)
     }
