@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.crestdeviceservice
 
 import org.gxf.crestdeviceservice.metrics.MetricService
@@ -19,47 +18,30 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @WebMvcTest(PskController::class)
 class DeviceCredentialsControllerTest {
 
-    @Autowired
-    private lateinit var mvcRequest: MockMvc
+    @Autowired private lateinit var mvcRequest: MockMvc
 
-    @MockBean
-    private lateinit var pskService: PskService
+    @MockBean private lateinit var pskService: PskService
 
-    @MockBean
-    private lateinit var metricService: MetricService
+    @MockBean private lateinit var metricService: MetricService
 
     @Test
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
         val identity = "identity"
-        whenever(
-            pskService.getCurrentActiveKey(
-                identity
-            )
-        ).thenReturn(null)
+        whenever(pskService.getCurrentActiveKey(identity)).thenReturn(null)
 
-        mvcRequest.perform(
-                MockMvcRequestBuilders
-                        .get("/psk")
-                    .header("x-device-identity", identity)
-        )
-                .andExpect(MockMvcResultMatchers.status().isNotFound)
+        mvcRequest
+            .perform(MockMvcRequestBuilders.get("/psk").header("x-device-identity", identity))
+            .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
     @Test
     fun shouldReturnKeyForIdentity() {
         val identity = "identity"
-        whenever(
-            pskService.getCurrentActiveKey(
-                identity
-            )
-        ).thenReturn("key")
+        whenever(pskService.getCurrentActiveKey(identity)).thenReturn("key")
 
-        mvcRequest.perform(
-                MockMvcRequestBuilders
-                        .get("/psk")
-                    .header("x-device-identity", identity)
-        )
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.content().string("key"))
+        mvcRequest
+            .perform(MockMvcRequestBuilders.get("/psk").header("x-device-identity", identity))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.content().string("key"))
     }
 }

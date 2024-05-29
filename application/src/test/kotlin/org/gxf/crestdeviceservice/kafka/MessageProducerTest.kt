@@ -21,14 +21,11 @@ import org.springframework.kafka.core.KafkaTemplate
 @ExtendWith(MockitoExtension::class)
 class MessageProducerTest {
 
-    @Mock
-    private lateinit var mockedKafkaTemplate: KafkaTemplate<String, DeviceMessage>
+    @Mock private lateinit var mockedKafkaTemplate: KafkaTemplate<String, DeviceMessage>
 
-    @Mock
-    private lateinit var mockedKafkaProducerProperties: KafkaProducerProperties
+    @Mock private lateinit var mockedKafkaProducerProperties: KafkaProducerProperties
 
-    @InjectMocks
-    private lateinit var messageProducer: MessageProducer
+    @InjectMocks private lateinit var messageProducer: MessageProducer
 
     @BeforeEach
     fun setup() {
@@ -37,13 +34,17 @@ class MessageProducerTest {
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
-        val jsonNode = ObjectMapper().readTree("""
+        val jsonNode =
+            ObjectMapper()
+                .readTree("""
             {
                 "ID":12345
             }
         """)
         messageProducer.produceMessage(jsonNode)
-        verify(mockedKafkaTemplate).send(
-                check { assertThat(it).isEqualTo("topic") }, check { assertThat(it.payload).isEqualTo(jsonNode.toString()) })
+        verify(mockedKafkaTemplate)
+            .send(
+                check { assertThat(it).isEqualTo("topic") },
+                check { assertThat(it.payload).isEqualTo(jsonNode.toString()) })
     }
 }

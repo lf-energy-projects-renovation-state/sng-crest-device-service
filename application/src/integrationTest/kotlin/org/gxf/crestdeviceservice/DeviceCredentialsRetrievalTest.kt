@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.crestdeviceservice
 
+import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
@@ -19,12 +19,10 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.kafka.test.context.EmbeddedKafka
-import java.time.Instant
-
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
-        topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
+    topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
 )
 class DeviceCredentialsRetrievalTest {
 
@@ -34,24 +32,15 @@ class DeviceCredentialsRetrievalTest {
         private const val SECRET = "123456789"
     }
 
-    @Autowired
-    private lateinit var restTemplate: TestRestTemplate
+    @Autowired private lateinit var restTemplate: TestRestTemplate
 
-    @Autowired
-    private lateinit var pskRepository: PskRepository
+    @Autowired private lateinit var pskRepository: PskRepository
 
     @BeforeEach
     fun setup() {
         pskRepository.save(
             PreSharedKey(
-                IDENTITY,
-                0,
-                Instant.MIN,
-                PRE_SHARED_KEY,
-                SECRET,
-                PreSharedKeyStatus.ACTIVE
-            )
-        )
+                IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY, SECRET, PreSharedKeyStatus.ACTIVE))
     }
 
     @AfterEach
@@ -64,18 +53,12 @@ class DeviceCredentialsRetrievalTest {
         // create second PSK for identity this one should be returned
         pskRepository.save(
             PreSharedKey(
-                IDENTITY,
-                1,
-                Instant.MIN,
-                "0000111122223333",
-                SECRET,
-                PreSharedKeyStatus.ACTIVE
-            )
-        )
+                IDENTITY, 1, Instant.MIN, "0000111122223333", SECRET, PreSharedKeyStatus.ACTIVE))
 
         val headers = HttpHeaders().apply { add("x-device-identity", IDENTITY) }
-        val result = restTemplate.exchange("/psk",
-                HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
+        val result =
+            restTemplate.exchange(
+                "/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
 
         assertThat(result.body).isEqualTo("0000111122223333")
     }
@@ -83,8 +66,9 @@ class DeviceCredentialsRetrievalTest {
     @Test
     fun shouldReturn404WhenNoKeyIsFound() {
         val headers = HttpHeaders().apply { add("x-device-identity", "12345") }
-        val result = restTemplate.exchange("/psk",
-                HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
+        val result =
+            restTemplate.exchange(
+                "/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
 
         assertThat(result.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }

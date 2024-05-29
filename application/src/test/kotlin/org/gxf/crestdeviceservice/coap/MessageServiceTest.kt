@@ -14,11 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension
 
 @ExtendWith(MockitoExtension::class)
 class MessageServiceTest {
-    @Mock
-    private lateinit var mock: MessageProducer
+    @Mock private lateinit var mock: MessageProducer
 
-    @InjectMocks
-    private lateinit var messageService: MessageService
+    @InjectMocks private lateinit var messageService: MessageService
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {

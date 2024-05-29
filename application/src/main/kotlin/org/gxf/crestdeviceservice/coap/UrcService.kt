@@ -10,9 +10,7 @@ import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.springframework.stereotype.Service
 
 @Service
-class UrcService(
-    private val pskService: PskService
-) {
+class UrcService(private val pskService: PskService) {
     companion object {
         private const val URC_PSK_SUCCESS = "PSK:SET"
         private const val URC_PSK_ERROR = "ER"
@@ -34,23 +32,22 @@ class UrcService(
             urcsContainsError(urcs) -> {
                 handleErrorUrc(identity)
             }
-
             urcsContainsSuccess(urcs) -> {
                 handleSuccessUrc(identity)
             }
         }
     }
 
-    private fun getUrcsFromMessage(body: JsonNode) = body[URC_FIELD]
-        .filter { it.isTextual }
-        .map { it.asText() }
+    private fun getUrcsFromMessage(body: JsonNode) =
+        body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
 
     private fun urcsContainsError(urcs: List<String>) =
         urcs.any { urc -> urc.contains(URC_PSK_ERROR) }
 
     private fun handleErrorUrc(identity: String) {
         if (!pskService.isPendingKeyPresent(identity)) {
-            throw NoExistingPskException("Failure URC received, but no pending key present to set as invalid")
+            throw NoExistingPskException(
+                "Failure URC received, but no pending key present to set as invalid")
         }
         logger.warn { "Error received for set PSK command, setting pending key to invalid" }
         pskService.setPendingKeyAsInvalid(identity)
@@ -61,7 +58,8 @@ class UrcService(
 
     private fun handleSuccessUrc(identity: String) {
         if (!pskService.isPendingKeyPresent(identity)) {
-            throw NoExistingPskException("Success URC received, but no pending key present to set as active")
+            throw NoExistingPskException(
+                "Success URC received, but no pending key present to set as active")
         }
         logger.info { "PSK set successfully, changing active key" }
         pskService.changeActiveKey(identity)
