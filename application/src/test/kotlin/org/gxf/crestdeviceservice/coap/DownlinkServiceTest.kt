@@ -4,6 +4,7 @@
 package org.gxf.crestdeviceservice.coap
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.psk.PskService
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
@@ -13,7 +14,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 import org.springframework.util.ResourceUtils
-import java.time.Instant
 
 class DownlinkServiceTest {
     private val pskService = mock<PskService>()
@@ -25,14 +25,9 @@ class DownlinkServiceTest {
         val identity = "identity"
         val expectedKey = "key"
         val expectedHash = "238104b039438f9dcbbef1dd6e295aa3cf2f248406c01ba7f6034becfe1a53d9"
-        val psk = PreSharedKey(
-            identity,
-            1,
-            Instant.now(),
-            expectedKey,
-            "secret",
-            PreSharedKeyStatus.PENDING
-        )
+        val psk =
+            PreSharedKey(
+                identity, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
 
         whenever(pskService.getCurrentActiveKey(identity)).thenReturn("oldKey")
         whenever(pskService.needsKeyChange(identity)).thenReturn(true)
@@ -44,7 +39,8 @@ class DownlinkServiceTest {
         val result = downLinkService.getDownlinkForIdentity(identity, message)
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]:SET
-        assertThat(result).isEqualTo("!PSK:${expectedKey}:${expectedHash};PSK:${expectedKey}:${expectedHash}:SET")
+        assertThat(result)
+            .isEqualTo("!PSK:${expectedKey}:${expectedHash};PSK:${expectedKey}:${expectedHash}:SET")
     }
 
     @Test
