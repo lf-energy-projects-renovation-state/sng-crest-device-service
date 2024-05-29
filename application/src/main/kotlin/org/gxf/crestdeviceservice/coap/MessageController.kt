@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/sng")
 class MessageController(
-        private val messageService: MessageService,
-        private val downlinkService: DownlinkService,
-        private val urcService: UrcService
+    private val messageService: MessageService,
+    private val downlinkService: DownlinkService,
+    private val urcService: UrcService
 ) {
 
     private val logger = KotlinLogging.logger {}
@@ -41,7 +41,9 @@ class MessageController(
                 val downlink = downlinkService.getDownlinkForIdentity(identity, body)
                 return ResponseEntity.ok(downlink)
             } catch (e: Exception) {
-                logger.error(e) { "Exception occurred while creating downlink for device $identity" }
+                logger.error(e) {
+                    "Exception occurred while creating downlink for device $identity"
+                }
                 return ResponseEntity.internalServerError().build()
             }
         }
