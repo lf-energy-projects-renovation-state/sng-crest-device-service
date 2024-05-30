@@ -3,40 +3,38 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.coap
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
+import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.psk.PskService
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
-import org.springframework.util.ResourceUtils
 
 class DownlinkServiceTest {
     private val pskService = mock<PskService>()
     private val downLinkService = DownlinkService(pskService)
-    private val mapper = spy<ObjectMapper>()
+    private val message = TestHelper.messageTemplate()
+
+    companion object {
+        private const val IDENTITY = "867787050253370"
+    }
 
     @Test
     fun shouldReturnPskDownlinkWhenThereIsANewPsk() {
-        val identity = "identity"
         val expectedKey = "key"
         val expectedHash = "238104b039438f9dcbbef1dd6e295aa3cf2f248406c01ba7f6034becfe1a53d9"
         val psk =
             PreSharedKey(
-                identity, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
+                IDENTITY, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
 
-        whenever(pskService.getCurrentActiveKey(identity)).thenReturn("oldKey")
-        whenever(pskService.needsKeyChange(identity)).thenReturn(true)
-        whenever(pskService.setReadyKeyForIdentityAsPending(identity)).thenReturn(psk)
+        whenever(pskService.getCurrentActiveKey(IDENTITY)).thenReturn("oldKey")
+        whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(true)
+        whenever(pskService.setReadyKeyForIdentityAsPending(IDENTITY)).thenReturn(psk)
 
-        val fileToUse = ResourceUtils.getFile("classpath:messages/message-template.json")
-        val message = mapper.readTree(fileToUse)
-
-        val result = downLinkService.getDownlinkForIdentity(identity, message)
+        val result = downLinkService.getDownlinkForIdentity(IDENTITY, message)
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]:SET
         assertThat(result)
@@ -45,13 +43,9 @@ class DownlinkServiceTest {
 
     @Test
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPsk() {
-        val identity = "identity"
-        whenever(pskService.needsKeyChange(identity)).thenReturn(false)
+        whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
 
-        val fileToUse = ResourceUtils.getFile("classpath:messages/message-template.json")
-        val message = mapper.readTree(fileToUse)
-
-        val result = downLinkService.getDownlinkForIdentity(identity, message)
+        val result = downLinkService.getDownlinkForIdentity(IDENTITY, message)
 
         assertThat(result).isEqualTo("0")
     }

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import java.util.stream.Stream
+import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.psk.PskService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -20,7 +21,6 @@ import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.springframework.util.ResourceUtils
 
 class UrcServiceTest {
     private val pskService = mock<PskService>()
@@ -93,16 +93,11 @@ class UrcServiceTest {
     }
 
     private fun updatePskCommandInMessage(urcs: List<String>): JsonNode {
-        val message = messageTemplate()
+        val message = TestHelper.messageTemplate()
         val urcFieldValue = urcFieldValue(urcs)
 
         message.replace(URC_FIELD, urcFieldValue)
         return message
-    }
-
-    private fun messageTemplate(): ObjectNode {
-        val fileToUse = ResourceUtils.getFile("classpath:message-template.json")
-        return mapper.readTree(fileToUse) as ObjectNode
     }
 
     private fun urcFieldValue(urcs: List<String>): ArrayNode? {
