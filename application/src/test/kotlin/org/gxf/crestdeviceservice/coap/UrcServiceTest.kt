@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.BaseJsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import java.util.stream.Stream
 import org.gxf.crestdeviceservice.psk.PskService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -20,7 +21,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.util.ResourceUtils
-import java.util.stream.Stream
 
 class UrcServiceTest {
     private val pskService = mock<PskService>()
@@ -45,8 +45,7 @@ class UrcServiceTest {
                 listOf("[DL]:HSER"),
                 listOf("[DL]:CSER"),
                 listOf("TS:ERR", "[DL]:#ERR", "[DL]:DLER"),
-                listOf("[DL]:#ERR", "[DL]:DLER")
-            )
+                listOf("[DL]:#ERR", "[DL]:DLER"))
 
         @JvmStatic
         private fun notContainingPskOrDownlinkErrorUrcs() =
@@ -60,8 +59,7 @@ class UrcServiceTest {
                 listOf("EXR"),
                 listOf("POR"),
                 listOf("TS:ERR"),
-                listOf("INIT", "BOR", "POR")
-            )
+                listOf("INIT", "BOR", "POR"))
     }
 
     @Test
