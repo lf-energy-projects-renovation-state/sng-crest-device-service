@@ -44,6 +44,7 @@ class UrcServiceTest {
                 listOf("[DL]:#ERR"),
                 listOf("[DL]:HSER"),
                 listOf("[DL]:CSER"),
+
                 listOf("TS:ERR", "[DL]:#ERR", "[DL]:DLER"),
                 listOf("[DL]:#ERR", "[DL]:DLER"))
 
