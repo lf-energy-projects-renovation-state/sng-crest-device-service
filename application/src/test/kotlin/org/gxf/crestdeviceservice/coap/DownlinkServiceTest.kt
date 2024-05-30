@@ -33,7 +33,7 @@ class DownlinkServiceTest {
         whenever(pskService.needsKeyChange(identity)).thenReturn(true)
         whenever(pskService.setReadyKeyForIdentityAsPending(identity)).thenReturn(psk)
 
-        val fileToUse = ResourceUtils.getFile("classpath:messages/message.json")
+        val fileToUse = ResourceUtils.getFile("classpath:messages/message-template.json")
         val message = mapper.readTree(fileToUse)
 
         val result = downLinkService.getDownlinkForIdentity(identity, message)
@@ -48,7 +48,7 @@ class DownlinkServiceTest {
         val identity = "identity"
         whenever(pskService.needsKeyChange(identity)).thenReturn(false)
 
-        val fileToUse = ResourceUtils.getFile("classpath:messages/message.json")
+        val fileToUse = ResourceUtils.getFile("classpath:messages/message-template.json")
         val message = mapper.readTree(fileToUse)
 
         val result = downLinkService.getDownlinkForIdentity(identity, message)

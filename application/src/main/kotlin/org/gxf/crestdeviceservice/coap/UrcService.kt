@@ -41,35 +41,22 @@ class UrcService(private val pskService: PskService) {
         body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
 
     private fun urcsContainPskOrDownlinkError(urcs: List<String>) =
-        urcs.any { urc -> isPskOrDownlinkErrorURC(urc) }
-
-    private fun isPskOrDownlinkErrorURC(urc: String) =
-        PskOrDownlinkErrorUrc.entries.toTypedArray().contains(PskOrDownlinkErrorUrc.from(urc))
+        urcs.any { urc -> PskOrDownlinkErrorUrc.isPskOrDownlinkErrorURC(urc) }
 
     private fun handlePskOrDownlinkErrors(identity: String, urcs: List<String>) {
-        urcs
-            .stream()
-            .filter { urc -> isPskOrDownlinkErrorURC(urc) }
-            .forEach { urc -> handlePskOrDownlinkError(identity, urc) }
-    }
-
-    private fun handlePskOrDownlinkError(identity: String, urc: String) {
         if (!pskService.isPendingKeyPresent(identity)) {
             throw NoExistingPskException(
                 "Failure URC received, but no pending key present to set as invalid")
         }
-        val errorMessage =
-            when (PskOrDownlinkErrorUrc.from(urc)) {
-                PskOrDownlinkErrorUrc.PSK_EQER -> "Set PSK does not equal earlier PSK"
-                PskOrDownlinkErrorUrc.DL_UNK -> "Downlink unknown"
-                PskOrDownlinkErrorUrc.DL_DLNA -> "Downlink not allowed"
-                PskOrDownlinkErrorUrc.DL_DLER -> "Downlink (syntax) error"
-                PskOrDownlinkErrorUrc.DL_ERR -> "Error processing (downlink) value"
-                PskOrDownlinkErrorUrc.DL_HSER -> "SHA256 hash error"
-                PskOrDownlinkErrorUrc.DL_CSER -> "Checksum error"
-                null -> "Unknown URC"
+
+        urcs
+            .filter { urc -> PskOrDownlinkErrorUrc.isPskOrDownlinkErrorURC(urc) }
+            .forEach { urc ->
+                logger.warn {
+                    "PSK set failed for device with id ${identity}: ${PskOrDownlinkErrorUrc.messageFromCode(urc)}"
+                }
             }
-        logger.warn { "PSK set failed for device with id ${identity}: $errorMessage" }
+
         pskService.setPendingKeyAsInvalid(identity)
     }
 
