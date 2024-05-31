@@ -4,8 +4,8 @@
 package org.gxf.crestdeviceservice.coap
 
 enum class PskErrorUrc(val code: String, val message: String) {
-    PSK_EQER("PSK:EQER", "Set PSK does not equal earlier PSK"),
     DL_UNK("DL:UNK", "Downlink unknown"),
+    PSK_EQER("PSK:EQER", "Set PSK does not equal earlier PSK"),
     PSK_DLNA("PSK:DLNA", "Downlink not allowed"),
     PSK_DLER("PSK:DLER", "Downlink (syntax) error"),
     PSK_ERR("PSK:#ERR", "Error processing (downlink) value"),
