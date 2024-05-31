@@ -43,7 +43,7 @@ class UrcServiceTest {
                 listOf("PSK:HSER"),
                 listOf("PSK:CSER"),
                 listOf("TS:ERR", "PSK:DLER"),
-                listOf("PSK:#ERR", "PSK:DLER"))
+                listOf("PSK:HSER", "PSK:DLER"))
 
         @JvmStatic
         private fun notContainingPskErrorUrcs() =
