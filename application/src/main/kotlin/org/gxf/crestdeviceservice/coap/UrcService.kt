@@ -28,8 +28,8 @@ class UrcService(private val pskService: PskService) {
         logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
 
         when {
-            urcsContainPskOrDownlinkError(urcs) -> {
-                handlePskOrDownlinkErrors(identity, urcs)
+            urcsContainPskError(urcs) -> {
+                handlePskErrors(identity, urcs)
             }
             urcsContainPskSuccess(urcs) -> {
                 handlePskSuccess(identity)
@@ -40,20 +40,20 @@ class UrcService(private val pskService: PskService) {
     private fun getUrcsFromMessage(body: JsonNode) =
         body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
 
-    private fun urcsContainPskOrDownlinkError(urcs: List<String>) =
-        urcs.any { urc -> PskOrDownlinkErrorUrc.isPskOrDownlinkErrorURC(urc) }
+    private fun urcsContainPskError(urcs: List<String>) =
+        urcs.any { urc -> PskErrorUrc.isPskErrorURC(urc) }
 
-    private fun handlePskOrDownlinkErrors(identity: String, urcs: List<String>) {
+    private fun handlePskErrors(identity: String, urcs: List<String>) {
         if (!pskService.isPendingKeyPresent(identity)) {
             throw NoExistingPskException(
                 "Failure URC received, but no pending key present to set as invalid")
         }
 
         urcs
-            .filter { urc -> PskOrDownlinkErrorUrc.isPskOrDownlinkErrorURC(urc) }
+            .filter { urc -> PskErrorUrc.isPskErrorURC(urc) }
             .forEach { urc ->
                 logger.warn {
-                    "PSK set failed for device with id ${identity}: ${PskOrDownlinkErrorUrc.messageFromCode(urc)}"
+                    "PSK set failed for device with id ${identity}: ${PskErrorUrc.messageFromCode(urc)}"
                 }
             }
 

@@ -35,20 +35,20 @@ class UrcServiceTest {
         private const val IDENTITY = "867787050253370"
 
         @JvmStatic
-        private fun containingPskOrDownlinkErrorUrcs() =
+        private fun containingPskErrorUrcs() =
             Stream.of(
                 listOf("PSK:EQER"),
                 listOf("DL:UNK"),
-                listOf("[DL]:DLNA"),
-                listOf("[DL]:DLER"),
-                listOf("[DL]:#ERR"),
-                listOf("[DL]:HSER"),
-                listOf("[DL]:CSER"),
-                listOf("TS:ERR", "[DL]:#ERR", "[DL]:DLER"),
-                listOf("[DL]:#ERR", "[DL]:DLER"))
+                listOf("PSK:DLNA"),
+                listOf("PSK:DLER"),
+                listOf("PSK:#ERR"),
+                listOf("PSK:HSER"),
+                listOf("PSK:CSER"),
+                listOf("TS:ERR", "PSK:#ERR", "PSK:DLER"),
+                listOf("PSK:#ERR", "PSK:DLER"))
 
         @JvmStatic
-        private fun notContainingPskOrDownlinkErrorUrcs() =
+        private fun notContainingPskErrorUrcs() =
             Stream.of(
                 listOf("INIT"),
                 listOf("ENPD"),
@@ -59,7 +59,8 @@ class UrcServiceTest {
                 listOf("EXR"),
                 listOf("POR"),
                 listOf("TS:ERR"),
-                listOf("INIT", "BOR", "POR"))
+                listOf("INIT", "BOR", "POR"),
+                listOf("OTA:HSER", "MSI:DLNA"))
     }
 
     @Test
@@ -70,14 +71,14 @@ class UrcServiceTest {
     }
 
     @ParameterizedTest(name = "should set pending key as invalid for {0}")
-    @MethodSource("containingPskOrDownlinkErrorUrcs")
+    @MethodSource("containingPskErrorUrcs")
     fun shouldSetPendingKeyAsInvalidWhenFailureURCReceived(urcs: List<String>) {
         interpretURCWhileNewKeyIsPending(urcs)
         verify(pskService).setPendingKeyAsInvalid(IDENTITY)
     }
 
     @ParameterizedTest(name = "should not set pending key as invalid for {0}")
-    @MethodSource("notContainingPskOrDownlinkErrorUrcs")
+    @MethodSource("notContainingPskErrorUrcs")
     fun shouldNotSetPendingKeyAsInvalidWhenOtherURCReceived(urcs: List<String>) {
         interpretURCWhileNewKeyIsPending(urcs)
         verify(pskService, times(0)).setPendingKeyAsInvalid(IDENTITY)
