@@ -25,9 +25,6 @@ class DownlinkService(private val pskService: PskService) {
         logger.debug { "Check if device $identity needs key change" }
         if (pskService.needsKeyChange(identity)) {
             logger.info { "Device $identity needs key change" }
-            val oldKey =
-                pskService.getCurrentActiveKey(identity)
-                    ?: throw NoExistingPskException("No current key found to calculate hash")
             val newKey = pskService.setReadyKeyForIdentityAsPending(identity)
 
             // After setting a new psk, the device will send a new message if the psk set was
@@ -35,7 +32,7 @@ class DownlinkService(private val pskService: PskService) {
             logger.debug {
                 "Create PSK set command for key for device ${newKey.identity} with revision ${newKey.revision} and status ${newKey.status}"
             }
-            return PskCommandCreator.createPskSetCommand(newKey, oldKey)
+            return PskCommandCreator.createPskSetCommand(newKey)
         }
 
         return RESPONSE_SUCCESS
