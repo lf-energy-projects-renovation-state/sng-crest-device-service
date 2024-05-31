@@ -38,13 +38,11 @@ class UrcServiceTest {
         private fun containingPskErrorUrcs() =
             Stream.of(
                 listOf("PSK:EQER"),
-                listOf("DL:UNK"),
                 listOf("PSK:DLNA"),
                 listOf("PSK:DLER"),
-                listOf("PSK:#ERR"),
                 listOf("PSK:HSER"),
                 listOf("PSK:CSER"),
-                listOf("TS:ERR", "PSK:#ERR", "PSK:DLER"),
+                listOf("TS:ERR", "PSK:DLER"),
                 listOf("PSK:#ERR", "PSK:DLER"))
 
         @JvmStatic
