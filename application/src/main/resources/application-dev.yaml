@@ -13,6 +13,14 @@ spring:
   kafka:
     bootstrap-servers: "localhost:9092"
 
+# Local testing certificates
+mutual-tls:
+  keystore:
+    private-key: "classpath:ssl/dev-device-service-key.pem"
+    certificate: "classpath:ssl/dev-device-service-cert.pem"
+  truststore:
+    certificate: "classpath:ssl/dev-proxy-cert.pem"
+
 server:
   port: 9000
 

@@ -7,6 +7,25 @@ management:
       exposure:
         include: "prometheus"
 
+# The crest device service should always require mutual tls
+server:
+  ssl:
+    enabled: true
+    client-auth: need
+    bundle: "crest-device-service"
+
+# Default server ssl bundle
+spring:
+  ssl:
+    bundle:
+      pem:
+        crest-device-service:
+          keystore:
+            private-key: "${mutual-tls.keystore.private-key}"
+            certificate: "${mutual-tls.keystore.certificate}"
+          truststore:
+            certificate: "${mutual-tls.truststore.certificate}"
+
 logging:
   level:
     com:
