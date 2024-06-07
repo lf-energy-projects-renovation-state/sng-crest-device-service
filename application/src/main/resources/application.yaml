@@ -1,11 +1,6 @@
 #SPDX-FileCopyrightText: Contributors to the GXF project
 #
 #SPDX-License-Identifier: Apache-2.0
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "prometheus"
 
 # The crest device service should always require mutual tls
 server:
@@ -13,6 +8,17 @@ server:
     enabled: true
     client-auth: need
     bundle: "crest-device-service"
+
+# Run the actuator under a different not tls port
+management:
+  server:
+    port: 8081
+    ssl:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
 
 # Default server ssl bundle
 spring:
