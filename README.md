@@ -25,3 +25,10 @@ To test this flow locally:
 8. When the crest device service receives a message from the device (simulator), a psk set command will be sent in the downlink response to the device (simulator). The new key will be set to pending.
     1. When the crest device service receives a success result code in the subsequent message from the device (simulator), the pending key will be set to active and the old key will become inactive.
     2. When the crest device service receives a failure result code in the subsequent message from the device (simulator), the pending key will be set to invalid.
+
+
+## Mutual TLS
+Communication between the COAP HTTP Proxy and the Crest device service should be encrypted using mutual TLS.
+
+The repositories contain test certificates that can be used for local testing. (they are not included in the jar or docker image)
+They can be also be (re)generated using the [generate_certificates.sh](generate_certificates.sh) script.

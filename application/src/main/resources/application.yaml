@@ -1,11 +1,36 @@
 #SPDX-FileCopyrightText: Contributors to the GXF project
 #
 #SPDX-License-Identifier: Apache-2.0
+
+# The crest device service should always require mutual tls
+server:
+  ssl:
+    enabled: true
+    client-auth: need
+    bundle: "crest-device-service"
+
+# Run the actuator under a different not tls port
 management:
+  server:
+    port: 8081
+    ssl:
+      enabled: false
   endpoints:
     web:
       exposure:
         include: "prometheus"
+
+# Default server ssl bundle
+spring:
+  ssl:
+    bundle:
+      pem:
+        crest-device-service:
+          keystore:
+            private-key: "${mutual-tls.keystore.private-key}"
+            certificate: "${mutual-tls.keystore.certificate}"
+          truststore:
+            certificate: "${mutual-tls.truststore.certificate}"
 
 logging:
   level:
