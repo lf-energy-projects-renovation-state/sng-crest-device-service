@@ -5,23 +5,24 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.github.davidmc24.gradle.plugin.avro.GenerateAvroJavaTask
 import io.spring.gradle.dependencymanagement.internal.dsl.StandardDependencyManagementExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.2.6" apply false
+    id("org.springframework.boot") version "3.3.0" apply false
     id("io.spring.dependency-management") version "1.1.4" apply false
-    kotlin("jvm") version "1.9.23" apply false
-    kotlin("plugin.spring") version "1.9.23" apply false
-    kotlin("plugin.jpa") version "1.9.23" apply false
+    kotlin("jvm") version "2.0.0" apply false
+    kotlin("plugin.spring") version "2.0.0" apply false
+    kotlin("plugin.jpa") version "2.0.0" apply false
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1" apply false
     id("com.diffplug.spotless") version "6.25.0"
-    id("org.sonarqube") version "4.4.1.3373"
+    id("org.sonarqube") version "5.0.0.4638"
     id("eclipse")
 }
 
 version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "develop"
 
-sonarqube {
+sonar {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.projectKey", "OSGP_sng-crest-device-service")
@@ -40,8 +41,9 @@ subprojects {
     apply(plugin = "jacoco")
     apply(plugin = "jacoco-report-aggregation")
 
-    group = "org.gxf.template"
+    group = "org.gxf.deviceservice"
     version = rootProject.version
+
     repositories {
         mavenCentral()
         maven {
@@ -65,27 +67,22 @@ subprojects {
         }
     }
 
-    extensions.configure<JavaPluginExtension> {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
-        }
+    extensions.configure<StandardDependencyManagementExtension> {
+        imports { mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES) }
     }
 
-    extensions.configure<StandardDependencyManagementExtension> {
-        imports {
-            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    extensions.configure<KotlinJvmProjectExtension> {
+        jvmToolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+        compilerOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
         }
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "21"
-        }
         dependsOn(tasks.withType<GenerateAvroJavaTask>())
     }
 
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
+    tasks.withType<Test> { useJUnitPlatform() }
 }
