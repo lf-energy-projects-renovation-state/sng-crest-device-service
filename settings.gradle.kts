@@ -13,7 +13,7 @@ dependencyResolutionManagement {
             library("flyway", "org.flywaydb", "flyway-core").withoutVersion()
             bundle("data", listOf("postgresql", "flyway"))
 
-            library("logging", "io.github.oshai", "kotlin-logging-jvm").version("6.0.3")
+            library("logging", "io.github.oshai", "kotlin-logging-jvm").version("6.0.9")
 
             library("avro", "org.apache.avro", "avro").version("1.11.3")
 
@@ -22,13 +22,13 @@ dependencyResolutionManagement {
             library("kafkaAzureOauth", "com.gxf.utilities", "kafka-azure-oauth").versionRef("utilities")
             bundle("gxfUtils", listOf("kafkaAvro", "kafkaAzureOauth"))
 
-            library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").version("5.1.0")
+            library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").version("5.3.1")
 
             library("commonsCodec", "commons-codec", "commons-codec").version("1.17.0")
         }
         create("integrationTestLibs") {
             library("h2", "com.h2database", "h2").version("2.2.224")
-            library("kafkaTestContainers", "org.testcontainers", "kafka").version("1.19.7")
+            library("kafkaTestContainers", "org.testcontainers", "kafka").version("1.19.8")
         }
     }
 }
