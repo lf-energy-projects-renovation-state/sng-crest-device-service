@@ -14,29 +14,21 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework.kafka:spring-kafka")
 
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springframework:spring-aop")
+    implementation(kotlin("reflect"))
     implementation(libs.logging)
 
-    implementation(libs.bundles.data)
     implementation(libs.bundles.gxfUtils)
-
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
-    implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.boot:spring-boot-starter-logging")
-
-    implementation("org.springframework:spring-aspects")
-
-    implementation("org.springframework.kafka:spring-kafka")
 
     implementation(libs.commonsCodec)
 
     implementation(libs.avro)
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(libs.mockitoKotlin)
@@ -77,10 +69,10 @@ testing {
                 implementation("org.springframework.kafka:spring-kafka")
                 implementation("org.springframework.boot:spring-boot-starter-test")
                 implementation("org.springframework.kafka:spring-kafka-test")
-                implementation(integrationTestLibs.kafkaTestContainers)
+                implementation("org.testcontainers:kafka")
                 implementation("org.springframework.ws:spring-ws-test")
                 implementation(libs.mockitoKotlin)
-                runtimeOnly(integrationTestLibs.h2)
+                runtimeOnly("com.h2database:h2")
             }
         }
     }
