@@ -9,26 +9,23 @@ include("application")
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            library("postgresql", "org.postgresql", "postgresql").withoutVersion()
-            library("flyway", "org.flywaydb", "flyway-core").withoutVersion()
-            bundle("data", listOf("postgresql", "flyway"))
+            version("kotlinLogging", "7.0.0")
+            version("avro", "1.11.3")
+            version("mockitoKotlin", "5.3.1")
+            version("commonsCodec", "1.17.0")
+            version("gxfUtils", "0.3.7")
 
-            library("logging", "io.github.oshai", "kotlin-logging-jvm").version("6.0.9")
+            library("logging", "io.github.oshai", "kotlin-logging-jvm").versionRef("kotlinLogging")
 
-            library("avro", "org.apache.avro", "avro").version("1.11.3")
+            library("avro", "org.apache.avro", "avro").versionRef("avro")
 
-            version("utilities", "0.3.7")
-            library("kafkaAvro", "com.gxf.utilities", "kafka-avro").versionRef("utilities")
-            library("kafkaAzureOauth", "com.gxf.utilities", "kafka-azure-oauth").versionRef("utilities")
+            library("kafkaAvro", "com.gxf.utilities", "kafka-avro").versionRef("gxfUtils")
+            library("kafkaAzureOauth", "com.gxf.utilities", "kafka-azure-oauth").versionRef("gxfUtils")
             bundle("gxfUtils", listOf("kafkaAvro", "kafkaAzureOauth"))
 
-            library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").version("5.3.1")
+            library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").versionRef("mockitoKotlin")
 
-            library("commonsCodec", "commons-codec", "commons-codec").version("1.17.0")
-        }
-        create("integrationTestLibs") {
-            library("h2", "com.h2database", "h2").version("2.2.224")
-            library("kafkaTestContainers", "org.testcontainers", "kafka").version("1.19.8")
+            library("commonsCodec", "commons-codec", "commons-codec").versionRef("commonsCodec")
         }
     }
 }
