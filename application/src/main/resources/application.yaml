@@ -18,7 +18,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: "prometheus"
+        include:
+         - "prometheus"
+         - "health"
+         - "info"
 
 # Default server ssl bundle
 spring:
