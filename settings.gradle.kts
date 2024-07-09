@@ -11,7 +11,7 @@ dependencyResolutionManagement {
         create("libs") {
             version("kotlinLogging", "7.0.0")
             version("avro", "1.11.3")
-            version("mockitoKotlin", "5.3.1")
+            version("mockitoKotlin", "5.4.0")
             version("commonsCodec", "1.17.0")
             version("gxfUtils", "0.3.7")
 
