@@ -19,8 +19,7 @@ class IncomingDeviceCredentialsService(
     @KafkaListener(
         id = "pre-shared-key",
         idIsGroup = false,
-        topics = ["\${kafka.consumers.pre-shared-key.topic}"],
-        groupId = "\${kafka.consumers.pre-shared-key.group-id}")
+        topics = ["\${kafka.consumers.pre-shared-key.topic}"])
     fun handleIncomingDeviceCredentials(deviceCredentials: DeviceCredentials) {
         logger.info { "Received key for ${deviceCredentials.imei}" }
 
