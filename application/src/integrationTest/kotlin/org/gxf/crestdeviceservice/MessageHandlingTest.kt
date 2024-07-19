@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.IntegrationTestHelper.createKafkaConsumer
 import org.gxf.crestdeviceservice.IntegrationTestHelper.getFileContentAsString
 import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
+import org.gxf.sng.avro.DeviceMessage
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -24,7 +25,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
-    topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
+    topics = ["\${kafka.producers.device-message.topic}"],
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EnableConfigurationProperties(KafkaProducerProperties::class)
@@ -41,20 +42,19 @@ class MessageHandlingTest {
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
 
-        val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.topicName)
+        val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.topic)
         val response = testRestTemplate.postForEntity<String>("/sng/1", request)
 
         assertThat(response.body).isEqualTo("0")
 
         val records = consumer.poll(Duration.ofSeconds(1))
 
-        assertThat(records.records(kafkaProducerProperties.topicName)).hasSize(1)
+        assertThat(records.records(kafkaProducerProperties.topic)).hasSize(1)
 
         val expectedJsonNode = ObjectMapper().readTree(getFileContentAsString("message.json"))
-        val payloadJsonNode =
-            ObjectMapper()
-                .readTree(
-                    records.records(kafkaProducerProperties.topicName).first().value().payload)
+        val deviceMessage =
+            records.records(kafkaProducerProperties.topic).first().value() as DeviceMessage
+        val payloadJsonNode = ObjectMapper().readTree(deviceMessage.payload)
 
         assertThat(payloadJsonNode).isEqualTo(expectedJsonNode)
     }

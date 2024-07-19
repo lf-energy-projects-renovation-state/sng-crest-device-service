@@ -24,7 +24,7 @@ import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
-    topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
+    topics = ["\${kafka.producers.device-message.topic}"],
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CoapMessageHandlingTest {

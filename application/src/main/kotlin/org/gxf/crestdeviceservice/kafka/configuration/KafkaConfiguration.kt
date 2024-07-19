@@ -6,9 +6,9 @@ package org.gxf.crestdeviceservice.kafka.configuration
 import com.alliander.sng.DeviceCredentials
 import com.gxf.utilities.kafka.avro.AvroDeserializer
 import com.gxf.utilities.kafka.avro.AvroSerializer
+import org.apache.avro.specific.SpecificRecordBase
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
-import org.gxf.sng.avro.DeviceMessage
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.boot.ssl.SslBundles
 import org.springframework.context.annotation.Bean
@@ -28,27 +28,27 @@ class KafkaConfiguration(
 
     @Bean
     fun kafkaListenerContainerFactory(
-        consumerFactory: ConsumerFactory<String, DeviceCredentials>
-    ): ConcurrentKafkaListenerContainerFactory<String, DeviceCredentials> =
-        ConcurrentKafkaListenerContainerFactory<String, DeviceCredentials>().apply {
+        consumerFactory: ConsumerFactory<String, SpecificRecordBase>
+    ) =
+        ConcurrentKafkaListenerContainerFactory<String, SpecificRecordBase>().apply {
             this.consumerFactory = consumerFactory
         }
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, DeviceCredentials> =
+    fun consumerFactory(): ConsumerFactory<String, SpecificRecordBase> =
         DefaultKafkaConsumerFactory(
             kafkaProperties.buildConsumerProperties(sslBundles),
             StringDeserializer(),
-            AvroDeserializer(DeviceCredentials.getDecoder()))
+            AvroDeserializer(listOf(DeviceCredentials.getClassSchema())))
 
     @Bean
-    fun kafkaTemplate(producerFactory: ProducerFactory<String, DeviceMessage>) =
+    fun kafkaTemplate(producerFactory: ProducerFactory<String, SpecificRecordBase>) =
         KafkaTemplate(producerFactory)
 
     @Bean
-    fun producerFactory(): ProducerFactory<String, DeviceMessage> =
+    fun producerFactory(): ProducerFactory<String, SpecificRecordBase> =
         DefaultKafkaProducerFactory(
             kafkaProperties.buildProducerProperties(sslBundles),
             StringSerializer(),
-            AvroSerializer(DeviceMessage.getEncoder()))
+            AvroSerializer())
 }
