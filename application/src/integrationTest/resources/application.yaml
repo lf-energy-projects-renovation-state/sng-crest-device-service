@@ -15,22 +15,24 @@ spring:
       ddl-auto: create-drop
   kafka:
     bootstrap-servers: ${spring.embedded.kafka.brokers}
+    consumer:
+      # Setting this property to "earliest" prevents failing integration tests caused
+      # by the producer sending a message before the consumer has been assigned the topic/partition.
+      # When not set it defaults to "latest"
+      auto-offset-reset: earliest
+      group-id: "gxf-sng-crest-device-service"
+
+kafka:
+  consumers:
+    pre-shared-key:
+      topic: "pre-shared-key"
+  producers:
+    device-message:
+      topic: "crest-message"
 
 crest-device-service:
   database:
     encryption-key: "super-secret-key"
-    #Should be the same as the PSK in the simulator only relevant for dev
-    dev-initial-psk: "ABCDEFGHIJKLMNOP"
-    dev-initial-secret: "123456"
-    #Should be the same as the identity in the simulator only relevant for dev
-    dev-device-identity: "867787050253370"
-  kafka:
-    pre-shared-key-consumer:
-      id: "gxf-sng-crest-device-service"
-      topic-name: "pre-shared-key"
-    message-producer:
-      id: "gxf-sng-crest-device-service"
-      topic-name: "crest-message"
   psk:
     decryption:
       method: "RSA"

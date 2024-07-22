@@ -17,8 +17,9 @@ class IncomingDeviceCredentialsService(
     private val logger = KotlinLogging.logger {}
 
     @KafkaListener(
-        topics = ["\${crest-device-service.kafka.pre-shared-key-consumer.topic-name}"],
-        id = "\${crest-device-service.kafka.pre-shared-key-consumer.id}")
+        id = "pre-shared-key",
+        idIsGroup = false,
+        topics = ["\${kafka.consumers.pre-shared-key.topic}"])
     fun handleIncomingDeviceCredentials(deviceCredentials: DeviceCredentials) {
         logger.info { "Received key for ${deviceCredentials.imei}" }
 

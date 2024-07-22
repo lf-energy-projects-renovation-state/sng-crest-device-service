@@ -22,7 +22,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(
-    topics = ["\${crest-device-service.kafka.message-producer.topic-name}"],
+    topics = ["\${kafka.producers.device-message.topic}"],
 )
 class DeviceCredentialsRetrievalTest {
 

@@ -8,6 +8,8 @@ spring:
     password: "1234"
   kafka:
     bootstrap-servers: "localhost:9092"
+    consumer:
+      group-id: "gxf-sng-crest-device-service"
 
 # Local testing certificates
 mutual-tls:
@@ -20,17 +22,19 @@ mutual-tls:
 server:
   port: 9000
 
+kafka:
+  consumers:
+    pre-shared-key:
+      topic: "pre-shared-key"
+  producers:
+    device-message:
+      topic: "crest-message"
+
 crest-device-service:
   database:
     # This key was used to encrypt the data in db/migration/test-data/V3__test_data.sql
     # If this is changed the test data also needs to be updated.
     encryption-key: "super-secret-key"
-  kafka:
-    pre-shared-key-consumer:
-      id: "gxf-sng-crest-device-service"
-      topic-name: "pre-shared-key"
-    message-producer:
-      topic-name: "crest-message"
   psk:
     change-initial-psk: false
     decryption:

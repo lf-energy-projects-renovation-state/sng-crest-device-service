@@ -4,6 +4,7 @@
 package org.gxf.crestdeviceservice
 
 import com.gxf.utilities.kafka.avro.AvroDeserializer
+import org.apache.avro.specific.SpecificRecordBase
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.gxf.sng.avro.DeviceMessage
@@ -17,11 +18,13 @@ object IntegrationTestHelper {
     fun createKafkaConsumer(
         embeddedKafkaBroker: EmbeddedKafkaBroker,
         topic: String
-    ): Consumer<String, DeviceMessage> {
+    ): Consumer<String, SpecificRecordBase> {
         val testProperties = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker)
         val consumerFactory =
             DefaultKafkaConsumerFactory(
-                testProperties, StringDeserializer(), AvroDeserializer(DeviceMessage.getDecoder()))
+                testProperties,
+                StringDeserializer(),
+                AvroDeserializer(listOf(DeviceMessage.getClassSchema())))
         val consumer = consumerFactory.createConsumer()
         embeddedKafkaBroker.consumeFromAnEmbeddedTopic(consumer, topic)
         return consumer
