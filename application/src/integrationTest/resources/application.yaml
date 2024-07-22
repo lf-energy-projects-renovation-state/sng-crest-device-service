@@ -20,12 +20,12 @@ spring:
       # by the producer sending a message before the consumer has been assigned the topic/partition.
       # When not set it defaults to "latest"
       auto-offset-reset: earliest
+      group-id: "gxf-sng-crest-device-service"
 
 kafka:
   consumers:
     pre-shared-key:
       topic: "pre-shared-key"
-      group-id: "gxf-sng-crest-device-service"
   producers:
     device-message:
       topic: "crest-message"

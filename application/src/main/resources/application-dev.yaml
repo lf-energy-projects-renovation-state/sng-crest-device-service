@@ -8,6 +8,8 @@ spring:
     password: "1234"
   kafka:
     bootstrap-servers: "localhost:9092"
+    consumer:
+      group-id: "gxf-sng-crest-device-service"
 
 # Local testing certificates
 mutual-tls:
@@ -24,7 +26,6 @@ kafka:
   consumers:
     pre-shared-key:
       topic: "pre-shared-key"
-      group-id: "gxf-sng-crest-device-service"
   producers:
     device-message:
       topic: "crest-message"
