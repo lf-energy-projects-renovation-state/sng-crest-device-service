@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.controller
+package org.gxf.crestdeviceservice.consumer
 
 import com.alliander.sng.DeviceCredentials
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -11,7 +11,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 
 @Service
-class IncomingDeviceCredentialsController(
+class IncomingDeviceCredentialsConsumer(
     private val pskService: PskService,
     private val pskDecryptionService: PskDecryptionService
 ) {

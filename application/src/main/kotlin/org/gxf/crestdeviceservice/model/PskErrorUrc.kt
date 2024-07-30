@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.service
+package org.gxf.crestdeviceservice.model
 
 enum class PskErrorUrc(val code: String, val message: String) {
     PSK_EQER("PSK:EQER", "Set PSK does not equal earlier PSK"),
