@@ -7,7 +7,7 @@ import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
-import org.gxf.crestdeviceservice.psk.entity.PskRepository
+import org.gxf.crestdeviceservice.psk.repository.PskRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
