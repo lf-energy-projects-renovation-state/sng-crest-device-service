@@ -7,7 +7,7 @@ import java.time.Duration
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.IntegrationTestHelper.createKafkaConsumer
 import org.gxf.crestdeviceservice.IntegrationTestHelper.getFileContentAsString
-import org.gxf.crestdeviceservice.kafka.configuration.KafkaProducerProperties
+import org.gxf.crestdeviceservice.config.KafkaProducerProperties
 import org.gxf.sng.avro.DeviceMessage
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
