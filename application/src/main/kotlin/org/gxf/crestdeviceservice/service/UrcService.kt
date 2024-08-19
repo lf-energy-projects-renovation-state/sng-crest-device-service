@@ -5,13 +5,19 @@ package org.gxf.crestdeviceservice.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.gxf.crestdeviceservice.model.PskErrorUrc
+import org.gxf.crestdeviceservice.command.service.CommandService
+import org.gxf.crestdeviceservice.model.ErrorUrc
+import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isErrorUrc
+import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isPskErrorUrc
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.stereotype.Service
 
 @Service
-class UrcService(private val pskService: PskService) {
+class UrcService(
+    private val pskService: PskService,
+    private val commandService: CommandService
+) {
     companion object {
         private const val URC_FIELD = "URC"
         private const val URC_PSK_SUCCESS = "PSK:SET"
@@ -19,7 +25,6 @@ class UrcService(private val pskService: PskService) {
 
     private val logger = KotlinLogging.logger {}
 
-    @Throws(NoExistingPskException::class)
     fun interpretURCInMessage(identity: String, body: JsonNode) {
         val urcs = getUrcsFromMessage(body)
         if (urcs.isEmpty()) {
@@ -28,33 +33,45 @@ class UrcService(private val pskService: PskService) {
         }
         logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
 
-        when {
-            urcsContainPskError(urcs) -> {
-                handlePskErrors(identity, urcs)
+        // Check for PSK Success or error
+        if (urcsContainPskError(urcs)) {
+            handlePskErrors(identity, urcs)
+            return
+        } else if (urcsContainPskSuccess(urcs)) {
+            handlePskSuccess(identity)
+            return
+        }
+
+        val pendingCommand = commandService.getPendingCommandForDevice(identity)
+        if (pendingCommand != null) {
+            // Handle downlinks for pending command
+            if (urcsContainErrors(urcs)) {
+                commandService.handleCommandError(identity, pendingCommand)
+            } else {
+                commandService.handleCommandSuccess(identity, pendingCommand)
             }
-            urcsContainPskSuccess(urcs) -> {
-                handlePskSuccess(identity)
-            }
+            return
         }
     }
 
+    // PSK
     private fun getUrcsFromMessage(body: JsonNode) =
         body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
 
     private fun urcsContainPskError(urcs: List<String>) =
-        urcs.any { urc -> PskErrorUrc.isPskErrorURC(urc) }
+        urcs.any { urc -> isPskErrorUrc(urc) }
 
     private fun handlePskErrors(identity: String, urcs: List<String>) {
         if (!pskService.isPendingKeyPresent(identity)) {
             throw NoExistingPskException(
-                "Failure URC received, but no pending key present to set as invalid")
+                "Failure URC received, but no pending key present to set as invalid"
+            )
         }
 
-        urcs
-            .filter { urc -> PskErrorUrc.isPskErrorURC(urc) }
+        urcs.filter { urc -> isPskErrorUrc(urc) }
             .forEach { urc ->
                 logger.warn {
-                    "PSK set failed for device with id ${identity}: ${PskErrorUrc.messageFromCode(urc)}"
+                    "PSK set failed for device with id ${identity}: ${ErrorUrc.messageFromCode(urc)}"
                 }
             }
 
@@ -67,9 +84,15 @@ class UrcService(private val pskService: PskService) {
     private fun handlePskSuccess(identity: String) {
         if (!pskService.isPendingKeyPresent(identity)) {
             throw NoExistingPskException(
-                "Success URC received, but no pending key present to set as active")
+                "Success URC received, but no pending key present to set as active"
+            )
         }
         logger.info { "PSK set successfully, changing active key" }
         pskService.changeActiveKey(identity)
     }
+
+    // Other errors
+    private fun urcsContainErrors(urcs: List<String>) =
+        urcs.any { urc -> isErrorUrc(urc) }
+
 }

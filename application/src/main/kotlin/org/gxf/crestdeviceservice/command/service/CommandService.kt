@@ -1,6 +1,5 @@
 package org.gxf.crestdeviceservice.command.service
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import com.alliander.sng.Command as ExternalCommand
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
@@ -13,8 +12,6 @@ import java.util.*
 class CommandService(
     private val commandRepository: CommandRepository
 ) {
-
-    private val logger = KotlinLogging.logger {}
 
     private val knownCommands = Command.CommandType.entries.map { it.name }
 
@@ -55,7 +52,7 @@ class CommandService(
         }
 
         // If the device already has a newer command in the database ignore the incoming command
-        if(latestCommandInDatabase.timestampIssued.isAfter(timestampNewCommand)){
+        if (latestCommandInDatabase.timestampIssued.isAfter(timestampNewCommand)) {
             return true
         }
 
@@ -66,6 +63,9 @@ class CommandService(
 
         return false
     }
+
+    fun getPendingCommandForDevice(deviceId: String) =
+        commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, CommandStatus.PENDING)
 
     fun saveCommand(incomingCommand: ExternalCommand) {
 
@@ -80,5 +80,10 @@ class CommandService(
         )
 
         commandRepository.save(commandEntity)
+    }
+
+    fun setCommandInProgress(command: Command) {
+        command.status = CommandStatus.IN_PROGRESS
+        commandRepository.save(command)
     }
 }

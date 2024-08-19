@@ -19,7 +19,7 @@ data class Command(
     val timestampIssued: Instant,
     @Enumerated(EnumType.STRING) val type: CommandType,
     val commandValue: String?,
-    @Enumerated(EnumType.STRING) val status: CommandStatus,
+    @Enumerated(EnumType.STRING) var status: CommandStatus,
 ) {
     enum class CommandType {
         REBOOT

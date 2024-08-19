@@ -9,4 +9,6 @@ import java.util.*
 interface CommandRepository : CrudRepository<Command, UUID> {
 
     fun findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(deviceId: String, type: Command.CommandType): Command?
+
+    fun findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId: String, status: Command.CommandStatus): Command?
 }
