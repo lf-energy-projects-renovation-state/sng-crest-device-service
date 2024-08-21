@@ -8,6 +8,7 @@ import org.mockito.kotlin.mock
 
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -27,8 +28,8 @@ class CommandConsumerTest {
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
+        verify(commandFeedbackService).rejectCommand(eq(externalCommand), any<String>())
         verify(commandService, times(0)).existingCommandToBeCanceled(any<com.alliander.sng.Command>())
-        verify(commandService, times(0)).saveCommandEntity(any<Command>())
         verify(commandService, times(0)).saveExternalCommand(any<com.alliander.sng.Command>())
     }
 
@@ -54,7 +55,6 @@ class CommandConsumerTest {
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
-        verify(commandService, times(0)).saveCommandEntity(any<Command>())
         verify(commandService).saveExternalCommand(externalCommand)
     }
 }
