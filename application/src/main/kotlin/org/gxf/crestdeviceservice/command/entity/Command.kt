@@ -22,8 +22,7 @@ data class Command(
     @Enumerated(EnumType.STRING) var status: CommandStatus,
 ) {
     enum class CommandType {
-        REBOOT,
-        FIRMWARE
+        REBOOT
     }
 
     enum class CommandStatus {

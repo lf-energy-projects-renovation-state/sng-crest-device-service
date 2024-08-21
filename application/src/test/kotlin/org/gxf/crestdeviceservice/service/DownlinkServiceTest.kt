@@ -45,7 +45,19 @@ class DownlinkServiceTest {
     }
 
     @Test
-    fun shouldReturnNoActionDownlinkWhenThereIsNoNewPsk() {
+    fun shouldSendFirstPendingCommand() {
+        whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
+        whenever(commandService.getFirstPendingCommandForDevice(IDENTITY))
+            .thenReturn(TestHelper.pendingRebootCommand())
+
+        val result = downLinkService.getDownlinkForIdentity(IDENTITY, message)
+
+        val expectedDownlink = "CMD:REBOOT"
+        assertThat(result).isEqualTo(expectedDownlink)
+    }
+
+    @Test
+    fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskOrPendingCommand() {
         whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
 
         val result = downLinkService.getDownlinkForIdentity(IDENTITY, message)
@@ -71,14 +83,5 @@ class DownlinkServiceTest {
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]:SET
         assertThat(result).isEqualTo("!PSK:${key}:${expectedHash};PSK:${key}:${expectedHash}:SET")
-    }
-
-    @Test
-    fun shouldConcatenateMultipleCommands() {
-        val expected = "CMD:REBOOT;OTA"
-
-        val result = downLinkService.createDownlinkCommands(TestHelper.commandsForDownlink())
-
-        assertThat(result).isEqualTo(expected)
     }
 }

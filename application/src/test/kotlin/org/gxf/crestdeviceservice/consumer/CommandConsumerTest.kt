@@ -19,7 +19,7 @@ class CommandConsumerTest {
     private val commandFeedbackService = mock<CommandFeedbackService>()
     private val commandConsumer = CommandConsumer(commandService, commandFeedbackService)
 
-    private val externalCommand = TestHelper.externalCommand()
+    private val externalCommand = TestHelper.receivedRebootCommand()
 
     @Test
     fun commandRejected() {
@@ -35,7 +35,7 @@ class CommandConsumerTest {
 
     @Test
     fun existingCommandCanceled() {
-        val existingPendingCommand = TestHelper.pendingCommandEntity()
+        val existingPendingCommand = TestHelper.pendingRebootCommand()
         val existingCommandCanceled = existingPendingCommand.copy(status = Command.CommandStatus.CANCELED)
 
         whenever(commandService.shouldBeRejected(externalCommand)).thenReturn(Optional.empty())

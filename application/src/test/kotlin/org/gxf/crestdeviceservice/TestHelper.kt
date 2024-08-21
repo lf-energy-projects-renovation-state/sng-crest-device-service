@@ -13,45 +13,24 @@ import java.util.UUID
 
 object TestHelper {
     private val mapper = spy<ObjectMapper>()
-    private val deviceId = "device-id"
+    private const val DEVICE_ID = "device-id"
 
     fun messageTemplate(): ObjectNode {
         val messageFile = ResourceUtils.getFile("classpath:message-template.json")
         return mapper.readTree(messageFile) as ObjectNode
     }
 
-    fun commandsForDownlink() = listOf(
-        Command(
-            UUID.randomUUID(),
-            deviceId,
-            UUID.randomUUID(),
-            Instant.now(),
-            Command.CommandType.REBOOT,
-            "reboot",
-            Command.CommandStatus.IN_PROGRESS
-        ),
-        Command(
-            UUID.randomUUID(),
-            deviceId,
-            UUID.randomUUID(),
-            Instant.now(),
-            Command.CommandType.FIRMWARE,
-            "firmware",
-            Command.CommandStatus.IN_PROGRESS
-        )
-    )
-
-    fun externalCommand() = com.alliander.sng.Command.newBuilder()
-        .setDeviceId(deviceId)
+    fun receivedRebootCommand() = com.alliander.sng.Command.newBuilder()
+        .setDeviceId(DEVICE_ID)
         .setCorrelationId(UUID.randomUUID())
         .setTimestamp(Instant.now())
         .setCommand(Command.CommandType.REBOOT.name)
         .setValue(null)
-        .build()
+        .build()!!
 
-    fun pendingCommandEntity() = Command(
+    fun pendingRebootCommand() = Command(
         id = UUID.randomUUID(),
-        deviceId = deviceId,
+        deviceId = DEVICE_ID,
         correlationId = UUID.randomUUID(),
         timestampIssued = Instant.now(),
         type = Command.CommandType.REBOOT,

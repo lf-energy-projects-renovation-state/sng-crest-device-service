@@ -78,8 +78,8 @@ class CommandService(
         return Optional.empty()
     }
 
-    fun getPendingCommandsForDevice(deviceId: String) =
-        commandRepository.findByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, CommandStatus.PENDING)
+    fun getFirstPendingCommandForDevice(deviceId: String) =
+        commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, CommandStatus.PENDING)
 
     fun saveExternalCommand(incomingCommand: ExternalCommand) {
 
@@ -104,11 +104,11 @@ class CommandService(
         commandRepository.save(command)
     }
 
-    fun handleCommandError(identity: String, pendingCommands: List<Command>) {
+    fun handleCommandError(identity: String, pendingCommand: Command) {
         TODO("Not yet implemented")
     }
 
-    fun handleCommandSuccess(identity: String, pendingCommands: List<Command>) {
+    fun handleCommandSuccess(identity: String, pendingCommands: Command) {
         TODO("Not yet implemented")
     }
 }

@@ -41,13 +41,13 @@ class UrcService(
             return
         }
 
-        val pendingCommands = commandService.getPendingCommandsForDevice(identity)
-        if (pendingCommands.isNotEmpty()) {
+        val pendingCommand = commandService.getFirstPendingCommandForDevice(identity)
+        if (pendingCommand != null) {
             // Handle downlinks for pending command
             if (urcsContainErrors(urcs)) {
-                commandService.handleCommandError(identity, pendingCommands)
+                commandService.handleCommandError(identity, pendingCommand)
             } else { // todo is geen error automatisch een succes?
-                commandService.handleCommandSuccess(identity, pendingCommands)
+                commandService.handleCommandSuccess(identity, pendingCommand)
             }
         }
     }
