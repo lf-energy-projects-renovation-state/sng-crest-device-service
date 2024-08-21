@@ -81,6 +81,9 @@ class CommandService(
     fun getFirstPendingCommandForDevice(deviceId: String) =
         commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, CommandStatus.PENDING)
 
+    fun getFirstCommandInProgressForDevice(deviceId: String) =
+        commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, CommandStatus.IN_PROGRESS)
+
     fun saveExternalCommand(incomingCommand: ExternalCommand) {
 
         val commandEntity = Command(
@@ -99,7 +102,7 @@ class CommandService(
     fun saveCommandEntity(command: Command) =
         commandRepository.save(command)
 
-    fun setCommandInProgress(command: Command) {
+    fun setCommandInProgress(command: Command) { // todo equivalent voor canceled?
         command.status = CommandStatus.IN_PROGRESS
         commandRepository.save(command)
     }

@@ -41,12 +41,12 @@ class UrcService(
             return
         }
 
-        val pendingCommand = commandService.getFirstPendingCommandForDevice(identity)
+        val pendingCommand = commandService.getFirstPendingCommandForDevice(identity) // todo moet dit niet in progress zijn?
         if (pendingCommand != null) {
             // Handle downlinks for pending command
-            if (urcsContainErrors(urcs)) {
+            if (urcsContainErrors(urcs)) { // todo gaat dit per se over gestuurde command?
                 commandService.handleCommandError(identity, pendingCommand)
-            } else { // todo is geen error automatisch een succes?
+            } else { // todo is geen error automatisch een succes? nee, kan urc over iets anders zijn
                 commandService.handleCommandSuccess(identity, pendingCommand)
             }
         }

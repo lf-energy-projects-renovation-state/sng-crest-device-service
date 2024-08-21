@@ -41,7 +41,7 @@ class MessageController(
         synchronized(lock(identity)) {
             try {
                 urcService.interpretURCInMessage(identity, body)
-                val downlink = downlinkService.getDownlinkForIdentity(identity, body)
+                val downlink = downlinkService.getDownlinkForDevice(identity, body)
                 return ResponseEntity.ok(downlink)
             } catch (e: Exception) {
                 logger.error(e) {

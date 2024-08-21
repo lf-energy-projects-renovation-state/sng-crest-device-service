@@ -37,7 +37,7 @@ class DownlinkServiceTest {
         whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(true)
         whenever(pskService.setReadyKeyForIdentityAsPending(IDENTITY)).thenReturn(psk)
 
-        val result = downLinkService.getDownlinkForIdentity(IDENTITY, message)
+        val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]:SET
         assertThat(result)
@@ -45,22 +45,35 @@ class DownlinkServiceTest {
     }
 
     @Test
-    fun shouldSendFirstPendingCommand() {
+    fun shouldSendFirstPendingCommandIfNoCommandInProgress() {
         whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
         whenever(commandService.getFirstPendingCommandForDevice(IDENTITY))
             .thenReturn(TestHelper.pendingRebootCommand())
+        whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY)).thenReturn(null)
 
-        val result = downLinkService.getDownlinkForIdentity(IDENTITY, message)
+        val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
 
         val expectedDownlink = "CMD:REBOOT"
         assertThat(result).isEqualTo(expectedDownlink)
     }
 
     @Test
+    fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskAndACommandIsInProgress() {
+        whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
+        whenever(commandService.getFirstPendingCommandForDevice(IDENTITY))
+            .thenReturn(null)
+        whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY)).thenReturn(TestHelper.rebootCommandInProgress())
+
+        val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
+
+        assertThat(result).isEqualTo("0")
+    }
+
+    @Test
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskOrPendingCommand() {
         whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
 
-        val result = downLinkService.getDownlinkForIdentity(IDENTITY, message)
+        val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
 
         assertThat(result).isEqualTo("0")
     }

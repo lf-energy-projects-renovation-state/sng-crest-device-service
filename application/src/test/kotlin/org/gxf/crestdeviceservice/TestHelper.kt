@@ -37,4 +37,6 @@ object TestHelper {
         commandValue = null,
         status = Command.CommandStatus.PENDING
     )
+
+    fun rebootCommandInProgress() = pendingRebootCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
 }

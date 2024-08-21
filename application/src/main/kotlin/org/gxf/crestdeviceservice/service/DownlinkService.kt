@@ -28,11 +28,11 @@ class DownlinkService(
 
     @Transactional
     @Throws(NoExistingPskException::class)
-    fun getDownlinkForIdentity(identity: String, body: JsonNode): String {
-        logger.debug { "Check if device $identity needs key change" }
-        if (pskService.needsKeyChange(identity)) {
-            logger.info { "Device $identity needs key change" }
-            val newKey = pskService.setReadyKeyForIdentityAsPending(identity)
+    fun getDownlinkForDevice(deviceId: String, body: JsonNode): String {
+        logger.debug { "Check if device $deviceId needs key change" }
+        if (pskService.needsKeyChange(deviceId)) {
+            logger.info { "Device $deviceId needs key change" }
+            val newKey = pskService.setReadyKeyForIdentityAsPending(deviceId)
 
             // After setting a new psk, the device will send a new message if the psk set was
             // successful
@@ -42,9 +42,10 @@ class DownlinkService(
             return createPskSetCommand(newKey)
         }
 
-        val pendingCommand = commandService.getFirstPendingCommandForDevice(identity)
-        if (pendingCommand != null) {
-            logger.info { "Device $identity has pending command of type: ${pendingCommand.type}" }
+        val pendingCommand = commandService.getFirstPendingCommandForDevice(deviceId)
+        val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
+        if (pendingCommand != null && commandInProgress == null) { // no other commands in progress
+            logger.info { "Device $deviceId has pending command of type: ${pendingCommand.type}" }
             commandService.setCommandInProgress(pendingCommand)
 
             return createDownlinkCommand(pendingCommand)
