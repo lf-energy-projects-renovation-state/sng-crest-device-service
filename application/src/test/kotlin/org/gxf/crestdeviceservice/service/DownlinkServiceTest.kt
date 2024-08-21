@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice.service
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestHelper
+import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -17,7 +18,8 @@ import org.mockito.kotlin.whenever
 
 class DownlinkServiceTest {
     private val pskService = mock<PskService>()
-    private val downLinkService = DownlinkService(pskService)
+    private val commandService = mock<CommandService>()
+    private val downLinkService = DownlinkService(pskService, commandService)
     private val message = TestHelper.messageTemplate()
 
     companion object {
@@ -69,5 +71,14 @@ class DownlinkServiceTest {
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]:SET
         assertThat(result).isEqualTo("!PSK:${key}:${expectedHash};PSK:${key}:${expectedHash}:SET")
+    }
+
+    @Test
+    fun shouldConcatenateMultipleCommands() {
+        val expected = "CMD:REBOOT;OTA"
+
+        val result = downLinkService.createDownlinkCommands(TestHelper.commandsForDownlink())
+
+        assertThat(result).isEqualTo(expected)
     }
 }

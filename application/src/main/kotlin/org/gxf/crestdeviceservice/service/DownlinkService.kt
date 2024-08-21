@@ -20,7 +20,6 @@ class DownlinkService(
     private val pskService: PskService,
     private val commandService: CommandService
 ) {
-
     companion object {
         private const val RESPONSE_SUCCESS = "0"
     }
@@ -43,11 +42,14 @@ class DownlinkService(
             return createPskSetCommand(newKey)
         }
 
-        val pendingCommand = commandService.getPendingCommandForDevice(identity)
-        if (pendingCommand != null) {
-            logger.info { "Device $identity has pending command of type: ${pendingCommand.type}" }
-            commandService.setCommandInProgress(pendingCommand)
-            return createDownlinkForCommand(pendingCommand)
+        val pendingCommands = commandService.getPendingCommandsForDevice(identity)
+        if (pendingCommands.isNotEmpty()) {
+            pendingCommands.forEach{ command -> run {
+                logger.info { "Device $identity has pending command of type: ${command.type}" }
+                commandService.setCommandInProgress(command)
+            } }
+
+            return createDownlinkCommands(pendingCommands)
         }
 
         return RESPONSE_SUCCESS
@@ -59,9 +61,12 @@ class DownlinkService(
         return "!PSK:${newKey}:${hash};PSK:${newKey}:${hash}:SET"
     }
 
-    fun createDownlinkForCommand(command: Command): String {
-        return when (command.type) {
+    fun createDownlinkCommands(commands: List<Command>) =
+        commands.joinToString(";") { command -> createDownlinkCommand(command) }
+
+    fun createDownlinkCommand(command: Command) =
+        when (command.type) {
             CommandType.REBOOT -> "CMD:REBOOT"
+            CommandType.FIRMWARE -> "OTA" // todo FDP-1620 create downlink for firmware updates
         }
-    }
 }

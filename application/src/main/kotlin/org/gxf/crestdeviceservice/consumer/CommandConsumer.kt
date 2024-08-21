@@ -4,6 +4,7 @@
 package org.gxf.crestdeviceservice.consumer
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import com.alliander.sng.Command as ExternalCommand
@@ -15,25 +16,33 @@ class CommandConsumer(
     private val commandService: CommandService,
     private val commandFeedbackService: CommandFeedbackService
 ) {
-
     private val logger = KotlinLogging.logger {}
 
     @KafkaListener(
-        id = "pre-shared-key",
+        id = "command",
         idIsGroup = false,
-        topics = ["\${kafka.consumers.pre-shared-key.topic}"])
+        topics = ["\${kafka.consumers.command.topic}"])
     fun handleIncomingCommand(command: ExternalCommand) {
         logger.info { "Received command for device: ${command.deviceId}, with correlation id: ${command.correlationId}" }
 
+        // reject command if unknown or if newer same command exists
         val shouldBeRejected = commandService.shouldBeRejected(command)
-
         if(shouldBeRejected.isPresent) {
-            logger.info { "Rejecting command for device id: ${command.deviceId}, with reason: ${shouldBeRejected.get()}" }
-            commandFeedbackService.rejectCommand(command, shouldBeRejected.get())
+            val message = shouldBeRejected.get()
+            logger.info { "Rejecting command for device id: ${command.deviceId}, with reason: $message" }
+            commandFeedbackService.rejectCommand(command, message)
             return
         }
 
-        commandService.saveCommand(command)
+        // if a same command is already pending, cancel the existing pending command
+        val commandAlreadyExisting = commandService.existingCommandToBeCanceled(command)
+        if(commandAlreadyExisting.isPresent) {
+            logger.info { "Device with id ${command.deviceId} already has a pending command of the same type. The existing command will be canceled." }
+            val existingCommand = commandAlreadyExisting.get()
+            existingCommand.status = Command.CommandStatus.CANCELED
+            commandService.saveCommandEntity(existingCommand)
+        }
 
+        commandService.saveExternalCommand(command)
     }
 }

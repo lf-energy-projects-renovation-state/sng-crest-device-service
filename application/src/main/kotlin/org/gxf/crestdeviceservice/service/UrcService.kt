@@ -33,24 +33,22 @@ class UrcService(
         }
         logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
 
-        // Check for PSK Success or error
         if (urcsContainPskError(urcs)) {
-            handlePskErrors(identity, urcs)
+            handlePskErrors(identity, urcs) // todo in psk service?
             return
         } else if (urcsContainPskSuccess(urcs)) {
             handlePskSuccess(identity)
             return
         }
 
-        val pendingCommand = commandService.getPendingCommandForDevice(identity)
-        if (pendingCommand != null) {
+        val pendingCommands = commandService.getPendingCommandsForDevice(identity)
+        if (pendingCommands.isNotEmpty()) {
             // Handle downlinks for pending command
             if (urcsContainErrors(urcs)) {
-                commandService.handleCommandError(identity, pendingCommand)
-            } else {
-                commandService.handleCommandSuccess(identity, pendingCommand)
+                commandService.handleCommandError(identity, pendingCommands)
+            } else { // todo is geen error automatisch een succes?
+                commandService.handleCommandSuccess(identity, pendingCommands)
             }
-            return
         }
     }
 

@@ -14,7 +14,6 @@ class CommandFeedbackService(
     @Value("\${kafka.producers.command-feedback.topic}")
     val commandFeedbackTopic: String
 ) {
-
     fun rejectCommand(command: Command, message: String) {
         val commandFeedback = CommandFeedback.newBuilder()
             .setDeviceId(command.deviceId)
@@ -26,6 +25,4 @@ class CommandFeedbackService(
 
         kafkaTemplate.send(commandFeedbackTopic, commandFeedback)
     }
-
-
 }

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import java.util.stream.Stream
 import org.gxf.crestdeviceservice.TestHelper
+import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,7 +25,8 @@ import org.mockito.kotlin.whenever
 
 class UrcServiceTest {
     private val pskService = mock<PskService>()
-    private val urcService = UrcService(pskService)
+    private val commandService = mock<CommandService>()
+    private val urcService = UrcService(pskService, commandService)
     private val mapper = spy<ObjectMapper>()
 
     companion object {

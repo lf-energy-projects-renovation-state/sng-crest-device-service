@@ -9,7 +9,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Table
 data class Command(
@@ -22,7 +22,8 @@ data class Command(
     @Enumerated(EnumType.STRING) var status: CommandStatus,
 ) {
     enum class CommandType {
-        REBOOT
+        REBOOT,
+        FIRMWARE
     }
 
     enum class CommandStatus {
