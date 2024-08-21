@@ -13,6 +13,7 @@ import java.util.UUID
 
 object TestHelper {
     private val mapper = spy<ObjectMapper>()
+    private val deviceId = "device-id"
 
     fun messageTemplate(): ObjectNode {
         val messageFile = ResourceUtils.getFile("classpath:message-template.json")
@@ -22,7 +23,7 @@ object TestHelper {
     fun commandsForDownlink() = listOf(
         Command(
             UUID.randomUUID(),
-            "TST-01",
+            deviceId,
             UUID.randomUUID(),
             Instant.now(),
             Command.CommandType.REBOOT,
@@ -31,12 +32,30 @@ object TestHelper {
         ),
         Command(
             UUID.randomUUID(),
-            "TST-01",
+            deviceId,
             UUID.randomUUID(),
             Instant.now(),
             Command.CommandType.FIRMWARE,
             "firmware",
             Command.CommandStatus.IN_PROGRESS
         )
+    )
+
+    fun externalCommand() = com.alliander.sng.Command.newBuilder()
+        .setDeviceId(deviceId)
+        .setCorrelationId(UUID.randomUUID())
+        .setTimestamp(Instant.now())
+        .setCommand(Command.CommandType.REBOOT.name)
+        .setValue(null)
+        .build()
+
+    fun pendingCommandEntity() = Command(
+        id = UUID.randomUUID(),
+        deviceId = deviceId,
+        correlationId = UUID.randomUUID(),
+        timestampIssued = Instant.now(),
+        type = Command.CommandType.REBOOT,
+        commandValue = null,
+        status = Command.CommandStatus.PENDING
     )
 }

@@ -67,6 +67,6 @@ class DownlinkService(
     fun createDownlinkCommand(command: Command) =
         when (command.type) {
             CommandType.REBOOT -> "CMD:REBOOT"
-            CommandType.FIRMWARE -> "OTA" // todo FDP-1620 create downlink for firmware updates
+            CommandType.FIRMWARE -> "OTA" // todo FDP-1620 create real downlink for firmware updates
         }
 }

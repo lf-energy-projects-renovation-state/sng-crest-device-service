@@ -35,12 +35,12 @@ class CommandConsumer(
         }
 
         // if a same command is already pending, cancel the existing pending command
-        val commandAlreadyExisting = commandService.existingCommandToBeCanceled(command)
-        if(commandAlreadyExisting.isPresent) {
+        val existingPendingCommand = commandService.existingCommandToBeCanceled(command)
+        if(existingPendingCommand.isPresent) {
             logger.info { "Device with id ${command.deviceId} already has a pending command of the same type. The existing command will be canceled." }
-            val existingCommand = commandAlreadyExisting.get()
-            existingCommand.status = Command.CommandStatus.CANCELED
-            commandService.saveCommandEntity(existingCommand)
+            val commandToBeCanceled = existingPendingCommand.get()
+            commandToBeCanceled.status = Command.CommandStatus.CANCELED
+            commandService.saveCommandEntity(commandToBeCanceled)
         }
 
         commandService.saveExternalCommand(command)

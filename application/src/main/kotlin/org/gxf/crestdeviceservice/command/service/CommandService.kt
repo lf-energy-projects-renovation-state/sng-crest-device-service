@@ -6,7 +6,8 @@ import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.util.*
+import java.util.Optional
+import java.util.UUID
 
 @Service
 class CommandService(
