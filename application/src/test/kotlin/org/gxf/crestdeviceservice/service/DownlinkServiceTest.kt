@@ -60,9 +60,9 @@ class DownlinkServiceTest {
     @Test
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskAndACommandIsInProgress() {
         whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
-        whenever(commandService.getFirstPendingCommandForDevice(IDENTITY))
-            .thenReturn(null)
-        whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY)).thenReturn(TestHelper.rebootCommandInProgress())
+        whenever(commandService.getFirstPendingCommandForDevice(IDENTITY)).thenReturn(null)
+        whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY))
+            .thenReturn(TestHelper.rebootCommandInProgress())
 
         val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
 

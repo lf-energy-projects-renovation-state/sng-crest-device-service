@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
 
+import com.alliander.sng.CommandStatus as ExternalCommandStatus
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
@@ -16,7 +17,6 @@ import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isPskErrorUrc
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.stereotype.Service
-import com.alliander.sng.CommandStatus as ExternalCommandStatus
 
 @Service
 class UrcService(
@@ -56,17 +56,16 @@ class UrcService(
     private fun getUrcsFromMessage(body: JsonNode) =
         body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
 
-    private fun urcsContainPskError(urcs: List<String>) =
-        urcs.any { urc -> isPskErrorUrc(urc) }
+    private fun urcsContainPskError(urcs: List<String>) = urcs.any { urc -> isPskErrorUrc(urc) }
 
     private fun handlePskErrors(deviceId: String, urcs: List<String>) {
         if (!pskService.isPendingKeyPresent(deviceId)) {
             throw NoExistingPskException(
-                "Failure URC received, but no pending key present to set as invalid"
-            )
+                "Failure URC received, but no pending key present to set as invalid")
         }
 
-        urcs.filter { urc -> isPskErrorUrc(urc) }
+        urcs
+            .filter { urc -> isPskErrorUrc(urc) }
             .forEach { urc ->
                 logger.warn {
                     "PSK set failed for device with id ${deviceId}: ${ErrorUrc.messageFromCode(urc)}"
@@ -82,8 +81,7 @@ class UrcService(
     private fun handlePskSuccess(deviceId: String) {
         if (!pskService.isPendingKeyPresent(deviceId)) {
             throw NoExistingPskException(
-                "Success URC received, but no pending key present to set as active"
-            )
+                "Success URC received, but no pending key present to set as active")
         }
         logger.info { "PSK set successfully, changing active key" }
         pskService.changeActiveKey(deviceId)
@@ -101,12 +99,12 @@ class UrcService(
         }
     }
 
-    private fun urcsContainErrors(urcs: List<String>) =
-        urcs.any { urc -> isErrorUrc(urc) }
+    private fun urcsContainErrors(urcs: List<String>) = urcs.any { urc -> isErrorUrc(urc) }
 
     private fun handleCommandError(deviceId: String, command: Command, urcs: List<String>) {
         val errorUrcs = urcs.filter { urc -> isErrorUrc(urc) }
-        val message = "Command failed for device with id $deviceId with code(s): ${errorUrcs.joinToString { ", " }}"
+        val message =
+            "Command failed for device with id $deviceId with code(s): ${errorUrcs.joinToString { ", " }}"
 
         logger.error { message }
 
@@ -117,13 +115,13 @@ class UrcService(
     }
 
     private fun handleCommandUrcs(deviceId: String, command: Command, urcs: List<String>) {
-        when(command.type) {
+        when (command.type) {
             Command.CommandType.REBOOT -> handleRebootUrcs(deviceId, command, urcs)
         }
     }
 
     private fun handleRebootUrcs(deviceId: String, command: Command, urcs: List<String>) {
-        if(urcs.contains(INITIALISATION)) {
+        if (urcs.contains(INITIALISATION)) {
             val message = "Reboot for device $deviceId went succesfully"
             logger.info { message }
             command.status = CommandStatus.SUCCESSFUL
@@ -131,7 +129,9 @@ class UrcService(
 
             commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Successful, message)
         } else {
-            logger.warn { "Reboot command sent for device $deviceId, did not receive expected urc: $INITIALISATION. Urcs received: ${urcs.joinToString { ", " }}" }
+            logger.warn {
+                "Reboot command sent for device $deviceId, did not receive expected urc: $INITIALISATION. Urcs received: ${urcs.joinToString { ", " }}"
+            }
         }
     }
 }

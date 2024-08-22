@@ -71,15 +71,10 @@ class UrcServiceTest {
                 listOf("BOR"),
                 listOf("EXR"),
                 listOf("POR"),
-                listOf("INIT", "BOR", "POR")
-            )
+                listOf("INIT", "BOR", "POR"))
 
         @JvmStatic
-        private fun containingRebootSuccesUrc() =
-            Stream.of(
-                listOf("INIT"),
-                listOf("INIT", "WDR")
-            )
+        private fun containingRebootSuccesUrc() = Stream.of(listOf("INIT"), listOf("INIT", "WDR"))
     }
 
     @Test
@@ -119,7 +114,8 @@ class UrcServiceTest {
         urcService.interpretURCInMessage(DEVICE_ID, message)
 
         verify(commandService).saveCommandEntity(commandError)
-        verify(commandFeedbackService).sendFeedback(eq(commandError), eq(CommandStatus.Error), any<String>())
+        verify(commandFeedbackService)
+            .sendFeedback(eq(commandError), eq(CommandStatus.Error), any<String>())
     }
 
     @ParameterizedTest(name = "should handle success urcs for command")
@@ -133,12 +129,14 @@ class UrcServiceTest {
         whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
-//        whenever(commandService.saveCommandEntity(commandSuccessful)).thenReturn(commandSuccessful)
+        //
+        // whenever(commandService.saveCommandEntity(commandSuccessful)).thenReturn(commandSuccessful)
 
         urcService.interpretURCInMessage(DEVICE_ID, message)
 
         verify(commandService).saveCommandEntity(eq(commandSuccessful))
-        verify(commandFeedbackService).sendFeedback(eq(commandSuccessful), eq(CommandStatus.Successful), any<String>())
+        verify(commandFeedbackService)
+            .sendFeedback(eq(commandSuccessful), eq(CommandStatus.Successful), any<String>())
     }
 
     private fun interpretURCWhileNewKeyIsPending(urcs: List<String>) {
