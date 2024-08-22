@@ -1,5 +1,6 @@
 package org.gxf.crestdeviceservice.consumer
 
+import com.alliander.sng.CommandStatus
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
@@ -28,9 +29,9 @@ class CommandConsumerTest {
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
-        verify(commandFeedbackService).rejectCommand(eq(externalCommand), any<String>())
+        verify(commandFeedbackService).sendFeedback(eq(externalCommand), eq(CommandStatus.Rejected), any<String>())
         verify(commandService, times(0)).existingCommandToBeCanceled(any<com.alliander.sng.Command>())
-        verify(commandService, times(0)).saveExternalCommand(any<com.alliander.sng.Command>())
+        verify(commandService, times(0)).saveExternalCommandAsPending(any<com.alliander.sng.Command>())
     }
 
     @Test
@@ -45,7 +46,7 @@ class CommandConsumerTest {
         commandConsumer.handleIncomingCommand(externalCommand)
 
         verify(commandService).saveCommandEntity(existingCommandCanceled)
-        verify(commandService).saveExternalCommand(externalCommand)
+        verify(commandService).saveExternalCommandAsPending(externalCommand)
     }
 
     @Test
@@ -55,6 +56,6 @@ class CommandConsumerTest {
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
-        verify(commandService).saveExternalCommand(externalCommand)
+        verify(commandService).saveExternalCommandAsPending(externalCommand)
     }
 }

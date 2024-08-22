@@ -1,19 +1,28 @@
 package org.gxf.crestdeviceservice.command.service
 
-import com.alliander.sng.Command as ExternalCommand
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
+import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isErrorUrc
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.Optional
 import java.util.UUID
+import com.alliander.sng.Command as ExternalCommand
+import com.alliander.sng.CommandStatus as ExternalCommandStatus
 
 @Service
 class CommandService(
-    private val commandRepository: CommandRepository
+    private val commandRepository: CommandRepository,
+    private val commandFeedbackService: CommandFeedbackService
 ) {
     private val knownCommands = Command.CommandType.entries.map { it.name }
+    private val logger = KotlinLogging.logger {}
+
+    companion object {
+        const val INITIALISATION = "INIT"
+    }
 
     /**
      * Check if the incoming command should be rejected.
@@ -36,14 +45,14 @@ class CommandService(
     fun existingCommandToBeCanceled(command: ExternalCommand): Optional<Command> {
         val commandType: Command.CommandType = Command.CommandType.valueOf(command.command)
 
-        return deviceHasSameCommandAlreadyPendingOrInProgress(command.deviceId, commandType, command.timestamp)
+        return deviceHasSameCommandAlreadyPendingOrInProgress(command.deviceId, commandType)
     }
 
     /**
      * Check if the device already has a newer command pending of the same type that was issued at a later date.
      * This check prevents issues if commands arrive out of order or if we reset the kafka consumer group.
      */
-    fun deviceHasNewerSameCommand(
+    private fun deviceHasNewerSameCommand(
         deviceId: String,
         commandType: Command.CommandType,
         timestampNewCommand: Instant
@@ -55,17 +64,16 @@ class CommandService(
         return latestCommandInDatabase.timestampIssued.isAfter(timestampNewCommand)
     }
 
-    fun latestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
+    private fun latestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
         commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(deviceId, commandType)
 
     /**
      * Check if the device already has a newer command pending of the same type that was issued at a later date.
      * This check prevents issues if commands arrive out of order or if we reset the kafka consumer group.
      */
-    fun deviceHasSameCommandAlreadyPendingOrInProgress(
+    private fun deviceHasSameCommandAlreadyPendingOrInProgress(
         deviceId: String,
-        commandType: Command.CommandType,
-        timestampNewCommand: Instant
+        commandType: Command.CommandType
     ): Optional<Command> {
         val latestCommandInDatabase = latestCommandInDatabase(deviceId, commandType)
             ?: return Optional.empty()
@@ -84,8 +92,7 @@ class CommandService(
     fun getFirstCommandInProgressForDevice(deviceId: String) =
         commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, CommandStatus.IN_PROGRESS)
 
-    fun saveExternalCommand(incomingCommand: ExternalCommand) {
-
+    fun saveExternalCommandAsPending(incomingCommand: ExternalCommand) {
         val commandEntity = Command(
             id = UUID.randomUUID(),
             deviceId = incomingCommand.deviceId,
@@ -107,11 +114,34 @@ class CommandService(
         commandRepository.save(command)
     }
 
-    fun handleCommandError(identity: String, pendingCommand: Command) {
-        TODO("Not yet implemented")
+    fun handleCommandError(deviceId: String, command: Command, urcs: List<String>) {
+        val errorUrcs = urcs.filter { urc -> isErrorUrc(urc) }
+        val message = "Command failed for device with id $deviceId with code(s): ${errorUrcs.joinToString { ", " }}"
+
+        logger.error { message }
+
+        command.status = CommandStatus.ERROR
+        saveCommandEntity(command)
+
+        commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Error, message)
     }
 
-    fun handleCommandSuccess(identity: String, pendingCommands: Command) {
-        TODO("Not yet implemented")
+    fun handleCommandUrcs(deviceId: String, command: Command, urcs: List<String>) {
+        when(command.type) {
+            Command.CommandType.REBOOT -> handleRebootUrcs(deviceId, command, urcs)
+        }
+    }
+
+    private fun handleRebootUrcs(deviceId: String, command: Command, urcs: List<String>) {
+        if(urcs.contains(INITIALISATION)) {
+            val message = "Reboot for device $deviceId went succesfully"
+            logger.info { message }
+            command.status = CommandStatus.SUCCESSFUL
+            saveCommandEntity(command)
+
+            commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Successful, message)
+        } else {
+            logger.warn { "Reboot command sent for device $deviceId, did not receive expected urc: $INITIALISATION. Urcs received: ${urcs.joinToString { ", " }}" }
+        }
     }
 }

@@ -1,20 +1,27 @@
 package org.gxf.crestdeviceservice.command.service
 
+import com.alliander.sng.CommandStatus
 import org.assertj.core.api.Assertions.assertThat
+import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.TestHelper.pendingRebootCommand
 import org.gxf.crestdeviceservice.TestHelper.receivedRebootCommand
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Instant
 import java.util.Optional
 
 class CommandServiceTest {
     private val commandRepository = mock<CommandRepository>()
-    private val commandService = CommandService(commandRepository)
+    private val commandFeedbackService = mock<CommandFeedbackService>()
+    private val commandService = CommandService(commandRepository, commandFeedbackService)
+
+    private val deviceId = "TST-01"
 
     @Test
     fun `Check if command is allowed`() {
@@ -66,5 +73,29 @@ class CommandServiceTest {
         val commandToBeCanceled = commandService.existingCommandToBeCanceled(newCommand)
 
         assertThat(commandToBeCanceled).isEmpty
+    }
+
+    @Test
+    fun handleCommandError() {
+        val commandInProgress = TestHelper.rebootCommandInProgress()
+        val commandError = commandInProgress.copy(status = Command.CommandStatus.ERROR)
+        whenever(commandRepository.save(commandError)).thenReturn(commandError)
+
+        commandService.handleCommandError(deviceId, commandInProgress, listOf("ERR, DLER"))
+
+        verify(commandRepository).save(commandError)
+        verify(commandFeedbackService).sendFeedback(eq(commandError), eq(CommandStatus.Error), any<String>())
+    }
+
+    @Test
+    fun handleCommandUrcsReboot() {
+        val commandInProgress = TestHelper.rebootCommandInProgress()
+        val commandSuccessful = commandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
+        whenever(commandRepository.save(commandSuccessful)).thenReturn(commandSuccessful)
+
+        commandService.handleCommandUrcs(deviceId, commandInProgress, listOf("INIT", "WDR"))
+
+        verify(commandRepository).save(commandSuccessful)
+        verify(commandFeedbackService).sendFeedback(eq(commandSuccessful), eq(CommandStatus.Successful), any<String>())
     }
 }

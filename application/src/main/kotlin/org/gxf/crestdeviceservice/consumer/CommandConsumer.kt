@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.consumer
 
+import com.alliander.sng.CommandStatus
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
@@ -30,7 +31,7 @@ class CommandConsumer(
         if(shouldBeRejected.isPresent) {
             val message = shouldBeRejected.get()
             logger.info { "Rejecting command for device id: ${command.deviceId}, with reason: $message" }
-            commandFeedbackService.rejectCommand(command, message)
+            commandFeedbackService.sendFeedback(command, CommandStatus.Rejected, message)
             return
         }
 
@@ -43,6 +44,6 @@ class CommandConsumer(
             commandService.saveCommandEntity(commandToBeCanceled)
         }
 
-        commandService.saveExternalCommand(command)
+        commandService.saveExternalCommandAsPending(command)
     }
 }

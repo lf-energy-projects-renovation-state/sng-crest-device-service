@@ -5,6 +5,7 @@ package org.gxf.crestdeviceservice.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.model.ErrorUrc
 import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isErrorUrc
@@ -25,7 +26,7 @@ class UrcService(
 
     private val logger = KotlinLogging.logger {}
 
-    fun interpretURCInMessage(identity: String, body: JsonNode) {
+    fun interpretURCInMessage(deviceId: String, body: JsonNode) {
         val urcs = getUrcsFromMessage(body)
         if (urcs.isEmpty()) {
             logger.debug { "Received message without urcs" }
@@ -34,33 +35,27 @@ class UrcService(
         logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
 
         if (urcsContainPskError(urcs)) {
-            handlePskErrors(identity, urcs) // todo in psk service?
+            handlePskErrors(deviceId, urcs) // todo in psk service?
             return
         } else if (urcsContainPskSuccess(urcs)) {
-            handlePskSuccess(identity)
+            handlePskSuccess(deviceId)
             return
         }
 
-        val pendingCommand = commandService.getFirstPendingCommandForDevice(identity) // todo moet dit niet in progress zijn?
-        if (pendingCommand != null) {
-            // Handle downlinks for pending command
-            if (urcsContainErrors(urcs)) { // todo gaat dit per se over gestuurde command?
-                commandService.handleCommandError(identity, pendingCommand)
-            } else { // todo is geen error automatisch een succes? nee, kan urc over iets anders zijn
-                commandService.handleCommandSuccess(identity, pendingCommand)
-            }
+        val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
+        if (commandInProgress != null) {
+            handleUrcsForCommand(urcs, deviceId, commandInProgress)
         }
     }
 
-    // PSK
     private fun getUrcsFromMessage(body: JsonNode) =
         body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
 
     private fun urcsContainPskError(urcs: List<String>) =
         urcs.any { urc -> isPskErrorUrc(urc) }
 
-    private fun handlePskErrors(identity: String, urcs: List<String>) {
-        if (!pskService.isPendingKeyPresent(identity)) {
+    private fun handlePskErrors(deviceId: String, urcs: List<String>) {
+        if (!pskService.isPendingKeyPresent(deviceId)) {
             throw NoExistingPskException(
                 "Failure URC received, but no pending key present to set as invalid"
             )
@@ -69,28 +64,38 @@ class UrcService(
         urcs.filter { urc -> isPskErrorUrc(urc) }
             .forEach { urc ->
                 logger.warn {
-                    "PSK set failed for device with id ${identity}: ${ErrorUrc.messageFromCode(urc)}"
+                    "PSK set failed for device with id ${deviceId}: ${ErrorUrc.messageFromCode(urc)}"
                 }
             }
 
-        pskService.setPendingKeyAsInvalid(identity)
+        pskService.setPendingKeyAsInvalid(deviceId)
     }
 
     private fun urcsContainPskSuccess(urcs: List<String>) =
         urcs.any { urc -> urc.contains(URC_PSK_SUCCESS) }
 
-    private fun handlePskSuccess(identity: String) {
-        if (!pskService.isPendingKeyPresent(identity)) {
+    private fun handlePskSuccess(deviceId: String) {
+        if (!pskService.isPendingKeyPresent(deviceId)) {
             throw NoExistingPskException(
                 "Success URC received, but no pending key present to set as active"
             )
         }
         logger.info { "PSK set successfully, changing active key" }
-        pskService.changeActiveKey(identity)
+        pskService.changeActiveKey(deviceId)
     }
 
-    // Other errors
+    private fun handleUrcsForCommand(
+        urcs: List<String>,
+        deviceId: String,
+        commandInProgress: Command
+    ) {
+        if (urcsContainErrors(urcs)) {
+            commandService.handleCommandError(deviceId, commandInProgress, urcs)
+        } else {
+            commandService.handleCommandUrcs(deviceId, commandInProgress, urcs)
+        }
+    }
+
     private fun urcsContainErrors(urcs: List<String>) =
         urcs.any { urc -> isErrorUrc(urc) }
-
 }
