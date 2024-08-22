@@ -26,9 +26,13 @@ kafka:
   consumers:
     pre-shared-key:
       topic: "pre-shared-key"
+    command:
+      topic: "command"
   producers:
     device-message:
       topic: "crest-message"
+    command-feedback:
+      topic: "command-feedback"
 
 crest-device-service:
   database:

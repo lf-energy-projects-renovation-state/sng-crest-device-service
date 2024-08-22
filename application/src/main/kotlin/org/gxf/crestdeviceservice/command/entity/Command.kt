@@ -4,14 +4,14 @@
 package org.gxf.crestdeviceservice.command.entity
 
 import jakarta.annotation.Generated
+import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
-import jakarta.persistence.Table
 import java.time.Instant
 import java.util.UUID
 
-@Table
+@Entity
 data class Command(
     @Id @Generated val id: UUID,
     val deviceId: String,
@@ -21,8 +21,8 @@ data class Command(
     val commandValue: String?,
     @Enumerated(EnumType.STRING) var status: CommandStatus,
 ) {
-    enum class CommandType(val downlink: String, val urcsSuccess: List<String>, val urcsFailure: List<String>) {
-        REBOOT("CMD:REBOOT", listOf("INIT", "WDR"), listOf())
+    enum class CommandType(val downlink: String, val urcsSuccess: List<String>) {
+        REBOOT("CMD:REBOOT", listOf("INIT", "WDR"))
     }
 
     enum class CommandStatus {

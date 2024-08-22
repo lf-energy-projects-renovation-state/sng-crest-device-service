@@ -28,7 +28,6 @@ import org.springframework.test.annotation.DirtiesContext
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CoapMessageHandlingTest {
-
     companion object {
         private const val IDENTITY = "1234"
         private const val PRE_SHARED_KEY_FIRST = "1234567890123456"
