@@ -38,8 +38,9 @@ class UrcServiceTest {
     companion object {
         private const val URC_FIELD = "URC"
         private const val DL_FIELD = "DL"
-        private const val PSK_COMMAND =
+        private const val PSK_DOWNLINK =
             "!PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3;PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3:SET"
+        private const val REBOOT_DOWNLINK = "CMD:REBOOT"
         private const val DEVICE_ID = "867787050253370"
 
         @JvmStatic
@@ -72,9 +73,6 @@ class UrcServiceTest {
                 listOf("EXR"),
                 listOf("POR"),
                 listOf("INIT", "BOR", "POR"))
-
-        @JvmStatic
-        private fun containingRebootSuccesUrc() = Stream.of(listOf("INIT"), listOf("INIT", "WDR"))
     }
 
     @Test
@@ -103,7 +101,7 @@ class UrcServiceTest {
     fun handleErrorUrcForCommand(urcs: List<String>) {
         val commandInProgress = TestHelper.rebootCommandInProgress()
         val commandError = commandInProgress.copy(status = Command.CommandStatus.ERROR)
-        val message = updatePskCommandInMessage(urcs)
+        val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
         whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
         whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
@@ -118,19 +116,18 @@ class UrcServiceTest {
             .sendFeedback(eq(commandError), eq(CommandStatus.Error), any<String>())
     }
 
-    @ParameterizedTest(name = "should handle success urcs for command")
-    @MethodSource("containingRebootSuccesUrc")
-    fun handleSuccessUrcForCommand(urcs: List<String>) {
+    @Test
+    fun handleSuccessUrcForCommand() {
+        val urcs = listOf("INIT", "WDR")
         val commandInProgress = TestHelper.rebootCommandInProgress()
         val commandSuccessful = commandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
-        val message = updatePskCommandInMessage(urcs)
+        val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
         whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
         whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
-        //
-        // whenever(commandService.saveCommandEntity(commandSuccessful)).thenReturn(commandSuccessful)
+        whenever(commandService.saveCommandEntity(commandSuccessful)).thenReturn(commandSuccessful)
 
         urcService.interpretURCInMessage(DEVICE_ID, message)
 
@@ -139,27 +136,44 @@ class UrcServiceTest {
             .sendFeedback(eq(commandSuccessful), eq(CommandStatus.Successful), any<String>())
     }
 
+    @Test
+    fun shouldDoNothingIfUrcDoesNotConcernCommandInProgress() {
+        val urcs = listOf("ENPD")
+        val commandInProgress = TestHelper.rebootCommandInProgress()
+        val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
+
+        whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
+        whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
+            .thenReturn(commandInProgress)
+
+        urcService.interpretURCInMessage(DEVICE_ID, message)
+
+        verify(commandService, times(0)).saveCommandEntity(any<Command>())
+        verify(commandFeedbackService, times(0)).sendFeedback(any<Command>(), any<CommandStatus>(), any<String>())
+    }
+
     private fun interpretURCWhileNewKeyIsPending(urcs: List<String>) {
         whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
         whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(true)
 
-        val message = updatePskCommandInMessage(urcs)
+        val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCInMessage(DEVICE_ID, message)
     }
 
-    private fun updatePskCommandInMessage(urcs: List<String>): JsonNode {
+    private fun updateUrcInMessage(urcs: List<String>, downlink: String): JsonNode {
         val message = TestHelper.messageTemplate()
-        val urcFieldValue = urcFieldValue(urcs)
+        val urcFieldValue = urcFieldValue(urcs, downlink)
 
         message.replace(URC_FIELD, urcFieldValue)
         return message
     }
 
-    private fun urcFieldValue(urcs: List<String>): ArrayNode? {
+    private fun urcFieldValue(urcs: List<String>, downlink: String): ArrayNode? {
         val urcNodes = urcs.map { urc -> TextNode(urc) }
         val downlinkNode =
-            ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(PSK_COMMAND)))
+            ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(downlink)))
         val urcsPlusReceivedDownlink: MutableList<BaseJsonNode> = mutableListOf()
         urcsPlusReceivedDownlink.addAll(urcNodes)
         urcsPlusReceivedDownlink.add(downlinkNode)

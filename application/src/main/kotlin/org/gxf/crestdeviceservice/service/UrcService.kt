@@ -26,6 +26,7 @@ class UrcService(
 ) {
     companion object {
         private const val URC_FIELD = "URC"
+        private const val DL_FIELD = "DL"
         private const val URC_PSK_SUCCESS = "PSK:SET"
     }
 
@@ -49,12 +50,16 @@ class UrcService(
 
         val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
         if (commandInProgress != null) {
-            handleUrcsForCommand(urcs, deviceId, commandInProgress)
+            val downlink = getDownlinkFromMessage(body)
+            handleUrcsForCommand(urcs, deviceId, commandInProgress, downlink)
         }
     }
 
     private fun getUrcsFromMessage(body: JsonNode) =
         body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
+
+    private fun getDownlinkFromMessage(body: JsonNode) =
+        body[URC_FIELD].first { it.isObject }[DL_FIELD].asText()
 
     private fun urcsContainPskError(urcs: List<String>) = urcs.any { urc -> isPskErrorUrc(urc) }
 
@@ -90,16 +95,25 @@ class UrcService(
     private fun handleUrcsForCommand(
         urcs: List<String>,
         deviceId: String,
-        commandInProgress: Command
+        commandInProgress: Command,
+        downlink: String
     ) {
-        if (urcsContainErrors(urcs)) {
-            handleCommandError(deviceId, commandInProgress, urcs)
-        } else {
-            handleCommandUrcs(deviceId, commandInProgress, urcs)
+        // check if urc is about this command
+        if(downlink.contains(commandInProgress.type.downlink)) {
+            if (urcsContainErrors(urcs)) {
+                handleCommandError(deviceId, commandInProgress, urcs)
+            } else if(urcsContainSuccesses(urcs, commandInProgress)){
+                handleCommandUrcs(deviceId, commandInProgress, urcs)
+            }
         }
     }
 
     private fun urcsContainErrors(urcs: List<String>) = urcs.any { urc -> isErrorUrc(urc) }
+
+    private fun urcsContainSuccesses(urcs: List<String>, command: Command) =
+        command.type.urcsSuccess.any {
+            successUrc -> urcs.contains(successUrc)
+        }
 
     private fun handleCommandError(deviceId: String, command: Command, urcs: List<String>) {
         val errorUrcs = urcs.filter { urc -> isErrorUrc(urc) }
