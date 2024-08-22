@@ -1,24 +1,19 @@
 package org.gxf.crestdeviceservice.command.service
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
-import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isErrorUrc
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.Optional
 import java.util.UUID
 import com.alliander.sng.Command as ExternalCommand
-import com.alliander.sng.CommandStatus as ExternalCommandStatus
 
 @Service
 class CommandService(
-    private val commandRepository: CommandRepository,
-    private val commandFeedbackService: CommandFeedbackService
+    private val commandRepository: CommandRepository
 ) {
     private val knownCommands = Command.CommandType.entries.map { it.name }
-    private val logger = KotlinLogging.logger {}
 
     companion object {
         const val INITIALISATION = "INIT"
@@ -112,36 +107,5 @@ class CommandService(
     fun setCommandInProgress(command: Command) { // todo equivalent voor canceled?
         command.status = CommandStatus.IN_PROGRESS
         commandRepository.save(command)
-    }
-
-    fun handleCommandError(deviceId: String, command: Command, urcs: List<String>) {
-        val errorUrcs = urcs.filter { urc -> isErrorUrc(urc) }
-        val message = "Command failed for device with id $deviceId with code(s): ${errorUrcs.joinToString { ", " }}"
-
-        logger.error { message }
-
-        command.status = CommandStatus.ERROR
-        saveCommandEntity(command)
-
-        commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Error, message)
-    }
-
-    fun handleCommandUrcs(deviceId: String, command: Command, urcs: List<String>) {
-        when(command.type) {
-            Command.CommandType.REBOOT -> handleRebootUrcs(deviceId, command, urcs)
-        }
-    }
-
-    private fun handleRebootUrcs(deviceId: String, command: Command, urcs: List<String>) {
-        if(urcs.contains(INITIALISATION)) {
-            val message = "Reboot for device $deviceId went succesfully"
-            logger.info { message }
-            command.status = CommandStatus.SUCCESSFUL
-            saveCommandEntity(command)
-
-            commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Successful, message)
-        } else {
-            logger.warn { "Reboot command sent for device $deviceId, did not receive expected urc: $INITIALISATION. Urcs received: ${urcs.joinToString { ", " }}" }
-        }
     }
 }

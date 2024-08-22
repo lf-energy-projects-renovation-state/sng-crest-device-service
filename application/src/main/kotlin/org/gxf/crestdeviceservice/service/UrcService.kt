@@ -6,18 +6,23 @@ package org.gxf.crestdeviceservice.service
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
+import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
+import org.gxf.crestdeviceservice.command.service.CommandService.Companion.INITIALISATION
 import org.gxf.crestdeviceservice.model.ErrorUrc
 import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isErrorUrc
 import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isPskErrorUrc
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.stereotype.Service
+import com.alliander.sng.CommandStatus as ExternalCommandStatus
 
 @Service
 class UrcService(
     private val pskService: PskService,
-    private val commandService: CommandService
+    private val commandService: CommandService,
+    private val commandFeedbackService: CommandFeedbackService
 ) {
     companion object {
         private const val URC_FIELD = "URC"
@@ -35,7 +40,7 @@ class UrcService(
         logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
 
         if (urcsContainPskError(urcs)) {
-            handlePskErrors(deviceId, urcs) // todo in psk service?
+            handlePskErrors(deviceId, urcs)
             return
         } else if (urcsContainPskSuccess(urcs)) {
             handlePskSuccess(deviceId)
@@ -90,12 +95,43 @@ class UrcService(
         commandInProgress: Command
     ) {
         if (urcsContainErrors(urcs)) {
-            commandService.handleCommandError(deviceId, commandInProgress, urcs)
+            handleCommandError(deviceId, commandInProgress, urcs)
         } else {
-            commandService.handleCommandUrcs(deviceId, commandInProgress, urcs)
+            handleCommandUrcs(deviceId, commandInProgress, urcs)
         }
     }
 
     private fun urcsContainErrors(urcs: List<String>) =
         urcs.any { urc -> isErrorUrc(urc) }
+
+    private fun handleCommandError(deviceId: String, command: Command, urcs: List<String>) {
+        val errorUrcs = urcs.filter { urc -> isErrorUrc(urc) }
+        val message = "Command failed for device with id $deviceId with code(s): ${errorUrcs.joinToString { ", " }}"
+
+        logger.error { message }
+
+        command.status = CommandStatus.ERROR
+        commandService.saveCommandEntity(command)
+
+        commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Error, message)
+    }
+
+    private fun handleCommandUrcs(deviceId: String, command: Command, urcs: List<String>) {
+        when(command.type) {
+            Command.CommandType.REBOOT -> handleRebootUrcs(deviceId, command, urcs)
+        }
+    }
+
+    private fun handleRebootUrcs(deviceId: String, command: Command, urcs: List<String>) {
+        if(urcs.contains(INITIALISATION)) {
+            val message = "Reboot for device $deviceId went succesfully"
+            logger.info { message }
+            command.status = CommandStatus.SUCCESSFUL
+            commandService.saveCommandEntity(command)
+
+            commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Successful, message)
+        } else {
+            logger.warn { "Reboot command sent for device $deviceId, did not receive expected urc: $INITIALISATION. Urcs received: ${urcs.joinToString { ", " }}" }
+        }
+    }
 }

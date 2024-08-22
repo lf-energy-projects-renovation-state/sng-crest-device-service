@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
 
+import com.alliander.sng.CommandStatus
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -12,11 +13,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import java.util.stream.Stream
 import org.gxf.crestdeviceservice.TestHelper
+import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
@@ -26,7 +31,8 @@ import org.mockito.kotlin.whenever
 class UrcServiceTest {
     private val pskService = mock<PskService>()
     private val commandService = mock<CommandService>()
-    private val urcService = UrcService(pskService, commandService)
+    private val commandFeedbackService = mock<CommandFeedbackService>()
+    private val urcService = UrcService(pskService, commandService, commandFeedbackService)
     private val mapper = spy<ObjectMapper>()
 
     companion object {
@@ -67,6 +73,13 @@ class UrcServiceTest {
                 listOf("POR"),
                 listOf("INIT", "BOR", "POR")
             )
+
+        @JvmStatic
+        private fun containingRebootSuccesUrc() =
+            Stream.of(
+                listOf("INIT"),
+                listOf("INIT", "WDR")
+            )
     }
 
     @Test
@@ -93,17 +106,39 @@ class UrcServiceTest {
     @ParameterizedTest(name = "should handle error urc for command")
     @MethodSource("containingErrorUrcs")
     fun handleErrorUrcForCommand(urcs: List<String>) {
+        val commandInProgress = TestHelper.rebootCommandInProgress()
+        val commandError = commandInProgress.copy(status = Command.CommandStatus.ERROR)
+        val message = updatePskCommandInMessage(urcs)
+
         whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
         whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
-        val commandInProgress = TestHelper.rebootCommandInProgress()
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
-
-        val message = updatePskCommandInMessage(urcs)
+        whenever(commandService.saveCommandEntity(commandError)).thenReturn(commandError)
 
         urcService.interpretURCInMessage(DEVICE_ID, message)
 
-        verify(commandService).handleCommandError(DEVICE_ID, commandInProgress, urcs)
+        verify(commandService).saveCommandEntity(commandError)
+        verify(commandFeedbackService).sendFeedback(eq(commandError), eq(CommandStatus.Error), any<String>())
+    }
+
+    @ParameterizedTest(name = "should handle success urcs for command")
+    @MethodSource("containingRebootSuccesUrc")
+    fun handleSuccessUrcForCommand(urcs: List<String>) {
+        val commandInProgress = TestHelper.rebootCommandInProgress()
+        val commandSuccessful = commandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
+        val message = updatePskCommandInMessage(urcs)
+
+        whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
+        whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
+            .thenReturn(commandInProgress)
+//        whenever(commandService.saveCommandEntity(commandSuccessful)).thenReturn(commandSuccessful)
+
+        urcService.interpretURCInMessage(DEVICE_ID, message)
+
+        verify(commandService).saveCommandEntity(eq(commandSuccessful))
+        verify(commandFeedbackService).sendFeedback(eq(commandSuccessful), eq(CommandStatus.Successful), any<String>())
     }
 
     private fun interpretURCWhileNewKeyIsPending(urcs: List<String>) {
