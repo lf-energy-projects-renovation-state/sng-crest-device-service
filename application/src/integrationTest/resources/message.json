@@ -11,9 +11,9 @@
   "TRY": 1,
   "MSI": 0,
   "URC": [
-    "INIT",
+    "INIT","WDR",
     {
-      "DL": "0"
+      "DL": "!CMD:REBOOT"
     }
   ],
   "A": [

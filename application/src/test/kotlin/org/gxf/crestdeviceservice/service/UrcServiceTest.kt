@@ -40,7 +40,7 @@ class UrcServiceTest {
         private const val DL_FIELD = "DL"
         private const val PSK_DOWNLINK =
             "!PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3;PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3:SET"
-        private const val REBOOT_DOWNLINK = "CMD:REBOOT"
+        private const val REBOOT_DOWNLINK = "!CMD:REBOOT"
         private const val DEVICE_ID = "867787050253370"
 
         @JvmStatic
@@ -150,7 +150,8 @@ class UrcServiceTest {
         urcService.interpretURCInMessage(DEVICE_ID, message)
 
         verify(commandService, times(0)).saveCommandEntity(any<Command>())
-        verify(commandFeedbackService, times(0)).sendFeedback(any<Command>(), any<CommandStatus>(), any<String>())
+        verify(commandFeedbackService, times(0))
+            .sendFeedback(any<Command>(), any<CommandStatus>(), any<String>())
     }
 
     private fun interpretURCWhileNewKeyIsPending(urcs: List<String>) {

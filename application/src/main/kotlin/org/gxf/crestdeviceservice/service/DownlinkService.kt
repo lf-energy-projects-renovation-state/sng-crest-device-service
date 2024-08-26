@@ -62,6 +62,6 @@ class DownlinkService(
 
     private fun createDownlinkCommand(command: Command) =
         when (command.type) {
-            CommandType.REBOOT -> "CMD:REBOOT"
+            CommandType.REBOOT -> "!CMD:REBOOT"
         }
 }

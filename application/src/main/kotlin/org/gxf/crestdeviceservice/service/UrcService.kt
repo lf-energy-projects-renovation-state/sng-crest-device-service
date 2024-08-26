@@ -99,10 +99,10 @@ class UrcService(
         downlink: String
     ) {
         // check if urc is about this command
-        if(downlink.contains(commandInProgress.type.downlink)) {
+        if (downlink.contains(commandInProgress.type.downlink)) {
             if (urcsContainErrors(urcs)) {
                 handleCommandError(deviceId, commandInProgress, urcs)
-            } else if(urcsContainSuccesses(urcs, commandInProgress)){
+            } else if (urcsContainSuccesses(urcs, commandInProgress)) {
                 handleCommandUrcs(deviceId, commandInProgress, urcs)
             }
         }
@@ -111,9 +111,7 @@ class UrcService(
     private fun urcsContainErrors(urcs: List<String>) = urcs.any { urc -> isErrorUrc(urc) }
 
     private fun urcsContainSuccesses(urcs: List<String>, command: Command) =
-        command.type.urcsSuccess.any {
-            successUrc -> urcs.contains(successUrc)
-        }
+        command.type.urcsSuccess.any { successUrc -> urcs.contains(successUrc) }
 
     private fun handleCommandError(deviceId: String, command: Command, urcs: List<String>) {
         val errorUrcs = urcs.filter { urc -> isErrorUrc(urc) }
@@ -136,7 +134,7 @@ class UrcService(
 
     private fun handleRebootUrcs(deviceId: String, command: Command, urcs: List<String>) {
         if (urcs.contains(INITIALISATION)) {
-            val message = "Reboot for device $deviceId went succesfully"
+            val message = "Reboot for device $deviceId went successfully"
             logger.info { message }
             command.status = CommandStatus.SUCCESSFUL
             commandService.saveCommandEntity(command)

@@ -27,11 +27,12 @@ class CommandService(private val commandRepository: CommandRepository) {
      *   accepted.
      */
     fun shouldBeRejected(command: ExternalCommand): Optional<String> {
-        if (command.command !in knownCommands) {
+        val translatedCommand = translateCommand(command.command)
+        if (translatedCommand !in knownCommands) {
             return Optional.of("Unknown command")
         }
 
-        val commandType: Command.CommandType = Command.CommandType.valueOf(command.command)
+        val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
         if (deviceHasNewerSameCommand(command.deviceId, commandType, command.timestamp)) {
             return Optional.of("Device has a newer command of the same type")
         }
@@ -40,10 +41,14 @@ class CommandService(private val commandRepository: CommandRepository) {
     }
 
     fun existingCommandToBeCanceled(command: ExternalCommand): Optional<Command> {
-        val commandType: Command.CommandType = Command.CommandType.valueOf(command.command)
+        val translatedCommand = translateCommand(command.command)
+        val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
 
         return deviceHasSameCommandAlreadyPendingOrInProgress(command.deviceId, commandType)
     }
+
+    private fun translateCommand(command: String) = // todo add to enum
+    command.trim('!').uppercase()
 
     /**
      * Check if the device already has a newer command pending of the same type that was issued at a
@@ -101,7 +106,7 @@ class CommandService(private val commandRepository: CommandRepository) {
                 deviceId = incomingCommand.deviceId,
                 correlationId = incomingCommand.correlationId,
                 timestampIssued = incomingCommand.timestamp,
-                type = Command.CommandType.valueOf(incomingCommand.command),
+                type = Command.CommandType.valueOf(translateCommand(incomingCommand.command)),
                 status = CommandStatus.PENDING,
                 commandValue = incomingCommand.value,
             )

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.consumer
+package org.gxf.crestdeviceservice.command.consumer
 
 import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandStatus

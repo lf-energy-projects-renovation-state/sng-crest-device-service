@@ -42,7 +42,8 @@ class MessageHandlingTest {
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
 
-        val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.deviceMessage.topic)
+        val consumer =
+            createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.deviceMessage.topic)
         val response = testRestTemplate.postForEntity<String>("/sng/1", request)
 
         assertThat(response.body).isEqualTo("0")
@@ -53,7 +54,8 @@ class MessageHandlingTest {
 
         val expectedJsonNode = ObjectMapper().readTree(getFileContentAsString("message.json"))
         val deviceMessage =
-            records.records(kafkaProducerProperties.deviceMessage.topic).first().value() as DeviceMessage
+            records.records(kafkaProducerProperties.deviceMessage.topic).first().value()
+                as DeviceMessage
         val payloadJsonNode = ObjectMapper().readTree(deviceMessage.payload)
 
         assertThat(payloadJsonNode).isEqualTo(expectedJsonNode)

@@ -53,7 +53,7 @@ class DownlinkServiceTest {
 
         val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
 
-        val expectedDownlink = "CMD:REBOOT"
+        val expectedDownlink = "!CMD:REBOOT"
         assertThat(result).isEqualTo(expectedDownlink)
     }
 

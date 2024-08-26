@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice.consumer
 import com.alliander.sng.CommandStatus
 import java.util.Optional
 import org.gxf.crestdeviceservice.TestHelper
+import org.gxf.crestdeviceservice.command.consumer.CommandConsumer
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
