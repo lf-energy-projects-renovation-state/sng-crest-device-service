@@ -120,10 +120,9 @@ class UrcService(
 
         logger.error { message }
 
-        command.status = CommandStatus.ERROR
-        commandService.saveCommandEntity(command)
+        val commandWithErrorStatus = commandService.saveCommandWithNewStatus(command, CommandStatus.ERROR)
 
-        commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Error, message)
+        commandFeedbackService.sendFeedback(commandWithErrorStatus, ExternalCommandStatus.Error, message)
     }
 
     private fun handleCommandUrcs(deviceId: String, command: Command, urcs: List<String>) {
@@ -136,10 +135,9 @@ class UrcService(
         if (urcs.contains(INITIALISATION)) {
             val message = "Reboot for device $deviceId went successfully"
             logger.info { message }
-            command.status = CommandStatus.SUCCESSFUL
-            commandService.saveCommandEntity(command)
+            val successfulCommand = commandService.saveCommandWithNewStatus(command, CommandStatus.SUCCESSFUL)
 
-            commandFeedbackService.sendFeedback(command, ExternalCommandStatus.Successful, message)
+            commandFeedbackService.sendFeedback(successfulCommand, ExternalCommandStatus.Successful, message)
         } else {
             logger.warn {
                 "Reboot command sent for device $deviceId, did not receive expected urc: $INITIALISATION. Urcs received: ${urcs.joinToString { ", " }}"

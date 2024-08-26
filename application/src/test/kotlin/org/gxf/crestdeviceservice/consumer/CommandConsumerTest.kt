@@ -52,7 +52,7 @@ class CommandConsumerTest {
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
-        verify(commandService).saveCommandEntity(existingCommandCanceled)
+        verify(commandService).saveCommandWithNewStatus(existingPendingCommand, Command.CommandStatus.CANCELED)
         verify(commandService).saveExternalCommandAsPending(externalCommand)
     }
 

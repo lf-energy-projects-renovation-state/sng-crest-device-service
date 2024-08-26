@@ -47,7 +47,7 @@ class CommandService(private val commandRepository: CommandRepository) {
         return deviceHasSameCommandAlreadyPendingOrInProgress(command.deviceId, commandType)
     }
 
-    private fun translateCommand(command: String) = // todo add to enum
+    private fun translateCommand(command: String) =
     command.trim('!').uppercase()
 
     /**
@@ -116,8 +116,8 @@ class CommandService(private val commandRepository: CommandRepository) {
 
     fun saveCommandEntity(command: Command) = commandRepository.save(command)
 
-    fun setCommandInProgress(command: Command) { // todo equivalent voor canceled?
-        command.status = CommandStatus.IN_PROGRESS
-        commandRepository.save(command)
+    fun saveCommandWithNewStatus(command: Command, status: CommandStatus): Command {
+        command.status = status
+        return commandRepository.save(command)
     }
 }

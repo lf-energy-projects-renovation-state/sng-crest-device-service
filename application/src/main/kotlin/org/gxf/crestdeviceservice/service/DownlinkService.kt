@@ -46,9 +46,9 @@ class DownlinkService(
         val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
         if (pendingCommand != null && commandInProgress == null) { // no other commands in progress
             logger.info { "Device $deviceId has pending command of type: ${pendingCommand.type}" }
-            commandService.setCommandInProgress(pendingCommand)
+            val commandToSend = commandService.saveCommandWithNewStatus(pendingCommand, Command.CommandStatus.IN_PROGRESS)
 
-            return createDownlinkCommand(pendingCommand)
+            return createDownlinkCommand(commandToSend)
         }
 
         return RESPONSE_SUCCESS

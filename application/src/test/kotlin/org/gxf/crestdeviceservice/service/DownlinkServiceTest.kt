@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice.service
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestHelper
+import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
@@ -46,10 +47,13 @@ class DownlinkServiceTest {
 
     @Test
     fun shouldSendFirstPendingCommandIfNoCommandInProgress() {
+        val pendingCommand = TestHelper.pendingRebootCommand()
         whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
         whenever(commandService.getFirstPendingCommandForDevice(IDENTITY))
-            .thenReturn(TestHelper.pendingRebootCommand())
+            .thenReturn(pendingCommand)
         whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY)).thenReturn(null)
+        whenever(commandService.saveCommandWithNewStatus(pendingCommand, Command.CommandStatus.IN_PROGRESS))
+            .thenReturn(pendingCommand.copy(status = Command.CommandStatus.IN_PROGRESS))
 
         val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
 

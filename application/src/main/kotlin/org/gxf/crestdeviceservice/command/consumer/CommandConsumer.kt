@@ -44,8 +44,7 @@ class CommandConsumer(
                 "Device with id ${command.deviceId} already has a pending command of the same type. The existing command will be canceled."
             }
             val commandToBeCanceled = existingPendingCommand.get()
-            commandToBeCanceled.status = Command.CommandStatus.CANCELED
-            commandService.saveCommandEntity(commandToBeCanceled)
+            commandService.saveCommandWithNewStatus(commandToBeCanceled, Command.CommandStatus.CANCELED)
         }
 
         commandService.saveExternalCommandAsPending(command)
