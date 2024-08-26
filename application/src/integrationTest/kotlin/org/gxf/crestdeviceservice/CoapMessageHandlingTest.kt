@@ -150,6 +150,15 @@ class CoapMessageHandlingTest {
 
         producer.send(ProducerRecord(commandTopic, commandFromMaki))
 
+        // assert that pending command has been saved
+        Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted {
+            val savedCommand =
+                commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
+                    DEVICE_ID, Command.CommandStatus.PENDING)
+
+            assertThat(savedCommand).isNotNull
+        }
+
         // receiving message from device
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
