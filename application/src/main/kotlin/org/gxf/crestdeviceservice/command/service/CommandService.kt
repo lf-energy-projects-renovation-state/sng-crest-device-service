@@ -47,8 +47,7 @@ class CommandService(private val commandRepository: CommandRepository) {
         return deviceHasSameCommandAlreadyPendingOrInProgress(command.deviceId, commandType)
     }
 
-    private fun translateCommand(command: String) =
-    command.trim('!').uppercase()
+    private fun translateCommand(command: String) = command.trim('!').uppercase()
 
     /**
      * Check if the device already has a newer command pending of the same type that was issued at a

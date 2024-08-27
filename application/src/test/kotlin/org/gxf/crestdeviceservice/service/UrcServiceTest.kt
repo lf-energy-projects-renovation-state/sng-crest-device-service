@@ -107,12 +107,15 @@ class UrcServiceTest {
         whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
-        whenever(commandService.saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.ERROR))
+        whenever(
+                commandService.saveCommandWithNewStatus(
+                    commandInProgress, Command.CommandStatus.ERROR))
             .thenReturn(commandError)
 
         urcService.interpretURCInMessage(DEVICE_ID, message)
 
-        verify(commandService).saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.ERROR)
+        verify(commandService)
+            .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.ERROR)
         verify(commandFeedbackService)
             .sendFeedback(eq(commandError), eq(CommandStatus.Error), any<String>())
     }
@@ -128,11 +131,15 @@ class UrcServiceTest {
         whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
-        whenever(commandService.saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)).thenReturn(commandSuccessful)
+        whenever(
+                commandService.saveCommandWithNewStatus(
+                    commandInProgress, Command.CommandStatus.SUCCESSFUL))
+            .thenReturn(commandSuccessful)
 
         urcService.interpretURCInMessage(DEVICE_ID, message)
 
-        verify(commandService).saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
+        verify(commandService)
+            .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
         verify(commandFeedbackService)
             .sendFeedback(eq(commandSuccessful), eq(CommandStatus.Successful), any<String>())
     }

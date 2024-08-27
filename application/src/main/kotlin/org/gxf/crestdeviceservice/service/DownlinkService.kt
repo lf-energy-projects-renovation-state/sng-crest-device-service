@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice.service
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
+import java.util.Optional
 import org.apache.commons.codec.digest.DigestUtils
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandType
@@ -14,7 +15,6 @@ import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.stereotype.Service
-import java.util.Optional
 
 @Service
 class DownlinkService(
@@ -40,24 +40,18 @@ class DownlinkService(
         val optionalPendingCommand = optionalPendingCommandToSend(deviceId)
 
         optionalPendingCommand.ifPresent { // no other commands in progress
-            pendingCommand ->
-            run {
-                downlink = getCommandDownlink(deviceId, pendingCommand)
-            }
+        pendingCommand ->
+            run { downlink = getCommandDownlink(deviceId, pendingCommand) }
         }
 
         return downlink
     }
 
-    private fun getCommandDownlink(
-        deviceId: String,
-        pendingCommand: Command
-    ): String {
+    private fun getCommandDownlink(deviceId: String, pendingCommand: Command): String {
         logger.info { "Device $deviceId has pending command of type: ${pendingCommand.type}" }
-        val commandToSend = commandService.saveCommandWithNewStatus(
-            pendingCommand,
-            Command.CommandStatus.IN_PROGRESS
-        )
+        val commandToSend =
+            commandService.saveCommandWithNewStatus(
+                pendingCommand, Command.CommandStatus.IN_PROGRESS)
         return createDownlinkCommand(commandToSend)
     }
 
