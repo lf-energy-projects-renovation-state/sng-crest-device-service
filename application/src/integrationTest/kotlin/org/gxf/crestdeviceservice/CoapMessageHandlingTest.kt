@@ -179,7 +179,7 @@ class CoapMessageHandlingTest {
     }
 
     @Test
-    fun shouldSendCommandFeedbackToMaki() {
+    fun shouldSendCommandSuccessFeedbackToMaki() {
         val consumer =
             IntegrationTestHelper.createKafkaConsumer(embeddedKafkaBroker, commandFeedbackTopic)
 

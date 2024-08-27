@@ -14,6 +14,7 @@ import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.stereotype.Service
+import java.util.Optional
 
 @Service
 class DownlinkService(
@@ -31,33 +32,60 @@ class DownlinkService(
     fun getDownlinkForDevice(deviceId: String, body: JsonNode): String {
         logger.debug { "Check if device $deviceId needs key change" }
         if (pskService.needsKeyChange(deviceId)) {
-            logger.info { "Device $deviceId needs key change" }
-            val newKey = pskService.setReadyKeyForIdentityAsPending(deviceId)
+            return changePreSharedKey(deviceId)
+        }
 
-            // After setting a new psk, the device will send a new message if the psk set was
-            // successful
-            logger.debug {
-                "Create PSK set command for key for device ${newKey.identity} with revision ${newKey.revision} and status ${newKey.status}"
+        var downlink = RESPONSE_SUCCESS
+
+        val optionalPendingCommand = optionalPendingCommandToSend(deviceId)
+
+        optionalPendingCommand.ifPresent { // no other commands in progress
+            pendingCommand ->
+            run {
+                downlink = getCommandDownlink(deviceId, pendingCommand)
             }
-            return createPskSetCommand(newKey)
         }
 
-        val pendingCommand = commandService.getFirstPendingCommandForDevice(deviceId)
-        val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
-        if (pendingCommand != null && commandInProgress == null) { // no other commands in progress
-            logger.info { "Device $deviceId has pending command of type: ${pendingCommand.type}" }
-            val commandToSend = commandService.saveCommandWithNewStatus(pendingCommand, Command.CommandStatus.IN_PROGRESS)
+        return downlink
+    }
 
-            return createDownlinkCommand(commandToSend)
+    private fun getCommandDownlink(
+        deviceId: String,
+        pendingCommand: Command
+    ): String {
+        logger.info { "Device $deviceId has pending command of type: ${pendingCommand.type}" }
+        val commandToSend = commandService.saveCommandWithNewStatus(
+            pendingCommand,
+            Command.CommandStatus.IN_PROGRESS
+        )
+        return createDownlinkCommand(commandToSend)
+    }
+
+    private fun changePreSharedKey(deviceId: String): String {
+        logger.info { "Device $deviceId needs key change" }
+        val newKey = pskService.setReadyKeyForIdentityAsPending(deviceId)
+
+        // After setting a new psk, the device will send a new message if the psk set was
+        // successful
+        logger.debug {
+            "Create PSK set command for key for device ${newKey.identity} with revision ${newKey.revision} and status ${newKey.status}"
         }
-
-        return RESPONSE_SUCCESS
+        return createPskSetCommand(newKey)
     }
 
     fun createPskSetCommand(newPreSharedKey: PreSharedKey): String {
         val newKey = newPreSharedKey.preSharedKey
         val hash = DigestUtils.sha256Hex("${newPreSharedKey.secret}${newKey}")
         return "!PSK:${newKey}:${hash};PSK:${newKey}:${hash}:SET"
+    }
+
+    private fun optionalPendingCommandToSend(deviceId: String): Optional<Command> {
+        val pendingCommand = commandService.getFirstPendingCommandForDevice(deviceId)
+        val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
+        if (pendingCommand != null && commandInProgress == null) {
+            return Optional.of(pendingCommand)
+        }
+        return Optional.empty()
     }
 
     private fun createDownlinkCommand(command: Command) =

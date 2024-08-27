@@ -28,7 +28,7 @@ class CommandConsumer(
 
         // reject command if unknown or if newer same command exists
         val shouldBeRejected = commandService.shouldBeRejected(command)
-        if (shouldBeRejected.isPresent) {
+        if(shouldBeRejected.isPresent) {
             val message = shouldBeRejected.get()
             logger.info {
                 "Rejecting command for device id: ${command.deviceId}, with reason: $message"
@@ -39,14 +39,23 @@ class CommandConsumer(
 
         // if a same command is already pending, cancel the existing pending command
         val existingPendingCommand = commandService.existingCommandToBeCanceled(command)
-        if (existingPendingCommand.isPresent) {
-            logger.info {
-                "Device with id ${command.deviceId} already has a pending command of the same type. The existing command will be canceled."
-            }
-            val commandToBeCanceled = existingPendingCommand.get()
-            commandService.saveCommandWithNewStatus(commandToBeCanceled, Command.CommandStatus.CANCELED)
+        existingPendingCommand.ifPresent {
+            commandToBeCanceled -> cancelExistingCommand(command, commandToBeCanceled)
         }
 
         commandService.saveExternalCommandAsPending(command)
+    }
+
+    private fun cancelExistingCommand(
+        command: com.alliander.sng.Command,
+        commandToBeCanceled: Command
+    ) {
+        logger.info {
+            "Device with id ${command.deviceId} already has a pending command of the same type. The existing command will be canceled."
+        }
+        commandService.saveCommandWithNewStatus(
+            commandToBeCanceled,
+            Command.CommandStatus.CANCELED
+        )
     }
 }
