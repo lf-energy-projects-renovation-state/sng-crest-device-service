@@ -6,10 +6,8 @@ package org.gxf.crestdeviceservice.service
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
-import java.util.Optional
 import org.apache.commons.codec.digest.DigestUtils
 import org.gxf.crestdeviceservice.command.entity.Command
-import org.gxf.crestdeviceservice.command.entity.Command.CommandType
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
@@ -30,34 +28,45 @@ class DownlinkService(
     @Transactional
     @Throws(NoExistingPskException::class)
     fun getDownlinkForDevice(deviceId: String, body: JsonNode): String {
-        logger.debug { "Check if device $deviceId needs key change" }
-        if (pskService.needsKeyChange(deviceId)) {
-            return changePreSharedKey(deviceId)
+        val pendingCommandToSend = pendingCommandToSend(deviceId)
+        if(pendingCommandToSend != null && commandCanBeSent(pendingCommandToSend)) {
+            return getCommandDownlink(pendingCommandToSend)
         }
-
-        var downlink = RESPONSE_SUCCESS
-
-        val optionalPendingCommand = optionalPendingCommandToSend(deviceId)
-
-        optionalPendingCommand.ifPresent { // no other commands in progress
-        pendingCommand ->
-            run { downlink = getCommandDownlink(deviceId, pendingCommand) }
-        }
-
-        return downlink
+        return RESPONSE_SUCCESS
     }
 
-    private fun getCommandDownlink(deviceId: String, pendingCommand: Command): String {
-        logger.info { "Device $deviceId has pending command of type: ${pendingCommand.type}" }
+    private fun pendingCommandToSend(deviceId: String): Command? {
+        val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
+
+        // if there is no other command already in progress
+        if(commandInProgress == null) {
+            val pendingCommand = commandService.getFirstPendingCommandForDevice(deviceId)
+            return pendingCommand
+        }
+        return null
+    }
+
+    // if command is psk set and pending psk exists in repository
+    fun commandCanBeSent(command: Command) =
+        command.type != Command.CommandType.PSK || pskService.readyForPskSetCommand(command.deviceId)
+
+    private fun getCommandDownlink(pendingCommand: Command): String {
+        logger.info { "Device ${pendingCommand.deviceId} has pending command of type: ${pendingCommand.type}. This command will be sent to the device." }
+
         val commandToSend =
             commandService.saveCommandWithNewStatus(
                 pendingCommand, Command.CommandStatus.IN_PROGRESS)
-        return createDownlinkCommand(commandToSend)
+
+        if(pendingCommand.type == Command.CommandType.PSK) {
+            return preparePskChange(pendingCommand.deviceId)
+        }
+
+        return commandToSend.type.downlink
     }
 
-    private fun changePreSharedKey(deviceId: String): String {
+    private fun preparePskChange(deviceId: String): String {
         logger.info { "Device $deviceId needs key change" }
-        val newKey = pskService.setReadyKeyForIdentityAsPending(deviceId)
+        val newKey = pskService.setPskToPendingForDevice(deviceId)
 
         // After setting a new psk, the device will send a new message if the psk set was
         // successful
@@ -72,18 +81,4 @@ class DownlinkService(
         val hash = DigestUtils.sha256Hex("${newPreSharedKey.secret}${newKey}")
         return "!PSK:${newKey}:${hash};PSK:${newKey}:${hash}:SET"
     }
-
-    private fun optionalPendingCommandToSend(deviceId: String): Optional<Command> {
-        val pendingCommand = commandService.getFirstPendingCommandForDevice(deviceId)
-        val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
-        if (pendingCommand != null && commandInProgress == null) {
-            return Optional.of(pendingCommand)
-        }
-        return Optional.empty()
-    }
-
-    private fun createDownlinkCommand(command: Command) =
-        when (command.type) {
-            CommandType.REBOOT -> "!CMD:REBOOT"
-        }
 }

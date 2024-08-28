@@ -103,8 +103,8 @@ class UrcServiceTest {
         val commandError = commandInProgress.copy(status = Command.CommandStatus.ERROR)
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
-        whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
-        whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.keyCanBeChanged(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
         whenever(
@@ -127,8 +127,8 @@ class UrcServiceTest {
         val commandSuccessful = commandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
-        whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
-        whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.keyCanBeChanged(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
         whenever(
@@ -150,8 +150,8 @@ class UrcServiceTest {
         val commandInProgress = TestHelper.rebootCommandInProgress()
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
-        whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
-        whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.keyCanBeChanged(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
 
@@ -163,8 +163,8 @@ class UrcServiceTest {
     }
 
     private fun interpretURCWhileNewKeyIsPending(urcs: List<String>) {
-        whenever(pskService.needsKeyChange(DEVICE_ID)).thenReturn(false)
-        whenever(pskService.isPendingKeyPresent(DEVICE_ID)).thenReturn(true)
+        whenever(pskService.keyCanBeChanged(DEVICE_ID)).thenReturn(false)
+        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
 
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 

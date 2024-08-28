@@ -29,7 +29,7 @@ class CommandFeedbackService(
                 .setStatus(status)
                 .setMessage(message)
                 .build()
-        kafkaTemplate.send(topic, commandFeedback)
+        kafkaTemplate.send(topic, command.deviceId, commandFeedback)
     }
 
     fun sendFeedback(command: CommandEntity, status: CommandStatus, message: String) {

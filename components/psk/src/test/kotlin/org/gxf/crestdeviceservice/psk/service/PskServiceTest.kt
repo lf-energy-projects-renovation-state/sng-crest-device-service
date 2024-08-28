@@ -55,7 +55,7 @@ class PskServiceTest {
                     identity, PreSharedKeyStatus.PENDING))
             .thenReturn(psk)
 
-        val pendingKeyPresent = pskService.isPendingKeyPresent(identity)
+        val pendingKeyPresent = pskService.isPendingPskPresent(identity)
 
         assertThat(pendingKeyPresent).isEqualTo(true)
     }
@@ -68,7 +68,7 @@ class PskServiceTest {
                     identity, PreSharedKeyStatus.PENDING))
             .thenReturn(null)
 
-        val pendingKeyPresent = pskService.isPendingKeyPresent(identity)
+        val pendingKeyPresent = pskService.isPendingPskPresent(identity)
 
         assertThat(pendingKeyPresent).isEqualTo(false)
     }
@@ -98,7 +98,7 @@ class PskServiceTest {
             .thenReturn(psk)
         whenever(pskRepository.save(psk)).thenReturn(psk)
 
-        val result = pskService.setReadyKeyForIdentityAsPending(identity)
+        val result = pskService.setPskToPendingForDevice(identity)
 
         verify(pskRepository).save(pskCaptor.capture())
         assertThat(pskCaptor.value.status).isEqualTo(PreSharedKeyStatus.PENDING)
@@ -106,7 +106,7 @@ class PskServiceTest {
     }
 
     @Test
-    fun needsKeyChangeReturnsTrueWhenChangeInitialPskIsTrueAndReadyKeyIsPresent() {
+    fun readyToIsPresentKey() {
         val psk = PSKTestHelper.preSharedKeyReady()
         val identity = psk.identity
         whenever(
@@ -115,22 +115,22 @@ class PskServiceTest {
             .thenReturn(psk)
         whenever(pskConfiguration.changeInitialPsk).thenReturn(true)
 
-        val needsKeyChange = pskService.needsKeyChange(identity)
+        val needsKeyChange = pskService.keyCanBeChanged(identity)
 
         assertThat(needsKeyChange).isTrue()
     }
 
     @Test
-    fun needsKeyChangeReturnsFalseWhenChangeInitialPskIsFalse() {
+    fun readyToChangeReturnsFalseWhenChangeKeyInitialPskIsFalse() {
         whenever(pskConfiguration.changeInitialPsk).thenReturn(false)
 
-        val needsKeyChange = pskService.needsKeyChange("123")
+        val needsKeyChange = pskService.keyCanBeChanged("123")
 
         assertThat(needsKeyChange).isFalse()
     }
 
     @Test
-    fun needsKeyChangeReturnFalseWhenChangeInitialPskIsTrueButReadyKeyIsNotPresent() {
+    fun readyToIsNotPresentKey() {
         val identity = "123"
         whenever(
                 pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
@@ -138,7 +138,7 @@ class PskServiceTest {
             .thenReturn(null)
         whenever(pskConfiguration.changeInitialPsk).thenReturn(true)
 
-        val needsKeyChange = pskService.needsKeyChange(identity)
+        val needsKeyChange = pskService.keyCanBeChanged(identity)
 
         assertThat(needsKeyChange).isFalse()
     }

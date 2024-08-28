@@ -9,13 +9,15 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
+import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 
 @Service
 class CommandConsumer(
     private val commandService: CommandService,
-    private val commandFeedbackService: CommandFeedbackService
+    private val commandFeedbackService: CommandFeedbackService,
+    private val pskService: PskService
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -29,13 +31,11 @@ class CommandConsumer(
         // reject command if unknown or if newer same command exists
         val shouldBeRejected = commandService.shouldBeRejected(command)
         if (shouldBeRejected.isPresent) {
-            val message = shouldBeRejected.get()
-            logger.info {
-                "Rejecting command for device id: ${command.deviceId}, with reason: $message"
-            }
-            commandFeedbackService.sendFeedback(command, CommandStatus.Rejected, message)
+            sendRejectionFeedback(shouldBeRejected.get(), command)
             return
         }
+
+        commandFeedbackService.sendFeedback(command, CommandStatus.Received, "command with correlation id ${command.correlationId} received")
 
         // if a same command is already pending, cancel the existing pending command
         val existingPendingCommand = commandService.existingCommandToBeCanceled(command)
@@ -43,16 +43,34 @@ class CommandConsumer(
             cancelExistingCommand(command, commandToBeCanceled)
         }
 
+        if(isPskCommand(command)) {
+            pskService.generateNewReadyKeyForDevice(command.deviceId)
+        }
+
         commandService.saveExternalCommandAsPending(command)
     }
 
+    private fun sendRejectionFeedback(
+        message: String,
+        command: ExternalCommand
+    ) {
+        logger.info {
+            "Rejecting command for device id: ${command.deviceId}, with reason: $message"
+        }
+        commandFeedbackService.sendFeedback(command, CommandStatus.Rejected, message)
+    }
+
+    private fun isPskCommand(command: com.alliander.sng.Command) = command.command.lowercase().contains("psk")
+
     private fun cancelExistingCommand(
-        command: com.alliander.sng.Command,
+        command: ExternalCommand,
         commandToBeCanceled: Command
     ) {
         logger.info {
             "Device with id ${command.deviceId} already has a pending command of the same type. The existing command will be canceled."
         }
+        val message = "Command canceled by newer same command with correlation id: ${command.correlationId}"
+        commandFeedbackService.sendFeedback(commandToBeCanceled, CommandStatus.Cancelled, message)
         commandService.saveCommandWithNewStatus(commandToBeCanceled, Command.CommandStatus.CANCELED)
     }
 }

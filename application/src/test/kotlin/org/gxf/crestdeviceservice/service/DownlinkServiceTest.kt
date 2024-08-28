@@ -35,8 +35,8 @@ class DownlinkServiceTest {
             PreSharedKey(
                 IDENTITY, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
 
-        whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(true)
-        whenever(pskService.setReadyKeyForIdentityAsPending(IDENTITY)).thenReturn(psk)
+        whenever(pskService.keyCanBeChanged(IDENTITY)).thenReturn(true)
+        whenever(pskService.setPskToPendingForDevice(IDENTITY)).thenReturn(psk)
 
         val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
 
@@ -48,7 +48,7 @@ class DownlinkServiceTest {
     @Test
     fun shouldSendFirstPendingCommandIfNoCommandInProgress() {
         val pendingCommand = TestHelper.pendingRebootCommand()
-        whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
+        whenever(pskService.keyCanBeChanged(IDENTITY)).thenReturn(false)
         whenever(commandService.getFirstPendingCommandForDevice(IDENTITY))
             .thenReturn(pendingCommand)
         whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY)).thenReturn(null)
@@ -65,7 +65,7 @@ class DownlinkServiceTest {
 
     @Test
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskAndACommandIsInProgress() {
-        whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
+        whenever(pskService.keyCanBeChanged(IDENTITY)).thenReturn(false)
         whenever(commandService.getFirstPendingCommandForDevice(IDENTITY)).thenReturn(null)
         whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY))
             .thenReturn(TestHelper.rebootCommandInProgress())
@@ -77,7 +77,7 @@ class DownlinkServiceTest {
 
     @Test
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskOrPendingCommand() {
-        whenever(pskService.needsKeyChange(IDENTITY)).thenReturn(false)
+        whenever(pskService.keyCanBeChanged(IDENTITY)).thenReturn(false)
 
         val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
 

@@ -21,8 +21,9 @@ data class Command(
     val commandValue: String?,
     @Enumerated(EnumType.STRING) var status: CommandStatus,
 ) {
-    enum class CommandType(val downlink: String, val urcsSuccess: List<String>) {
-        REBOOT("CMD:REBOOT", listOf("INIT", "WDR"))
+    enum class CommandType(val downlink: String, val urcsSuccess: List<String>, val urcsError: List<String>) {
+        PSK("!PSK:SET", listOf("PSK:SET"), listOf()),
+        REBOOT("!CMD:REBOOT", listOf("INIT", "WDR"), listOf("PSK:DLER", "PSK:HSER", "PSK: EQER"))
     }
 
     enum class CommandStatus {
