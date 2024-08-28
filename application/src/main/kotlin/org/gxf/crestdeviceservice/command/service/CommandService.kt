@@ -16,10 +16,6 @@ import org.springframework.stereotype.Service
 class CommandService(private val commandRepository: CommandRepository) {
     private val knownCommands = Command.CommandType.entries.map { it.name }
 
-    companion object {
-        const val INITIALISATION = "INIT"
-    }
-
     /**
      * Check if the incoming command should be rejected.
      *
@@ -40,7 +36,7 @@ class CommandService(private val commandRepository: CommandRepository) {
         return Optional.empty()
     }
 
-    fun existingCommandToBeCanceled(command: ExternalCommand): Optional<Command> {
+    fun existingCommandToBeCanceled(command: ExternalCommand): Command? {
         val translatedCommand = translateCommand(command.command)
         val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
 
@@ -77,17 +73,17 @@ class CommandService(private val commandRepository: CommandRepository) {
     private fun deviceHasSameCommandAlreadyPendingOrInProgress(
         deviceId: String,
         commandType: Command.CommandType
-    ): Optional<Command> {
+    ): Command? {
         val latestCommandInDatabase =
-            latestCommandInDatabase(deviceId, commandType) ?: return Optional.empty()
+            latestCommandInDatabase(deviceId, commandType) ?: return null
 
         // The latest command is pending or in progress
         if (latestCommandInDatabase.status == CommandStatus.PENDING ||
             latestCommandInDatabase.status == CommandStatus.IN_PROGRESS) {
-            return Optional.of(latestCommandInDatabase)
+            return latestCommandInDatabase
         }
 
-        return Optional.empty()
+        return null
     }
 
     fun getFirstPendingCommandForDevice(deviceId: String) =

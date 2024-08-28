@@ -10,6 +10,7 @@ import org.gxf.crestdeviceservice.command.consumer.CommandConsumer
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
+import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -21,7 +22,8 @@ import org.mockito.kotlin.whenever
 class CommandConsumerTest {
     private val commandService = mock<CommandService>()
     private val commandFeedbackService = mock<CommandFeedbackService>()
-    private val commandConsumer = CommandConsumer(commandService, commandFeedbackService)
+    private val pskService = mock<PskService>()
+    private val commandConsumer = CommandConsumer(commandService, commandFeedbackService, pskService)
 
     private val externalCommand = TestHelper.receivedRebootCommand()
 
@@ -43,12 +45,10 @@ class CommandConsumerTest {
     @Test
     fun existingCommandCanceled() {
         val existingPendingCommand = TestHelper.pendingRebootCommand()
-        val existingCommandCanceled =
-            existingPendingCommand.copy(status = Command.CommandStatus.CANCELED)
 
         whenever(commandService.shouldBeRejected(externalCommand)).thenReturn(Optional.empty())
         whenever(commandService.existingCommandToBeCanceled(externalCommand))
-            .thenReturn(Optional.of(existingPendingCommand))
+            .thenReturn(existingPendingCommand)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
@@ -61,7 +61,7 @@ class CommandConsumerTest {
     fun noExistingSameCommand() {
         whenever(commandService.shouldBeRejected(externalCommand)).thenReturn(Optional.empty())
         whenever(commandService.existingCommandToBeCanceled(externalCommand))
-            .thenReturn(Optional.empty())
+            .thenReturn(null)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
