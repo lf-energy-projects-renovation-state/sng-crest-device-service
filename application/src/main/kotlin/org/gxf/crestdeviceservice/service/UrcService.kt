@@ -88,16 +88,13 @@ class UrcService(
         }
         val errorMessages = urcs.joinToString(". ") { urc -> messageFromCode(urc) }
 
-        val message =
-            "Command ${command.type} failed for device with id ${command.deviceId}. Result code(s): $errorMessages."
-
-        logger.error { message }
+        logger.error { "Command ${command.type} failed for device with id ${command.deviceId}. Result code(s): $errorMessages." }
 
         val commandWithErrorStatus =
             commandService.saveCommandWithNewStatus(command, CommandStatus.ERROR)
 
         commandFeedbackService.sendFeedback(
-            commandWithErrorStatus, ExternalCommandStatus.Error, message)
+            commandWithErrorStatus, ExternalCommandStatus.Error, "Command failed. Result code(s): $errorMessages.")
     }
 
     private fun handlePskErrors(urcs: List<String>, command: Command) {

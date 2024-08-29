@@ -35,7 +35,7 @@ class CommandConsumer(
             return
         }
 
-        commandFeedbackService.sendFeedback(command, CommandStatus.Received, "command with correlation id ${command.correlationId} received")
+        commandFeedbackService.sendFeedback(command, CommandStatus.Received, "Command received")
 
         // if a same command is already pending, cancel the existing pending command
         val commandToBeCanceled = commandService.existingCommandToBeCanceled(command)
