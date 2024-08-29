@@ -29,9 +29,14 @@ class CommandService(private val commandRepository: CommandRepository) {
             return Optional.of("Unknown command")
         }
 
+        val deviceId = command.deviceId
         val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
-        if (deviceHasNewerSameCommand(command.deviceId, commandType, command.timestamp)) {
-            return Optional.of("Device has a newer command of the same type")
+        if (deviceHasNewerSameCommand(deviceId, commandType, command.timestamp)) {
+            return Optional.of("There is a newer command of the same type")
+        }
+
+        if(deviceHasSameCommandAlreadyInProgress(deviceId, commandType)) {
+            return Optional.of("A command of the same type is already in progress.")
         }
 
         return Optional.empty()
@@ -41,7 +46,7 @@ class CommandService(private val commandRepository: CommandRepository) {
         val translatedCommand = translateCommand(command.command)
         val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
 
-        return deviceHasSameCommandAlreadyPendingOrInProgress(command.deviceId, commandType)
+        return sameCommandForDeviceAlreadyPending(command.deviceId, commandType)
     }
 
     /**
@@ -60,25 +65,26 @@ class CommandService(private val commandRepository: CommandRepository) {
         return latestCommandInDatabase.timestampIssued.isAfter(timestampNewCommand)
     }
 
+    private fun deviceHasSameCommandAlreadyInProgress(
+        deviceId: String,
+        commandType: Command.CommandType
+    ) = commandRepository
+        .findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(deviceId, commandType, CommandStatus.IN_PROGRESS)
+        .isNotEmpty()
+
     private fun latestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
         commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
             deviceId, commandType)
 
-    /**
-     * Check if the device already has a newer command pending of the same type that was issued at a
-     * later date. This check prevents issues if commands arrive out of order or if we reset the
-     * kafka consumer group.
-     */
-    private fun deviceHasSameCommandAlreadyPendingOrInProgress(
+    private fun sameCommandForDeviceAlreadyPending(
         deviceId: String,
         commandType: Command.CommandType
     ): Command? {
         val latestCommandInDatabase =
             latestCommandInDatabase(deviceId, commandType) ?: return null
 
-        // The latest command is pending or in progress
-        if (latestCommandInDatabase.status == CommandStatus.PENDING ||
-            latestCommandInDatabase.status == CommandStatus.IN_PROGRESS) {
+        // The latest command is pending
+        if (latestCommandInDatabase.status == CommandStatus.PENDING) {
             return latestCommandInDatabase
         }
 
@@ -92,6 +98,13 @@ class CommandService(private val commandRepository: CommandRepository) {
     fun getFirstCommandInProgressForDevice(deviceId: String) =
         commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
             deviceId, CommandStatus.IN_PROGRESS)
+
+    fun getAllPendingCommandsForDevice(deviceId: String) =
+        commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
+            deviceId, CommandStatus.PENDING)
+
+    fun getAllCommandsInProgressForDevice(deviceId: String) =
+        commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, CommandStatus.IN_PROGRESS)
 
     fun saveExternalCommandAsPending(incomingCommand: ExternalCommand) {
         val commandEntity =

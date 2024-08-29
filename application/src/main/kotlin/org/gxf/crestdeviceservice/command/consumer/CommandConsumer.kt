@@ -29,9 +29,9 @@ class CommandConsumer(
         }
 
         // reject command if unknown or if newer same command exists
-        val shouldBeRejected = commandService.shouldBeRejected(command)
-        if (shouldBeRejected.isPresent) {
-            sendRejectionFeedback(shouldBeRejected.get(), command)
+        val reasonForRejection = commandService.shouldBeRejected(command)
+        if (reasonForRejection.isPresent) {
+            sendRejectionFeedback(reasonForRejection.get(), command)
             return
         }
 
@@ -51,13 +51,13 @@ class CommandConsumer(
     }
 
     private fun sendRejectionFeedback(
-        message: String,
+        reason: String,
         command: ExternalCommand
     ) {
         logger.info {
-            "Rejecting command for device id: ${command.deviceId}, with reason: $message"
+            "Rejecting command for device id: ${command.deviceId}, with reason: $reason"
         }
-        commandFeedbackService.sendFeedback(command, CommandStatus.Rejected, message)
+        commandFeedbackService.sendFeedback(command, CommandStatus.Rejected, reason)
     }
 
     private fun isPskCommand(command: com.alliander.sng.Command) = command.command.lowercase().contains("psk")

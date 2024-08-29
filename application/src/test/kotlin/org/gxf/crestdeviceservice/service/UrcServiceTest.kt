@@ -112,7 +112,7 @@ class UrcServiceTest {
                     commandInProgress, Command.CommandStatus.ERROR))
             .thenReturn(commandError)
 
-        urcService.interpretURCInMessage(DEVICE_ID, message)
+        urcService.interpretURCsInMessage(DEVICE_ID, message)
 
         verify(commandService)
             .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.ERROR)
@@ -136,7 +136,7 @@ class UrcServiceTest {
                     commandInProgress, Command.CommandStatus.SUCCESSFUL))
             .thenReturn(commandSuccessful)
 
-        urcService.interpretURCInMessage(DEVICE_ID, message)
+        urcService.interpretURCsInMessage(DEVICE_ID, message)
 
         verify(commandService)
             .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
@@ -155,7 +155,7 @@ class UrcServiceTest {
         whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(commandInProgress)
 
-        urcService.interpretURCInMessage(DEVICE_ID, message)
+        urcService.interpretURCsInMessage(DEVICE_ID, message)
 
         verify(commandService, times(0)).saveCommandEntity(any<Command>())
         verify(commandFeedbackService, times(0))
@@ -168,7 +168,7 @@ class UrcServiceTest {
 
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
-        urcService.interpretURCInMessage(DEVICE_ID, message)
+        urcService.interpretURCsInMessage(DEVICE_ID, message)
     }
 
     private fun updateUrcInMessage(urcs: List<String>, downlink: String): JsonNode {

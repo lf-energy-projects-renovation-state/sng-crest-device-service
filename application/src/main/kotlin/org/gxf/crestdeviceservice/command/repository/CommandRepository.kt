@@ -19,4 +19,8 @@ interface CommandRepository : CrudRepository<Command, UUID> {
         deviceId: String,
         status: Command.CommandStatus
     ): Command?
+
+    fun findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId: String, status: Command.CommandStatus): List<Command>
+
+    fun findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(deviceId: String, type: Command.CommandType, status: Command.CommandStatus): List<Command>
 }

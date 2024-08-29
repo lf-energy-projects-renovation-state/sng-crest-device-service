@@ -28,40 +28,42 @@ class DownlinkService(
     @Transactional
     @Throws(NoExistingPskException::class)
     fun getDownlinkForDevice(deviceId: String, body: JsonNode): String {
-        val pendingCommandToSend = pendingCommandToSend(deviceId)
-        if(pendingCommandToSend != null && commandCanBeSent(pendingCommandToSend)) {
-            return getCommandDownlink(pendingCommandToSend)
+        val pendingCommands = commandService.getAllPendingCommandsForDevice(deviceId)
+        val commandsToSend = commandsToSend(pendingCommands)
+        if(commandsToSend.isNotEmpty()) {
+            return getDownlinkFromCommands(deviceId, commandsToSend)
         }
         return RESPONSE_SUCCESS
     }
 
-    private fun pendingCommandToSend(deviceId: String): Command? {
-        val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
-
-        // if there is no other command already in progress
-        if(commandInProgress == null) {
-            val pendingCommand = commandService.getFirstPendingCommandForDevice(deviceId)
-            return pendingCommand
-        }
-        return null
-    }
+    fun commandsToSend(pendingCommands: List<Command>) =
+        pendingCommands.filter { command -> commandCanBeSent(command) }
 
     // if command is psk set and pending psk exists in repository
     fun commandCanBeSent(command: Command) =
         command.type != Command.CommandType.PSK || pskService.readyForPskSetCommand(command.deviceId)
 
-    private fun getCommandDownlink(pendingCommand: Command): String {
-        logger.info { "Device ${pendingCommand.deviceId} has pending command of type: ${pendingCommand.type}. This command will be sent to the device." }
+    private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
+        val types = pendingCommands.joinToString(", ") { command -> command.type.toString() }
+        logger.info { "Device ${deviceId} has pending commands of types: $types. These commands will be sent to the device." }
 
-        val commandToSend =
-            commandService.saveCommandWithNewStatus(
-                pendingCommand, Command.CommandStatus.IN_PROGRESS)
+        return pendingCommands
+            .filter { command -> fitsInMaxMessageSize(command) }
+            .map { command ->
+                commandService.saveCommandWithNewStatus(command, Command.CommandStatus.IN_PROGRESS)
+            }
+            .map { command -> getDownlinkPerCommand(command) }
+            .joinToString(";")
+    }
 
-        if(pendingCommand.type == Command.CommandType.PSK) {
-            return preparePskChange(pendingCommand.deviceId)
+    private fun fitsInMaxMessageSize(command: Command) = true // todo
+
+    private fun getDownlinkPerCommand(command: Command): String {
+        if(command.type == Command.CommandType.PSK) {
+            return preparePskChange(command.deviceId)
         }
 
-        return commandToSend.type.downlink
+        return "!${command.type.downlink}"
     }
 
     private fun preparePskChange(deviceId: String): String {

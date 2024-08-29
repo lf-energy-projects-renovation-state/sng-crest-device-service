@@ -8,10 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
+import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
-import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isErrorUrc
-import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.isPskErrorUrc
 import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.messageFromCode
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -30,7 +29,7 @@ class UrcService(
 
     private val logger = KotlinLogging.logger {}
 
-    fun interpretURCInMessage(deviceId: String, body: JsonNode) {
+    fun interpretURCsInMessage(deviceId: String, body: JsonNode) {
         val urcs = getUrcsFromMessage(body)
         if (urcs.isEmpty()) {
             logger.debug { "Received message without urcs" }
@@ -38,16 +37,35 @@ class UrcService(
             logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
         }
 
-        val downlinkFromMessage = getDownlinkFromMessage(body)
-        val commandInProgress = commandService.getFirstCommandInProgressForDevice(deviceId)
+        val downlinks = getDownlinksFromMessage(body)
+        downlinks.forEach { downlink -> handleDownlinkFromMessage(deviceId, downlink, urcs) }
+    }
 
-        if (commandInProgress != null && downlinkConcernsCommandInProgress(downlinkFromMessage, commandInProgress)) {
-            handleUrcsForCommand(urcs, commandInProgress)
+    private fun getUrcsFromMessage(body: JsonNode) =
+        body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
+
+    private fun getDownlinksFromMessage(body: JsonNode) =
+        body[URC_FIELD]
+            .first { it.isObject }[DL_FIELD]
+            .asText()
+            .split(";")
+
+    private fun handleDownlinkFromMessage(deviceId: String, downlink: String, urcs: List<String>) {
+        val command = commandThatDownlinkIsAbout(deviceId, downlink)
+
+        if(command != null) {
+            handleUrcsForCommand(urcs, command, downlink)
         } else {
-            logger.warn { "Device message dl field does not contain the command sent in the previous downlink." +
-                    "Command in progress: ${commandInProgress?.type}. " +
-                    "Received urcs: ${urcs.joinToString(", ")}," +
-                    "relating to downlink: $downlinkFromMessage." }
+            throw NoMatchingCommandException("Message received with downlink: $downlink, but there is no matching command in progress in the database.")
+        }
+    }
+
+    private fun commandThatDownlinkIsAbout(deviceId: String, downlink: String): Command? {
+        val commandsInProgress = commandService.getAllCommandsInProgressForDevice(deviceId)
+        return try {
+            commandsInProgress.first { command -> downlinkConcernsCommandInProgress(downlink, command) }
+        } catch(e: NoSuchElementException) {
+            null
         }
     }
 
@@ -56,54 +74,48 @@ class UrcService(
         commandInProgress: Command
     ) = downlink.contains(commandInProgress.type.downlink)
 
-    private fun getUrcsFromMessage(body: JsonNode) =
-        body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
-
-    private fun getDownlinkFromMessage(body: JsonNode) =
-        body[URC_FIELD].first { it.isObject }[DL_FIELD].asText()
-
     private fun handleUrcsForCommand(
         urcs: List<String>,
-        commandInProgress: Command
+        command: Command,
+        downlink: String
     ) {
-        if (urcsContainErrors(urcs)) {
-            handleCommandError(commandInProgress, urcs)
-        } else if (urcsContainSuccessesForCommand(urcs, commandInProgress)) {
-            handleCommandSuccess(commandInProgress)
+        if (urcsContainErrorsForCommand(urcs, command)) {
+            handleCommandErrors(command, urcs)
+        } else if (urcsContainSuccessesForCommand(urcs, command)) {
+            handleCommandSuccesses(command)
         } else {
-            logger.warn { "Unexpected urcs received for command ${commandInProgress.type}. Urcs received: ${urcs.joinToString(", ")}." }
+            logger.warn {
+                "No urcs received for command '${command.type}' that was sent in downlink: $downlink. Urcs received: ${
+                    urcs.joinToString(
+                        ", "
+                    )
+                }."
+            }
         }
     }
 
-    private fun urcsContainErrors(urcs: List<String>) = urcs.any { urc -> isErrorUrc(urc) }
+    private fun urcsContainErrorsForCommand(urcs: List<String>, command: Command) =
+        command.type.urcsError.any { errorUrc -> urcs.contains(errorUrc) }
 
     private fun urcsContainSuccessesForCommand(urcs: List<String>, command: Command) =
         command.type.urcsSuccess.any { successUrc -> urcs.contains(successUrc) }
 
-    private fun urcsContainPskErrors(urcs: List<String>) = urcs.any { urc -> isPskErrorUrc(urc) }
-
-    private fun handleCommandError(command: Command, urcs: List<String>) {
+    private fun handleCommandErrors(command: Command, urcs: List<String>) {
         if(command.type == Command.CommandType.PSK) {
-            handlePskErrors(urcs, command)
+            handlePskErrors(command.deviceId)
         }
         val errorMessages = urcs.joinToString(". ") { urc -> messageFromCode(urc) }
 
-        logger.error { "Command ${command.type} failed for device with id ${command.deviceId}. Result code(s): $errorMessages." }
+        logger.error { "Command ${command.type} failed for device with id ${command.deviceId}. Error(s): $errorMessages." }
 
         val commandWithErrorStatus =
             commandService.saveCommandWithNewStatus(command, CommandStatus.ERROR)
 
         commandFeedbackService.sendFeedback(
-            commandWithErrorStatus, ExternalCommandStatus.Error, "Command failed. Result code(s): $errorMessages.")
+            commandWithErrorStatus, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
     }
 
-    private fun handlePskErrors(urcs: List<String>, command: Command) {
-        val deviceId = command.deviceId
-        if(!urcsContainPskErrors(urcs)) {
-            logger.warn {
-                "Psk set command sent for device $deviceId. Urcs received do not seem to be about psk: ${urcs.joinToString { ", " }}."
-            }
-        }
+    private fun handlePskErrors(deviceId: String) {
         if (!pskService.isPendingPskPresent(deviceId)) {
             throw NoExistingPskException(
                 "Failure URC received, but no pending key present to set as invalid"
@@ -112,7 +124,7 @@ class UrcService(
         pskService.setPendingKeyAsInvalid(deviceId)
     }
 
-    private fun handleCommandSuccess(command: Command) {
+    private fun handleCommandSuccesses(command: Command) {
         if(command.type == Command.CommandType.PSK) {
             handlePskSetSuccess(command)
         }

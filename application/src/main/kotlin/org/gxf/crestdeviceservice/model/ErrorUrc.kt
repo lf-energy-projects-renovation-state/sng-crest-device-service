@@ -17,9 +17,5 @@ enum class ErrorUrc(val code: String, val message: String) {
             val error = entries.firstOrNull { code.endsWith(it.code) }
             return error?.message ?: "Unknown URC"
         }
-
-        fun isErrorUrc(code: String) = entries.any { code.endsWith(it.code) }
-
-        fun isPskErrorUrc(code: String) = entries.any { code == "PSK:${it.code}" }
     }
 }
