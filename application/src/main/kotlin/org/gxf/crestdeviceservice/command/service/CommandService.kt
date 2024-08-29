@@ -6,9 +6,10 @@ package org.gxf.crestdeviceservice.command.service
 import com.alliander.sng.Command as ExternalCommand
 import java.time.Instant
 import java.util.Optional
-import java.util.UUID
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
+import org.gxf.crestdeviceservice.command.mapper.CommandMapper.externalCommandToCommandEntity
+import org.gxf.crestdeviceservice.command.mapper.CommandMapper.translateCommand
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.springframework.stereotype.Service
 
@@ -42,8 +43,6 @@ class CommandService(private val commandRepository: CommandRepository) {
 
         return deviceHasSameCommandAlreadyPendingOrInProgress(command.deviceId, commandType)
     }
-
-    private fun translateCommand(command: String) = command.trim('!').uppercase()
 
     /**
      * Check if the device already has a newer command pending of the same type that was issued at a
@@ -96,15 +95,7 @@ class CommandService(private val commandRepository: CommandRepository) {
 
     fun saveExternalCommandAsPending(incomingCommand: ExternalCommand) {
         val commandEntity =
-            Command(
-                id = UUID.randomUUID(),
-                deviceId = incomingCommand.deviceId,
-                correlationId = incomingCommand.correlationId,
-                timestampIssued = incomingCommand.timestamp,
-                type = Command.CommandType.valueOf(translateCommand(incomingCommand.command)),
-                status = CommandStatus.PENDING,
-                commandValue = incomingCommand.value,
-            )
+            externalCommandToCommandEntity(incomingCommand, CommandStatus.PENDING)
 
         commandRepository.save(commandEntity)
     }
