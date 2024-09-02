@@ -19,7 +19,6 @@ class MessageController(
     private val downlinkService: DownlinkService,
     private val urcService: UrcService
 ) {
-
     private val logger = KotlinLogging.logger {}
 
     private val locks: MutableMap<String, Any> = mutableMapOf()

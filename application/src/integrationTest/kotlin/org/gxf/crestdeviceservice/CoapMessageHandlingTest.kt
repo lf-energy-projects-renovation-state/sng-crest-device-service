@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice
 import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
+import jakarta.persistence.criteria.CriteriaBuilder.In
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
@@ -73,10 +74,20 @@ class CoapMessageHandlingTest {
     }
 
     @Test
-    fun shouldReturnADownLinkContainingAPskSetCommandWhenTheKeyHasNotChangedYet() {
+    fun shouldReturnADownLinkContainingPskCommands() {
         pskRepository.save(
             PreSharedKey(
                 DEVICE_ID, 1, Instant.now(), PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.READY))
+        commandRepository.save(
+            Command(
+                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK, null, Command.CommandStatus.PENDING
+            )
+        )
+        commandRepository.save(
+            Command(
+                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK_SET, null, Command.CommandStatus.PENDING
+            )
+        )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
@@ -87,7 +98,7 @@ class CoapMessageHandlingTest {
     }
 
     @Test
-    fun shouldChangeActiveKeyWhenTheKeyIsPendingAndSuccessURCReceived() {
+    fun shouldChangeActiveKey() {
         // pending psk, waiting for URC in next message from device
         pskRepository.save(
             PreSharedKey(
@@ -97,6 +108,17 @@ class CoapMessageHandlingTest {
                 PRE_SHARED_KEY_NEW,
                 SECRET,
                 PreSharedKeyStatus.PENDING))
+
+        commandRepository.save(
+            Command(
+                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK, null, Command.CommandStatus.IN_PROGRESS
+            )
+        )
+        commandRepository.save(
+            Command(
+                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK_SET, null, Command.CommandStatus.IN_PROGRESS
+            )
+        )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request =
@@ -118,6 +140,16 @@ class CoapMessageHandlingTest {
         pskRepository.save(
             PreSharedKey(
                 DEVICE_ID, 1, Instant.MIN, PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.PENDING))
+        commandRepository.save(
+            Command(
+                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK, null, Command.CommandStatus.IN_PROGRESS
+            )
+        )
+        commandRepository.save(
+            Command(
+                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK_SET, null, Command.CommandStatus.IN_PROGRESS
+            )
+        )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request =
@@ -199,7 +231,7 @@ class CoapMessageHandlingTest {
 
         // receiving message from device
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-        val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
+        val request = HttpEntity<String>(getFileContentAsString("message_reboot.json"), headers)
 
         val result = restTemplate.postForEntity<String>("/sng/${DEVICE_ID}", request)
 
@@ -223,7 +255,7 @@ class CoapMessageHandlingTest {
                 .setCorrelationId(correlationId)
                 .setTimestampStatus(Instant.now())
                 .setStatus(CommandStatus.Successful)
-                .setMessage("Reboot for device $DEVICE_ID went successfully")
+                .setMessage("Command handled successfully")
                 .build()
 
         assertThat(actualFeedbackSent)

@@ -37,7 +37,7 @@ class UrcService(
             logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
         }
 
-        val downlinks = getDownlinksFromMessage(body)
+        val downlinks = getDownlinksFromMessage(body).filter { downlink -> !downlink.equals("0") }
         downlinks.forEach { downlink -> handleDownlinkFromMessage(deviceId, downlink, urcs) }
     }
 
