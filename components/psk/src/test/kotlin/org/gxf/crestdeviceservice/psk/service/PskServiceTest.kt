@@ -34,41 +34,41 @@ class PskServiceTest {
 
     @Test
     fun getCurrentActiveKey() {
-        val identity = "identity"
+        val deviceId = "identity"
         val psk = PSKTestHelper.preSharedKeyActive()
         whenever(
                 pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                    identity, PreSharedKeyStatus.ACTIVE))
+                    deviceId, PreSharedKeyStatus.ACTIVE))
             .thenReturn(psk)
 
-        val currentActiveKey = pskService.getCurrentActiveKey(identity)
+        val currentActiveKey = pskService.getCurrentActiveKey(deviceId)
 
         assertThat(currentActiveKey).isEqualTo(psk.preSharedKey)
     }
 
     @Test
     fun pendingKeyPresentTrue() {
-        val identity = "identity"
+        val deviceId = "identity"
         val psk = PSKTestHelper.preSharedKeyPending()
         whenever(
                 pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                    identity, PreSharedKeyStatus.PENDING))
+                    deviceId, PreSharedKeyStatus.PENDING))
             .thenReturn(psk)
 
-        val pendingKeyPresent = pskService.isPendingPskPresent(identity)
+        val pendingKeyPresent = pskService.isPendingPskPresent(deviceId)
 
         assertThat(pendingKeyPresent).isEqualTo(true)
     }
 
     @Test
     fun pendingKeyPresentFalse() {
-        val identity = "identity"
+        val deviceId = "identity"
         whenever(
                 pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                    identity, PreSharedKeyStatus.PENDING))
+                    deviceId, PreSharedKeyStatus.PENDING))
             .thenReturn(null)
 
-        val pendingKeyPresent = pskService.isPendingPskPresent(identity)
+        val pendingKeyPresent = pskService.isPendingPskPresent(deviceId)
 
         assertThat(pendingKeyPresent).isEqualTo(false)
     }
@@ -76,13 +76,13 @@ class PskServiceTest {
     @Test
     fun setPendingKeyAsInvalid() {
         val psk = PSKTestHelper.preSharedKeyPending()
-        val identity = psk.identity
+        val deviceId = psk.identity
         whenever(
                 pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                    identity, PreSharedKeyStatus.PENDING))
+                    deviceId, PreSharedKeyStatus.PENDING))
             .thenReturn(psk)
 
-        pskService.setPendingKeyAsInvalid(identity)
+        pskService.setPendingKeyAsInvalid(deviceId)
 
         verify(pskRepository).save(pskCaptor.capture())
         assertThat(pskCaptor.value.status).isEqualTo(PreSharedKeyStatus.INVALID)
@@ -91,14 +91,14 @@ class PskServiceTest {
     @Test
     fun saveReadyKeyForIdentityAsPending() {
         val psk = PSKTestHelper.preSharedKeyReady()
-        val identity = psk.identity
+        val deviceId = psk.identity
         val status = psk.status
 
-        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(identity, status))
+        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, status))
             .thenReturn(psk)
         whenever(pskRepository.save(psk)).thenReturn(psk)
 
-        val result = pskService.setPskToPendingForDevice(identity)
+        val result = pskService.setPskToPendingForDevice(deviceId)
 
         verify(pskRepository).save(pskCaptor.capture())
         assertThat(pskCaptor.value.status).isEqualTo(PreSharedKeyStatus.PENDING)
@@ -106,59 +106,21 @@ class PskServiceTest {
     }
 
     @Test
-    fun readyToIsPresentKey() {
-        val psk = PSKTestHelper.preSharedKeyReady()
-        val identity = psk.identity
-        whenever(
-                pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                    identity, PreSharedKeyStatus.READY))
-            .thenReturn(psk)
-        whenever(pskConfiguration.changeInitialPsk).thenReturn(true)
-
-        val needsKeyChange = pskService.keyCanBeChanged(identity)
-
-        assertThat(needsKeyChange).isTrue()
-    }
-
-    @Test
-    fun readyToChangeReturnsFalseWhenChangeKeyInitialPskIsFalse() {
-        whenever(pskConfiguration.changeInitialPsk).thenReturn(false)
-
-        val needsKeyChange = pskService.keyCanBeChanged("123")
-
-        assertThat(needsKeyChange).isFalse()
-    }
-
-    @Test
-    fun readyToIsNotPresentKey() {
-        val identity = "123"
-        whenever(
-                pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                    identity, PreSharedKeyStatus.READY))
-            .thenReturn(null)
-        whenever(pskConfiguration.changeInitialPsk).thenReturn(true)
-
-        val needsKeyChange = pskService.keyCanBeChanged(identity)
-
-        assertThat(needsKeyChange).isFalse()
-    }
-
-    @Test
     fun changeActiveKey() {
-        val identity = "identity"
+        val deviceId = "identity"
         val currentPsk = PSKTestHelper.preSharedKeyActive()
         val newPsk = PSKTestHelper.preSharedKeyPending()
 
         whenever(
                 pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                    identity, PreSharedKeyStatus.ACTIVE))
+                    deviceId, PreSharedKeyStatus.ACTIVE))
             .thenReturn(currentPsk)
         whenever(
                 pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                    identity, PreSharedKeyStatus.PENDING))
+                    deviceId, PreSharedKeyStatus.PENDING))
             .thenReturn(newPsk)
 
-        pskService.changeActiveKey(identity)
+        pskService.changeActiveKey(deviceId)
 
         verify(pskRepository).saveAll(pskListCaptor.capture())
         val actualSavedCurrentPsk = pskListCaptor.value[0]

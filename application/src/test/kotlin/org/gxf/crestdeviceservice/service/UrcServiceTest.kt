@@ -55,13 +55,6 @@ class UrcServiceTest {
                 listOf("PSK:HSER", "PSK:DLER"))
 
         @JvmStatic
-        private fun containingErrorUrcs() =
-            Stream.of(
-                listOf("OTA:HSER", "MSI:DLNA"),
-                listOf("TS:ERR"),
-            )
-
-        @JvmStatic
         private fun notContainingErrorUrcs() =
             Stream.of(
                 listOf("INIT"),
@@ -78,59 +71,64 @@ class UrcServiceTest {
     @Test
     fun shouldChangeActiveKeyWhenSuccessURCReceived() {
         val urcs = listOf("PSK:SET")
-        interpretURCWhileNewKeyIsPending(urcs)
+        val command = TestHelper.pskCommandInProgress()
+        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
+            .thenReturn(listOf(command))
+        val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
+
+        urcService.interpretURCsInMessage(DEVICE_ID, message)
+
         verify(pskService).changeActiveKey(DEVICE_ID)
     }
 
     @ParameterizedTest(name = "should set pending key as invalid for {0}")
     @MethodSource("containingPskErrorUrcs")
     fun shouldSetPendingKeyAsInvalidWhenPskFailureURCReceived(urcs: List<String>) {
-        interpretURCWhileNewKeyIsPending(urcs)
-        verify(pskService).setPendingKeyAsInvalid(DEVICE_ID)
-    }
-
-    @ParameterizedTest(name = "should not set pending key as invalid for {0}")
-    @MethodSource("notContainingErrorUrcs")
-    fun shouldNotSetPendingKeyAsInvalidWhenOtherURCReceived(urcs: List<String>) {
-        interpretURCWhileNewKeyIsPending(urcs)
-        verify(pskService, times(0)).setPendingKeyAsInvalid(DEVICE_ID)
-    }
-
-    @ParameterizedTest(name = "should handle error urc for command")
-    @MethodSource("containingErrorUrcs")
-    fun handleErrorUrcForCommand(urcs: List<String>) {
-        val commandInProgress = TestHelper.rebootCommandInProgress()
+        val commandInProgress = TestHelper.pskCommandInProgress()
         val commandError = commandInProgress.copy(status = Command.CommandStatus.ERROR)
-        val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
-
-        whenever(pskService.keyCanBeChanged(DEVICE_ID)).thenReturn(false)
-        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
-        whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
-            .thenReturn(commandInProgress)
+        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
+            .thenReturn(listOf(commandInProgress))
         whenever(
-                commandService.saveCommandWithNewStatus(
-                    commandInProgress, Command.CommandStatus.ERROR))
+            commandService.saveCommandWithNewStatus(
+                commandInProgress, Command.CommandStatus.ERROR))
             .thenReturn(commandError)
+        val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
+        verify(pskService).setPendingKeyAsInvalid(DEVICE_ID)
         verify(commandService)
             .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.ERROR)
         verify(commandFeedbackService)
             .sendFeedback(eq(commandError), eq(CommandStatus.Error), any<String>())
     }
 
+    @ParameterizedTest(name = "should not set pending key as invalid for {0}")
+    @MethodSource("notContainingErrorUrcs")
+    fun shouldNotSetPendingKeyAsInvalidWhenOtherURCReceived(urcs: List<String>) {
+        val command = TestHelper.pskCommandInProgress()
+        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
+            .thenReturn(listOf(command))
+        val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
+
+        urcService.interpretURCsInMessage(DEVICE_ID, message)
+
+        verify(pskService, times(0)).setPendingKeyAsInvalid(DEVICE_ID)
+    }
+
     @Test
-    fun handleSuccessUrcForCommand() {
+    fun handleSuccessUrcForRebootCommand() {
         val urcs = listOf("INIT", "WDR")
         val commandInProgress = TestHelper.rebootCommandInProgress()
         val commandSuccessful = commandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
-        whenever(pskService.keyCanBeChanged(DEVICE_ID)).thenReturn(false)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
-        whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
-            .thenReturn(commandInProgress)
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
+            .thenReturn(listOf(commandInProgress))
         whenever(
                 commandService.saveCommandWithNewStatus(
                     commandInProgress, Command.CommandStatus.SUCCESSFUL))
@@ -150,25 +148,15 @@ class UrcServiceTest {
         val commandInProgress = TestHelper.rebootCommandInProgress()
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
-        whenever(pskService.keyCanBeChanged(DEVICE_ID)).thenReturn(false)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
-        whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
-            .thenReturn(commandInProgress)
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
+            .thenReturn(listOf(commandInProgress))
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
         verify(commandService, times(0)).saveCommandEntity(any<Command>())
         verify(commandFeedbackService, times(0))
             .sendFeedback(any<Command>(), any<CommandStatus>(), any<String>())
-    }
-
-    private fun interpretURCWhileNewKeyIsPending(urcs: List<String>) {
-        whenever(pskService.keyCanBeChanged(DEVICE_ID)).thenReturn(false)
-        whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
-
-        val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
-
-        urcService.interpretURCsInMessage(DEVICE_ID, message)
     }
 
     private fun updateUrcInMessage(urcs: List<String>, downlink: String): JsonNode {

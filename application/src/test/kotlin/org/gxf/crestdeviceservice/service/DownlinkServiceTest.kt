@@ -24,7 +24,7 @@ class DownlinkServiceTest {
     private val message = TestHelper.messageTemplate()
 
     companion object {
-        private const val IDENTITY = "867787050253370"
+        private const val DEVICE_ID = "867787050253370"
     }
 
     @Test
@@ -33,12 +33,18 @@ class DownlinkServiceTest {
         val expectedHash = "ad165b11320bc91501ab08613cc3a48a62a6caca4d5c8b14ca82cc313b3b96cd"
         val psk =
             PreSharedKey(
-                IDENTITY, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
+                DEVICE_ID, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
+        val pskCommandPending = TestHelper.pendingPskCommand()
+        val pskCommandInProgress = pskCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
 
-        whenever(pskService.keyCanBeChanged(IDENTITY)).thenReturn(true)
-        whenever(pskService.setPskToPendingForDevice(IDENTITY)).thenReturn(psk)
+        whenever(commandService.getAllPendingCommandsForDevice(DEVICE_ID))
+            .thenReturn(listOf(pskCommandPending))
+        whenever(pskService.readyForPskSetCommand(DEVICE_ID)).thenReturn(true)
+        whenever(commandService.saveCommandWithNewStatus(pskCommandPending, Command.CommandStatus.IN_PROGRESS))
+            .thenReturn(pskCommandInProgress)
+        whenever(pskService.setPskToPendingForDevice(DEVICE_ID)).thenReturn(psk)
 
-        val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
+        val result = downLinkService.getDownlinkForDevice(DEVICE_ID, message)
 
         // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]:SET
         assertThat(result)
@@ -46,18 +52,19 @@ class DownlinkServiceTest {
     }
 
     @Test
-    fun shouldSendFirstPendingCommandIfNoCommandInProgress() {
-        val pendingCommand = TestHelper.pendingRebootCommand()
-        whenever(pskService.keyCanBeChanged(IDENTITY)).thenReturn(false)
-        whenever(commandService.getFirstPendingCommandForDevice(IDENTITY))
-            .thenReturn(pendingCommand)
-        whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY)).thenReturn(null)
+    fun shouldSendPendingCommandsIfNoCommandInProgress() {
+        val rebootCommand = TestHelper.pendingRebootCommand()
+        val pendingCommands = listOf(rebootCommand)
+        whenever(pskService.readyForPskSetCommand(DEVICE_ID)).thenReturn(false)
+        whenever(commandService.getAllPendingCommandsForDevice(DEVICE_ID))
+            .thenReturn(pendingCommands)
+        whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID)).thenReturn(null)
         whenever(
                 commandService.saveCommandWithNewStatus(
-                    pendingCommand, Command.CommandStatus.IN_PROGRESS))
-            .thenReturn(pendingCommand.copy(status = Command.CommandStatus.IN_PROGRESS))
+                    rebootCommand, Command.CommandStatus.IN_PROGRESS))
+            .thenReturn(rebootCommand.copy(status = Command.CommandStatus.IN_PROGRESS))
 
-        val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
+        val result = downLinkService.getDownlinkForDevice(DEVICE_ID, message)
 
         val expectedDownlink = "!CMD:REBOOT"
         assertThat(result).isEqualTo(expectedDownlink)
@@ -65,21 +72,21 @@ class DownlinkServiceTest {
 
     @Test
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskAndACommandIsInProgress() {
-        whenever(pskService.keyCanBeChanged(IDENTITY)).thenReturn(false)
-        whenever(commandService.getFirstPendingCommandForDevice(IDENTITY)).thenReturn(null)
-        whenever(commandService.getFirstCommandInProgressForDevice(IDENTITY))
+        whenever(pskService.readyForPskSetCommand(DEVICE_ID)).thenReturn(false)
+        whenever(commandService.getAllPendingCommandsForDevice(DEVICE_ID)).thenReturn(listOf())
+        whenever(commandService.getFirstCommandInProgressForDevice(DEVICE_ID))
             .thenReturn(TestHelper.rebootCommandInProgress())
 
-        val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
+        val result = downLinkService.getDownlinkForDevice(DEVICE_ID, message)
 
         assertThat(result).isEqualTo("0")
     }
 
     @Test
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskOrPendingCommand() {
-        whenever(pskService.keyCanBeChanged(IDENTITY)).thenReturn(false)
+        whenever(pskService.readyForPskSetCommand(DEVICE_ID)).thenReturn(false)
 
-        val result = downLinkService.getDownlinkForDevice(IDENTITY, message)
+        val result = downLinkService.getDownlinkForDevice(DEVICE_ID, message)
 
         assertThat(result).isEqualTo("0")
     }

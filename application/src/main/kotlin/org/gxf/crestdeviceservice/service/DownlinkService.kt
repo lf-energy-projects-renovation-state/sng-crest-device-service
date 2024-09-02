@@ -45,15 +45,13 @@ class DownlinkService(
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
         val types = pendingCommands.joinToString(", ") { command -> command.type.toString() }
-        logger.info { "Device ${deviceId} has pending commands of types: $types. These commands will be sent to the device." }
+        logger.info { "Device $deviceId has pending commands of types: $types. These commands will be sent to the device." }
 
         return pendingCommands
             .filter { command -> fitsInMaxMessageSize(command) }
             .map { command ->
                 commandService.saveCommandWithNewStatus(command, Command.CommandStatus.IN_PROGRESS)
-            }
-            .map { command -> getDownlinkPerCommand(command) }
-            .joinToString(";")
+            }.joinToString(";") { command -> getDownlinkPerCommand(command) }
     }
 
     private fun fitsInMaxMessageSize(command: Command) = true // todo

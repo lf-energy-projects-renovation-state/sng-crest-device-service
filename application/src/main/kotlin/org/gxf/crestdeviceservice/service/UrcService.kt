@@ -72,7 +72,7 @@ class UrcService(
     private fun downlinkConcernsCommandInProgress(
         downlink: String,
         commandInProgress: Command
-    ) = downlink.contains(commandInProgress.type.downlink)
+    ) = downlink.contains(commandInProgress.type.prefix)
 
     private fun handleUrcsForCommand(
         urcs: List<String>,

@@ -29,6 +29,17 @@ object TestHelper {
             .setValue(null)
             .build()!!
 
+    fun pendingPskCommand() =
+        Command(
+            id = UUID.randomUUID(),
+            deviceId = DEVICE_ID,
+            correlationId = UUID.randomUUID(),
+            timestampIssued = Instant.now(),
+            type = Command.CommandType.PSK,
+            commandValue = null,
+            status = Command.CommandStatus.PENDING
+        )
+
     fun pendingRebootCommand() =
         Command(
             id = UUID.randomUUID(),
@@ -39,6 +50,12 @@ object TestHelper {
             commandValue = null,
             status = Command.CommandStatus.PENDING)
 
+    fun pendingCommands() =
+        listOf(pendingPskCommand(), pendingRebootCommand())
+
     fun rebootCommandInProgress() =
         pendingRebootCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
+
+    fun pskCommandInProgress() =
+        pendingPskCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
 }
