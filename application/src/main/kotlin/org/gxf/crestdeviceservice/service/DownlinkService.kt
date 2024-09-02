@@ -57,28 +57,36 @@ class DownlinkService(
     private fun fitsInMaxMessageSize(command: Command) = true // todo
 
     private fun getDownlinkPerCommand(command: Command): String {
+        if(command.type == Command.CommandType.PSK) {
+            val newKey = pskService.getCurrentReadyPsk(command.deviceId)
+                ?: throw NoExistingPskException("There is no new key ready to be set")
+            return createPskCommand(newKey)
+        }
         if(command.type == Command.CommandType.PSK_SET) {
-            return preparePskChange(command.deviceId)
+            val newKey = preparePskChange(command.deviceId)
+            logger.debug {
+                "Create PSK set command for key for device ${newKey.identity} with revision ${newKey.revision} and status ${newKey.status}"
+            }
+            return createPskSetCommand(newKey)
         }
 
         return "!${command.type.downlink}"
     }
 
-    private fun preparePskChange(deviceId: String): String {
+    private fun preparePskChange(deviceId: String): PreSharedKey {
         logger.info { "Device $deviceId needs key change" }
-        val newKey = pskService.setPskToPendingForDevice(deviceId)
+        return pskService.setPskToPendingForDevice(deviceId)
+    }
 
-        // After setting a new psk, the device will send a new message if the psk set was
-        // successful
-        logger.debug {
-            "Create PSK set command for key for device ${newKey.identity} with revision ${newKey.revision} and status ${newKey.status}"
-        }
-        return createPskSetCommand(newKey)
+    fun createPskCommand(newPreSharedKey: PreSharedKey): String {
+        val newKey = newPreSharedKey.preSharedKey
+        val hash = DigestUtils.sha256Hex("${newPreSharedKey.secret}${newKey}")
+        return "!PSK:${newKey}:${hash}"
     }
 
     fun createPskSetCommand(newPreSharedKey: PreSharedKey): String {
         val newKey = newPreSharedKey.preSharedKey
         val hash = DigestUtils.sha256Hex("${newPreSharedKey.secret}${newKey}")
-        return "!PSK:${newKey}:${hash};PSK:${newKey}:${hash}:SET"
+        return "PSK:${newKey}:${hash}:SET"
     }
 }

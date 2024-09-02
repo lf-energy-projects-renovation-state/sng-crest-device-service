@@ -67,7 +67,7 @@ class CommandServiceTest {
 
         val commandToBeCanceled = commandService.existingCommandToBeCanceled(newCommand)
 
-        assertThat(commandToBeCanceled).isEqualTo(Optional.of(existingPendingCommand))
+        assertThat(commandToBeCanceled).isEqualTo(existingPendingCommand)
     }
 
     @Test

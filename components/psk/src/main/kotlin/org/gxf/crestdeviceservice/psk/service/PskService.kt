@@ -40,7 +40,7 @@ class PskService(
         pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
             deviceId, PreSharedKeyStatus.PENDING)
 
-    private fun getCurrentReadyPsk(deviceId: String) =
+    fun getCurrentReadyPsk(deviceId: String) =
         pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PreSharedKeyStatus.READY)
 
     fun readyForPskSetCommand(deviceId: String) =

@@ -22,27 +22,33 @@ class DownlinkServiceTest {
     private val commandService = mock<CommandService>()
     private val downLinkService = DownlinkService(pskService, commandService)
     private val message = TestHelper.messageTemplate()
-
-    companion object {
-        private const val DEVICE_ID = "867787050253370"
-    }
+    private val DEVICE_ID = TestHelper.DEVICE_ID
 
     @Test
     fun shouldReturnPskDownlinkWhenThereIsANewPsk() {
         val expectedKey = "key"
         val expectedHash = "ad165b11320bc91501ab08613cc3a48a62a6caca4d5c8b14ca82cc313b3b96cd"
-        val psk =
+        val pskReady =
             PreSharedKey(
-                DEVICE_ID, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
-        val pskCommandPending = TestHelper.pendingPskSetCommand()
+                DEVICE_ID, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.READY)
+        val pskPending = PreSharedKey(
+            DEVICE_ID, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
+        val pskCommandPending = TestHelper.pendingPskCommand()
+        val pskSetCommandPending = TestHelper.pendingPskSetCommand()
+        val pskCommandsPending = listOf(pskCommandPending, pskSetCommandPending)
         val pskCommandInProgress = pskCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
+        val pskSetCommandInProgress = pskSetCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
 
         whenever(commandService.getAllPendingCommandsForDevice(DEVICE_ID))
-            .thenReturn(listOf(pskCommandPending))
+            .thenReturn(pskCommandsPending)
         whenever(pskService.readyForPskSetCommand(DEVICE_ID)).thenReturn(true)
         whenever(commandService.saveCommandWithNewStatus(pskCommandPending, Command.CommandStatus.IN_PROGRESS))
             .thenReturn(pskCommandInProgress)
-        whenever(pskService.setPskToPendingForDevice(DEVICE_ID)).thenReturn(psk)
+        whenever(pskService.getCurrentReadyPsk(DEVICE_ID))
+            .thenReturn(pskReady)
+        whenever(commandService.saveCommandWithNewStatus(pskSetCommandPending, Command.CommandStatus.IN_PROGRESS))
+            .thenReturn(pskSetCommandInProgress)
+        whenever(pskService.setPskToPendingForDevice(DEVICE_ID)).thenReturn(pskPending)
 
         val result = downLinkService.getDownlinkForDevice(DEVICE_ID, message)
 
@@ -97,7 +103,7 @@ class DownlinkServiceTest {
         "1234567890123456,78383f73855e7595f8d31ee7cabdf854bc4e70d036f225f8d144d566083c7d01,different-secret",
         "6543210987654321,5e15cf0f8a55b58a54f51dda17c1d1645ebc145f912888ec2e02a55d7b7baea4,secret",
         "6543210987654321,64904d94590a354cecd8e65630289bcc22103c07b08c009b0b12a8ef0d58af9d,different-secret")
-    fun shouldCreateACorrectPskCommandoWithHash(
+    fun shouldCreateACorrectPskSetCommandWithHash(
         key: String,
         expectedHash: String,
         usedSecret: String
@@ -107,7 +113,7 @@ class DownlinkServiceTest {
 
         val result = downLinkService.createPskSetCommand(preSharedKey)
 
-        // Psk command is formatted as: PSK:[Key]:[Hash];PSK:[Key]:[Hash]:SET
-        assertThat(result).isEqualTo("!PSK:${key}:${expectedHash};PSK:${key}:${expectedHash}:SET")
+        // PSK:[Key]:[Hash]:SET
+        assertThat(result).isEqualTo("PSK:${key}:${expectedHash}:SET")
     }
 }
