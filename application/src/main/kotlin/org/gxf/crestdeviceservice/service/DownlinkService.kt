@@ -41,7 +41,7 @@ class DownlinkService(
 
     // if command is psk set and pending psk exists in repository
     fun commandCanBeSent(command: Command) =
-        command.type != Command.CommandType.PSK || pskService.readyForPskSetCommand(command.deviceId)
+        command.type != Command.CommandType.PSK_SET || pskService.readyForPskSetCommand(command.deviceId)
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
         val types = pendingCommands.joinToString(", ") { command -> command.type.toString() }
@@ -57,7 +57,7 @@ class DownlinkService(
     private fun fitsInMaxMessageSize(command: Command) = true // todo
 
     private fun getDownlinkPerCommand(command: Command): String {
-        if(command.type == Command.CommandType.PSK) {
+        if(command.type == Command.CommandType.PSK_SET) {
             return preparePskChange(command.deviceId)
         }
 

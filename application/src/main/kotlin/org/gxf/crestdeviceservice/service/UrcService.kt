@@ -72,7 +72,17 @@ class UrcService(
     private fun downlinkConcernsCommandInProgress(
         downlink: String,
         commandInProgress: Command
-    ) = downlink.contains(commandInProgress.type.prefix)
+    ): Boolean {
+        // do not treat PSK SET downlink as PSK command
+        if(commandInProgress.type == Command.CommandType.PSK && downlink.contains("SET")) {
+            return false
+        } else {
+            val prefixes = commandInProgress.type.prefix
+            return prefixes.all { prefix ->
+                downlink.contains(prefix)
+            }
+        }
+    }
 
     private fun handleUrcsForCommand(
         urcs: List<String>,
@@ -101,7 +111,7 @@ class UrcService(
         command.type.urcsSuccess.any { successUrc -> urcs.contains(successUrc) }
 
     private fun handleCommandErrors(command: Command, urcs: List<String>) {
-        if(command.type == Command.CommandType.PSK) {
+        if(command.type == Command.CommandType.PSK_SET) {
             handlePskErrors(command.deviceId)
         }
         val errorMessages = urcs.joinToString(". ") { urc -> messageFromCode(urc) }
@@ -125,7 +135,7 @@ class UrcService(
     }
 
     private fun handleCommandSuccesses(command: Command) {
-        if(command.type == Command.CommandType.PSK) {
+        if(command.type == Command.CommandType.PSK_SET) {
             handlePskSetSuccess(command)
         }
         logger.info { "Command ${command.type} for device ${command.deviceId} handled successfully. Saving command and sending feedback to Maki." }
@@ -139,12 +149,12 @@ class UrcService(
 
     private fun handlePskSetSuccess(command: Command) {
         val deviceId = command.deviceId
-            if (!pskService.isPendingPskPresent(deviceId)) {
-                throw NoExistingPskException(
-                    "Success URC received, but no pending key present to set as active"
-                )
-            }
-            logger.info { "PSK set successfully, changing active key" }
-            pskService.changeActiveKey(deviceId)
+        if (!pskService.isPendingPskPresent(deviceId)) {
+            throw NoExistingPskException(
+                "Success URC received, but no pending key present to set as active"
+            )
+        }
+        logger.info { "PSK set successfully, changing active key" }
+        pskService.changeActiveKey(deviceId)
     }
 }

@@ -34,7 +34,7 @@ class DownlinkServiceTest {
         val psk =
             PreSharedKey(
                 DEVICE_ID, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
-        val pskCommandPending = TestHelper.pendingPskCommand()
+        val pskCommandPending = TestHelper.pendingPskSetCommand()
         val pskCommandInProgress = pskCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
 
         whenever(commandService.getAllPendingCommandsForDevice(DEVICE_ID))

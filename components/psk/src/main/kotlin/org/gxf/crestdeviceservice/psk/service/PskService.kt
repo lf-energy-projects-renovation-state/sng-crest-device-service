@@ -36,7 +36,7 @@ class PskService(
         pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
             deviceId, PreSharedKeyStatus.ACTIVE)
 
-    private fun getCurrentPendingPsk(deviceId: String) =
+    fun getCurrentPendingPsk(deviceId: String) =
         pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
             deviceId, PreSharedKeyStatus.PENDING)
 
@@ -46,7 +46,9 @@ class PskService(
     fun readyForPskSetCommand(deviceId: String) =
         isReadyPskPresent(deviceId) && !isPendingPskPresent(deviceId)
 
-    fun isPendingPskPresent(deviceId: String) = getCurrentPendingPsk(deviceId) != null
+    fun isPendingPskPresent(deviceId: String): Boolean {
+        return getCurrentPendingPsk(deviceId) != null
+    }
 
     fun isReadyPskPresent(deviceId: String) = getCurrentReadyPsk(deviceId) != null
 

@@ -41,21 +41,19 @@ class UrcServiceTest {
         private const val PSK_DOWNLINK =
             "!PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3;PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3:SET"
         private const val REBOOT_DOWNLINK = "!CMD:REBOOT"
-        private const val DEVICE_ID = "867787050253370"
+        private const val DEVICE_ID = TestHelper.DEVICE_ID
 
         @JvmStatic
         private fun containingPskErrorUrcs() =
             Stream.of(
-                listOf("PSK:EQER"),
-                listOf("PSK:DLNA"),
                 listOf("PSK:DLER"),
                 listOf("PSK:HSER"),
-                listOf("PSK:CSER"),
                 listOf("TS:ERR", "PSK:DLER"),
-                listOf("PSK:HSER", "PSK:DLER"))
+                listOf("PSK:DLER", "PSK:EQER")
+            )
 
         @JvmStatic
-        private fun notContainingErrorUrcs() =
+        private fun notContainingPSKUrcs() =
             Stream.of(
                 listOf("INIT"),
                 listOf("ENPD"),
@@ -70,11 +68,11 @@ class UrcServiceTest {
 
     @Test
     fun shouldChangeActiveKeyWhenSuccessURCReceived() {
-        val urcs = listOf("PSK:SET")
-        val command = TestHelper.pskCommandInProgress()
+        val urcs = listOf("PSK:TMP", "PSK:SET")
+        val pskCommands = TestHelper.pendingPskCommands()
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(listOf(command))
+            .thenReturn(pskCommands)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
@@ -85,33 +83,39 @@ class UrcServiceTest {
     @ParameterizedTest(name = "should set pending key as invalid for {0}")
     @MethodSource("containingPskErrorUrcs")
     fun shouldSetPendingKeyAsInvalidWhenPskFailureURCReceived(urcs: List<String>) {
-        val commandInProgress = TestHelper.pskCommandInProgress()
-        val commandError = commandInProgress.copy(status = Command.CommandStatus.ERROR)
+        val pskCommandInProgress = TestHelper.pskCommandInProgress()
+        val pskSetCommandInProgress = TestHelper.pskSetCommandInProgress()
+        val pskCommandError = pskCommandInProgress.copy(status = Command.CommandStatus.ERROR)
+        val pskSetCommandError = pskSetCommandInProgress.copy(status = Command.CommandStatus.ERROR)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(listOf(commandInProgress))
+            .thenReturn(listOf(pskCommandInProgress, pskSetCommandInProgress))
         whenever(
             commandService.saveCommandWithNewStatus(
-                commandInProgress, Command.CommandStatus.ERROR))
-            .thenReturn(commandError)
+                pskCommandInProgress, Command.CommandStatus.ERROR))
+            .thenReturn(pskCommandError)
+        whenever(
+            commandService.saveCommandWithNewStatus(
+                pskSetCommandInProgress, Command.CommandStatus.ERROR))
+            .thenReturn(pskSetCommandError)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
         verify(pskService).setPendingKeyAsInvalid(DEVICE_ID)
-        verify(commandService)
-            .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.ERROR)
-        verify(commandFeedbackService)
-            .sendFeedback(eq(commandError), eq(CommandStatus.Error), any<String>())
+        verify(commandService, times(2))
+            .saveCommandWithNewStatus(any<Command>(), eq(Command.CommandStatus.ERROR))
+        verify(commandFeedbackService, times(2))
+            .sendFeedback(any<Command>(), eq(CommandStatus.Error), any<String>())
     }
 
     @ParameterizedTest(name = "should not set pending key as invalid for {0}")
-    @MethodSource("notContainingErrorUrcs")
+    @MethodSource("notContainingPSKUrcs")
     fun shouldNotSetPendingKeyAsInvalidWhenOtherURCReceived(urcs: List<String>) {
-        val command = TestHelper.pskCommandInProgress()
+        val pskCommands = TestHelper.pskCommandsInProgress()
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(listOf(command))
+            .thenReturn(pskCommands)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
@@ -154,7 +158,7 @@ class UrcServiceTest {
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
-        verify(commandService, times(0)).saveCommandEntity(any<Command>())
+        verify(commandService, times(0)).saveCommandEntities(any<List<Command>>())
         verify(commandFeedbackService, times(0))
             .sendFeedback(any<Command>(), any<CommandStatus>(), any<String>())
     }

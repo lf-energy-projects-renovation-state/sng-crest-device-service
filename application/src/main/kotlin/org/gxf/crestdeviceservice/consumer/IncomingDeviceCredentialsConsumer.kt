@@ -38,7 +38,7 @@ class IncomingDeviceCredentialsConsumer(
 
             pskService.generateNewReadyKeyForDevice(deviceId)
             if(pskService.changeInitialPsk()) {
-                preparePskSetCommand(deviceId)
+                preparePskCommands(deviceId)
             }
         } catch (e: Exception) {
             logger.error(e) { "Failed to set device credentials for $deviceId" }
@@ -59,8 +59,8 @@ class IncomingDeviceCredentialsConsumer(
         pskService.setInitialKeyForIdentity(deviceId, decryptedPsk, decryptedSecret)
     }
 
-    private fun preparePskSetCommand(deviceId: String) {
-        val pskSetCommand = Command(
+    private fun preparePskCommands(deviceId: String) {
+        val pskCommand = Command(
             id = UUID.randomUUID(),
             deviceId = deviceId,
             correlationId = UUID.randomUUID(),
@@ -69,6 +69,16 @@ class IncomingDeviceCredentialsConsumer(
             status = CommandStatus.PENDING,
             commandValue = null,
         )
-        commandService.saveCommandEntity(pskSetCommand)
+        val pskSetCommand = Command(
+            id = UUID.randomUUID(),
+            deviceId = deviceId,
+            correlationId = UUID.randomUUID(),
+            timestampIssued = Instant.now(),
+            type = Command.CommandType.PSK_SET,
+            status = CommandStatus.PENDING,
+            commandValue = null,
+        )
+
+        commandService.saveCommandEntities(listOf(pskCommand,pskSetCommand))
     }
 }

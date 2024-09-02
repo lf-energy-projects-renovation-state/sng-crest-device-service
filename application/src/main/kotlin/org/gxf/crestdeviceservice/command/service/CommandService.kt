@@ -91,10 +91,6 @@ class CommandService(private val commandRepository: CommandRepository) {
         return null
     }
 
-    fun getFirstPendingCommandForDevice(deviceId: String) =
-        commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-            deviceId, CommandStatus.PENDING)
-
     fun getFirstCommandInProgressForDevice(deviceId: String) =
         commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
             deviceId, CommandStatus.IN_PROGRESS)
@@ -113,7 +109,7 @@ class CommandService(private val commandRepository: CommandRepository) {
         commandRepository.save(commandEntity)
     }
 
-    fun saveCommandEntity(command: Command) = commandRepository.save(command)
+    fun saveCommandEntities(commands: List<Command>): MutableIterable<Command> = commandRepository.saveAll(commands)
 
     fun saveCommandWithNewStatus(command: Command, status: CommandStatus): Command {
         command.status = status

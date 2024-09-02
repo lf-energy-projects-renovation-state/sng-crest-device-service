@@ -13,7 +13,7 @@ import org.springframework.util.ResourceUtils
 
 object TestHelper {
     private val mapper = spy<ObjectMapper>()
-    private const val DEVICE_ID = "device-id"
+    const val DEVICE_ID = "device-id"
 
     fun messageTemplate(): ObjectNode {
         val messageFile = ResourceUtils.getFile("classpath:message-template.json")
@@ -40,6 +40,17 @@ object TestHelper {
             status = Command.CommandStatus.PENDING
         )
 
+    fun pendingPskSetCommand() =
+        Command(
+            id = UUID.randomUUID(),
+            deviceId = DEVICE_ID,
+            correlationId = UUID.randomUUID(),
+            timestampIssued = Instant.now(),
+            type = Command.CommandType.PSK_SET,
+            commandValue = null,
+            status = Command.CommandStatus.PENDING
+        )
+
     fun pendingRebootCommand() =
         Command(
             id = UUID.randomUUID(),
@@ -50,12 +61,18 @@ object TestHelper {
             commandValue = null,
             status = Command.CommandStatus.PENDING)
 
-    fun pendingCommands() =
-        listOf(pendingPskCommand(), pendingRebootCommand())
+    fun pendingPskCommands() =
+        listOf(pendingPskCommand(), pendingPskSetCommand())
 
     fun rebootCommandInProgress() =
         pendingRebootCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
 
     fun pskCommandInProgress() =
         pendingPskCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
+
+    fun pskSetCommandInProgress() =
+        pendingPskSetCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
+
+    fun pskCommandsInProgress() =
+        listOf(pskCommandInProgress(), pskSetCommandInProgress())
 }
