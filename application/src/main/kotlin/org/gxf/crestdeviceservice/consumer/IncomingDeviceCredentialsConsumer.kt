@@ -5,6 +5,8 @@ package org.gxf.crestdeviceservice.consumer
 
 import com.alliander.sng.DeviceCredentials
 import io.github.oshai.kotlinlogging.KotlinLogging
+import java.time.Instant
+import java.util.UUID
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -12,8 +14,6 @@ import org.gxf.crestdeviceservice.psk.service.PskDecryptionService
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
-import java.time.Instant
-import java.util.UUID
 
 @Service
 class IncomingDeviceCredentialsConsumer(
@@ -37,7 +37,7 @@ class IncomingDeviceCredentialsConsumer(
             setInitialKey(deviceCredentials, deviceId)
 
             pskService.generateNewReadyKeyForDevice(deviceId)
-            if(pskService.changeInitialPsk()) {
+            if (pskService.changeInitialPsk()) {
                 preparePskCommands(deviceId)
             }
         } catch (e: Exception) {
@@ -45,40 +45,37 @@ class IncomingDeviceCredentialsConsumer(
         }
     }
 
-    private fun setInitialKey(
-        deviceCredentials: DeviceCredentials,
-        deviceId: String
-    ) {
+    private fun setInitialKey(deviceCredentials: DeviceCredentials, deviceId: String) {
         val decryptedPsk =
             pskDecryptionService.decryptSecret(deviceCredentials.psk, deviceCredentials.keyRef)
         val decryptedSecret =
-            pskDecryptionService.decryptSecret(
-                deviceCredentials.secret, deviceCredentials.keyRef
-            )
+            pskDecryptionService.decryptSecret(deviceCredentials.secret, deviceCredentials.keyRef)
 
         pskService.setInitialKeyForIdentity(deviceId, decryptedPsk, decryptedSecret)
     }
 
     private fun preparePskCommands(deviceId: String) {
-        val pskCommand = Command(
-            id = UUID.randomUUID(),
-            deviceId = deviceId,
-            correlationId = UUID.randomUUID(),
-            timestampIssued = Instant.now(),
-            type = Command.CommandType.PSK,
-            status = CommandStatus.PENDING,
-            commandValue = null,
-        )
-        val pskSetCommand = Command(
-            id = UUID.randomUUID(),
-            deviceId = deviceId,
-            correlationId = UUID.randomUUID(),
-            timestampIssued = Instant.now(),
-            type = Command.CommandType.PSK_SET,
-            status = CommandStatus.PENDING,
-            commandValue = null,
-        )
+        val pskCommand =
+            Command(
+                id = UUID.randomUUID(),
+                deviceId = deviceId,
+                correlationId = UUID.randomUUID(),
+                timestampIssued = Instant.now(),
+                type = Command.CommandType.PSK,
+                status = CommandStatus.PENDING,
+                commandValue = null,
+            )
+        val pskSetCommand =
+            Command(
+                id = UUID.randomUUID(),
+                deviceId = deviceId,
+                correlationId = UUID.randomUUID(),
+                timestampIssued = Instant.now(),
+                type = Command.CommandType.PSK_SET,
+                status = CommandStatus.PENDING,
+                commandValue = null,
+            )
 
-        commandService.saveCommandEntities(listOf(pskCommand,pskSetCommand))
+        commandService.saveCommandEntities(listOf(pskCommand, pskSetCommand))
     }
 }

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
 
+import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestHelper.pendingRebootCommand
 import org.gxf.crestdeviceservice.TestHelper.receivedRebootCommand
@@ -12,8 +13,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.time.Instant
-import java.util.Optional
 
 class CommandServiceTest {
     private val commandRepository = mock<CommandRepository>()

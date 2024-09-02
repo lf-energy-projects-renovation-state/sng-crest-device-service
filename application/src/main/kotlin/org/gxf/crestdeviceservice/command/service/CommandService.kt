@@ -35,7 +35,7 @@ class CommandService(private val commandRepository: CommandRepository) {
             return Optional.of("There is a newer command of the same type")
         }
 
-        if(deviceHasSameCommandAlreadyInProgress(deviceId, commandType)) {
+        if (deviceHasSameCommandAlreadyInProgress(deviceId, commandType)) {
             return Optional.of("A command of the same type is already in progress.")
         }
 
@@ -68,9 +68,11 @@ class CommandService(private val commandRepository: CommandRepository) {
     private fun deviceHasSameCommandAlreadyInProgress(
         deviceId: String,
         commandType: Command.CommandType
-    ) = commandRepository
-        .findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(deviceId, commandType, CommandStatus.IN_PROGRESS)
-        .isNotEmpty()
+    ) =
+        commandRepository
+            .findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
+                deviceId, commandType, CommandStatus.IN_PROGRESS)
+            .isNotEmpty()
 
     private fun latestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
         commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
@@ -80,8 +82,7 @@ class CommandService(private val commandRepository: CommandRepository) {
         deviceId: String,
         commandType: Command.CommandType
     ): Command? {
-        val latestCommandInDatabase =
-            latestCommandInDatabase(deviceId, commandType) ?: return null
+        val latestCommandInDatabase = latestCommandInDatabase(deviceId, commandType) ?: return null
 
         // The latest command is pending
         if (latestCommandInDatabase.status == CommandStatus.PENDING) {
@@ -100,16 +101,17 @@ class CommandService(private val commandRepository: CommandRepository) {
             deviceId, CommandStatus.PENDING)
 
     fun getAllCommandsInProgressForDevice(deviceId: String) =
-        commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, CommandStatus.IN_PROGRESS)
+        commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
+            deviceId, CommandStatus.IN_PROGRESS)
 
     fun saveExternalCommandAsPending(incomingCommand: ExternalCommand) {
-        val commandEntity =
-            externalCommandToCommandEntity(incomingCommand, CommandStatus.PENDING)
+        val commandEntity = externalCommandToCommandEntity(incomingCommand, CommandStatus.PENDING)
 
         commandRepository.save(commandEntity)
     }
 
-    fun saveCommandEntities(commands: List<Command>): MutableIterable<Command> = commandRepository.saveAll(commands)
+    fun saveCommandEntities(commands: List<Command>): MutableIterable<Command> =
+        commandRepository.saveAll(commands)
 
     fun saveCommandWithNewStatus(command: Command, status: CommandStatus): Command {
         command.status = status

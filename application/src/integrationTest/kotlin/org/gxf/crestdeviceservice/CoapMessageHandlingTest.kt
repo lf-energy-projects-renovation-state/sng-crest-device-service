@@ -6,7 +6,6 @@ package org.gxf.crestdeviceservice
 import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
-import jakarta.persistence.criteria.CriteriaBuilder.In
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
@@ -80,14 +79,22 @@ class CoapMessageHandlingTest {
                 DEVICE_ID, 1, Instant.now(), PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.READY))
         commandRepository.save(
             Command(
-                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK, null, Command.CommandStatus.PENDING
-            )
-        )
+                UUID.randomUUID(),
+                DEVICE_ID,
+                UUID.randomUUID(),
+                Instant.now(),
+                Command.CommandType.PSK,
+                null,
+                Command.CommandStatus.PENDING))
         commandRepository.save(
             Command(
-                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK_SET, null, Command.CommandStatus.PENDING
-            )
-        )
+                UUID.randomUUID(),
+                DEVICE_ID,
+                UUID.randomUUID(),
+                Instant.now(),
+                Command.CommandType.PSK_SET,
+                null,
+                Command.CommandStatus.PENDING))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
@@ -111,14 +118,22 @@ class CoapMessageHandlingTest {
 
         commandRepository.save(
             Command(
-                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK, null, Command.CommandStatus.IN_PROGRESS
-            )
-        )
+                UUID.randomUUID(),
+                DEVICE_ID,
+                UUID.randomUUID(),
+                Instant.now(),
+                Command.CommandType.PSK,
+                null,
+                Command.CommandStatus.IN_PROGRESS))
         commandRepository.save(
             Command(
-                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK_SET, null, Command.CommandStatus.IN_PROGRESS
-            )
-        )
+                UUID.randomUUID(),
+                DEVICE_ID,
+                UUID.randomUUID(),
+                Instant.now(),
+                Command.CommandType.PSK_SET,
+                null,
+                Command.CommandStatus.IN_PROGRESS))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request =
@@ -142,14 +157,22 @@ class CoapMessageHandlingTest {
                 DEVICE_ID, 1, Instant.MIN, PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.PENDING))
         commandRepository.save(
             Command(
-                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK, null, Command.CommandStatus.IN_PROGRESS
-            )
-        )
+                UUID.randomUUID(),
+                DEVICE_ID,
+                UUID.randomUUID(),
+                Instant.now(),
+                Command.CommandType.PSK,
+                null,
+                Command.CommandStatus.IN_PROGRESS))
         commandRepository.save(
             Command(
-                UUID.randomUUID(), DEVICE_ID, UUID.randomUUID(), Instant.now(), Command.CommandType.PSK_SET, null, Command.CommandStatus.IN_PROGRESS
-            )
-        )
+                UUID.randomUUID(),
+                DEVICE_ID,
+                UUID.randomUUID(),
+                Instant.now(),
+                Command.CommandType.PSK_SET,
+                null,
+                Command.CommandStatus.IN_PROGRESS))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request =

@@ -1,8 +1,11 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.mapper
 
-import org.gxf.crestdeviceservice.command.entity.Command
-import java.util.UUID
 import com.alliander.sng.Command as ExternalCommand
+import java.util.UUID
+import org.gxf.crestdeviceservice.command.entity.Command
 
 object CommandMapper {
     fun externalCommandToCommandEntity(command: ExternalCommand, status: Command.CommandStatus) =
@@ -13,8 +16,7 @@ object CommandMapper {
             timestampIssued = command.timestamp,
             type = Command.CommandType.valueOf(translateCommand(command.command)),
             status = status,
-            commandValue = command.value
-        )
+            commandValue = command.value)
 
     fun translateCommand(command: String) = command.trim('!').uppercase()
 }

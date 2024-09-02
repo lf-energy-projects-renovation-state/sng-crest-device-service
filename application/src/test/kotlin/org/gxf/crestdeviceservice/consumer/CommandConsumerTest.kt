@@ -23,7 +23,8 @@ class CommandConsumerTest {
     private val commandService = mock<CommandService>()
     private val commandFeedbackService = mock<CommandFeedbackService>()
     private val pskService = mock<PskService>()
-    private val commandConsumer = CommandConsumer(commandService, commandFeedbackService, pskService)
+    private val commandConsumer =
+        CommandConsumer(commandService, commandFeedbackService, pskService)
 
     private val externalCommand = TestHelper.receivedRebootCommand()
 
@@ -60,8 +61,7 @@ class CommandConsumerTest {
     @Test
     fun noExistingSameCommand() {
         whenever(commandService.shouldBeRejected(externalCommand)).thenReturn(Optional.empty())
-        whenever(commandService.existingCommandToBeCanceled(externalCommand))
-            .thenReturn(null)
+        whenever(commandService.existingCommandToBeCanceled(externalCommand)).thenReturn(null)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 

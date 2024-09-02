@@ -41,7 +41,8 @@ class PskService(
             deviceId, PreSharedKeyStatus.PENDING)
 
     fun getCurrentReadyPsk(deviceId: String) =
-        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PreSharedKeyStatus.READY)
+        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+            deviceId, PreSharedKeyStatus.READY)
 
     fun readyForPskSetCommand(deviceId: String) =
         isReadyPskPresent(deviceId) && !isPendingPskPresent(deviceId)
@@ -75,7 +76,8 @@ class PskService(
     fun generateNewReadyKeyForDevice(deviceId: String) {
         logger.info { "Creating new ready key for device $deviceId" }
         val newKey = generatePsk()
-        val previousPSK = getCurrentActivePsk(deviceId)
+        val previousPSK =
+            getCurrentActivePsk(deviceId)
                 ?: throw NoExistingPskException("There is no active key present")
         val newVersion = previousPSK.revision + 1
         pskRepository.save(
@@ -95,7 +97,8 @@ class PskService(
         }
 
     fun setPskToPendingForDevice(deviceId: String): PreSharedKey {
-        val readyPsk = getCurrentReadyPsk(deviceId)
+        val readyPsk =
+            getCurrentReadyPsk(deviceId)
                 ?: throw NoExistingPskException("There is no new key ready to be set")
         readyPsk.status = PreSharedKeyStatus.PENDING
         logger.debug { "Save ready psk as pending" }

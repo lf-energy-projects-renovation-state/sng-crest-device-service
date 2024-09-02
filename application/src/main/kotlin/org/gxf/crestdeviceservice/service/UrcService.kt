@@ -45,26 +45,26 @@ class UrcService(
         body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
 
     private fun getDownlinksFromMessage(body: JsonNode) =
-        body[URC_FIELD]
-            .first { it.isObject }[DL_FIELD]
-            .asText()
-            .split(";")
+        body[URC_FIELD].first { it.isObject }[DL_FIELD].asText().split(";")
 
     private fun handleDownlinkFromMessage(deviceId: String, downlink: String, urcs: List<String>) {
         val command = commandThatDownlinkIsAbout(deviceId, downlink)
 
-        if(command != null) {
+        if (command != null) {
             handleUrcsForCommand(urcs, command, downlink)
         } else {
-            throw NoMatchingCommandException("Message received with downlink: $downlink, but there is no matching command in progress in the database.")
+            throw NoMatchingCommandException(
+                "Message received with downlink: $downlink, but there is no matching command in progress in the database.")
         }
     }
 
     private fun commandThatDownlinkIsAbout(deviceId: String, downlink: String): Command? {
         val commandsInProgress = commandService.getAllCommandsInProgressForDevice(deviceId)
         return try {
-            commandsInProgress.first { command -> downlinkConcernsCommandInProgress(downlink, command) }
-        } catch(e: NoSuchElementException) {
+            commandsInProgress.first { command ->
+                downlinkConcernsCommandInProgress(downlink, command)
+            }
+        } catch (e: NoSuchElementException) {
             null
         }
     }
@@ -74,21 +74,15 @@ class UrcService(
         commandInProgress: Command
     ): Boolean {
         // do not treat PSK SET downlink as PSK command
-        if(commandInProgress.type == Command.CommandType.PSK && downlink.contains("SET")) {
+        if (commandInProgress.type == Command.CommandType.PSK && downlink.contains("SET")) {
             return false
         } else {
             val prefixes = commandInProgress.type.prefix
-            return prefixes.all { prefix ->
-                downlink.contains(prefix)
-            }
+            return prefixes.all { prefix -> downlink.contains(prefix) }
         }
     }
 
-    private fun handleUrcsForCommand(
-        urcs: List<String>,
-        command: Command,
-        downlink: String
-    ) {
+    private fun handleUrcsForCommand(urcs: List<String>, command: Command, downlink: String) {
         if (urcsContainErrorsForCommand(urcs, command)) {
             handleCommandErrors(command, urcs)
         } else if (urcsContainSuccessesForCommand(urcs, command)) {
@@ -111,34 +105,39 @@ class UrcService(
         command.type.urcsSuccess.any { successUrc -> urcs.contains(successUrc) }
 
     private fun handleCommandErrors(command: Command, urcs: List<String>) {
-        if(command.type == Command.CommandType.PSK_SET) {
+        if (command.type == Command.CommandType.PSK_SET) {
             handlePskErrors(command.deviceId)
         }
         val errorMessages = urcs.joinToString(". ") { urc -> messageFromCode(urc) }
 
-        logger.error { "Command ${command.type} failed for device with id ${command.deviceId}. Error(s): $errorMessages." }
+        logger.error {
+            "Command ${command.type} failed for device with id ${command.deviceId}. Error(s): $errorMessages."
+        }
 
         val commandWithErrorStatus =
             commandService.saveCommandWithNewStatus(command, CommandStatus.ERROR)
 
         commandFeedbackService.sendFeedback(
-            commandWithErrorStatus, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
+            commandWithErrorStatus,
+            ExternalCommandStatus.Error,
+            "Command failed. Error(s): $errorMessages.")
     }
 
     private fun handlePskErrors(deviceId: String) {
         if (!pskService.isPendingPskPresent(deviceId)) {
             throw NoExistingPskException(
-                "Failure URC received, but no pending key present to set as invalid"
-            )
+                "Failure URC received, but no pending key present to set as invalid")
         }
         pskService.setPendingKeyAsInvalid(deviceId)
     }
 
     private fun handleCommandSuccesses(command: Command) {
-        if(command.type == Command.CommandType.PSK_SET) {
+        if (command.type == Command.CommandType.PSK_SET) {
             handlePskSetSuccess(command)
         }
-        logger.info { "Command ${command.type} for device ${command.deviceId} handled successfully. Saving command and sending feedback to Maki." }
+        logger.info {
+            "Command ${command.type} for device ${command.deviceId} handled successfully. Saving command and sending feedback to Maki."
+        }
 
         val successfulCommand =
             commandService.saveCommandWithNewStatus(command, CommandStatus.SUCCESSFUL)
@@ -151,8 +150,7 @@ class UrcService(
         val deviceId = command.deviceId
         if (!pskService.isPendingPskPresent(deviceId)) {
             throw NoExistingPskException(
-                "Success URC received, but no pending key present to set as active"
-            )
+                "Success URC received, but no pending key present to set as active")
         }
         logger.info { "PSK set successfully, changing active key" }
         pskService.changeActiveKey(deviceId)

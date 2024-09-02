@@ -31,22 +31,28 @@ class DownlinkServiceTest {
         val pskReady =
             PreSharedKey(
                 DEVICE_ID, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.READY)
-        val pskPending = PreSharedKey(
-            DEVICE_ID, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
+        val pskPending =
+            PreSharedKey(
+                DEVICE_ID, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
         val pskCommandPending = TestHelper.pendingPskCommand()
         val pskSetCommandPending = TestHelper.pendingPskSetCommand()
         val pskCommandsPending = listOf(pskCommandPending, pskSetCommandPending)
-        val pskCommandInProgress = pskCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
-        val pskSetCommandInProgress = pskSetCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
+        val pskCommandInProgress =
+            pskCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
+        val pskSetCommandInProgress =
+            pskSetCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
 
         whenever(commandService.getAllPendingCommandsForDevice(DEVICE_ID))
             .thenReturn(pskCommandsPending)
         whenever(pskService.readyForPskSetCommand(DEVICE_ID)).thenReturn(true)
-        whenever(commandService.saveCommandWithNewStatus(pskCommandPending, Command.CommandStatus.IN_PROGRESS))
+        whenever(
+                commandService.saveCommandWithNewStatus(
+                    pskCommandPending, Command.CommandStatus.IN_PROGRESS))
             .thenReturn(pskCommandInProgress)
-        whenever(pskService.getCurrentReadyPsk(DEVICE_ID))
-            .thenReturn(pskReady)
-        whenever(commandService.saveCommandWithNewStatus(pskSetCommandPending, Command.CommandStatus.IN_PROGRESS))
+        whenever(pskService.getCurrentReadyPsk(DEVICE_ID)).thenReturn(pskReady)
+        whenever(
+                commandService.saveCommandWithNewStatus(
+                    pskSetCommandPending, Command.CommandStatus.IN_PROGRESS))
             .thenReturn(pskSetCommandInProgress)
         whenever(pskService.setPskToPendingForDevice(DEVICE_ID)).thenReturn(pskPending)
 

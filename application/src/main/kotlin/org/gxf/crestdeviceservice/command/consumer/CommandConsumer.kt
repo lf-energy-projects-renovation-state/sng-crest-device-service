@@ -39,37 +39,31 @@ class CommandConsumer(
 
         // if a same command is already pending, cancel the existing pending command
         val commandToBeCanceled = commandService.existingCommandToBeCanceled(command)
-        if(commandToBeCanceled!= null) {
+        if (commandToBeCanceled != null) {
             cancelExistingCommand(command, commandToBeCanceled)
         }
 
-        if(isPskCommand(command)) {
+        if (isPskCommand(command)) {
             pskService.generateNewReadyKeyForDevice(command.deviceId)
         }
 
         commandService.saveExternalCommandAsPending(command)
     }
 
-    private fun sendRejectionFeedback(
-        reason: String,
-        command: ExternalCommand
-    ) {
-        logger.info {
-            "Rejecting command for device id: ${command.deviceId}, with reason: $reason"
-        }
+    private fun sendRejectionFeedback(reason: String, command: ExternalCommand) {
+        logger.info { "Rejecting command for device id: ${command.deviceId}, with reason: $reason" }
         commandFeedbackService.sendFeedback(command, CommandStatus.Rejected, reason)
     }
 
-    private fun isPskCommand(command: com.alliander.sng.Command) = command.command.lowercase().contains("psk")
+    private fun isPskCommand(command: com.alliander.sng.Command) =
+        command.command.lowercase().contains("psk")
 
-    private fun cancelExistingCommand(
-        command: ExternalCommand,
-        commandToBeCanceled: Command
-    ) {
+    private fun cancelExistingCommand(command: ExternalCommand, commandToBeCanceled: Command) {
         logger.info {
             "Device with id ${command.deviceId} already has a pending command of the same type. The existing command will be canceled."
         }
-        val message = "Command canceled by newer same command with correlation id: ${command.correlationId}"
+        val message =
+            "Command canceled by newer same command with correlation id: ${command.correlationId}"
         commandFeedbackService.sendFeedback(commandToBeCanceled, CommandStatus.Cancelled, message)
         commandService.saveCommandWithNewStatus(commandToBeCanceled, Command.CommandStatus.CANCELED)
     }

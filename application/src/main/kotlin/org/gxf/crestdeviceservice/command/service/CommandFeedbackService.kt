@@ -6,9 +6,9 @@ package org.gxf.crestdeviceservice.command.service
 import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandStatus as ExternalCommandStatus
 import org.apache.avro.specific.SpecificRecordBase
+import org.gxf.crestdeviceservice.command.entity.Command as CommandEntity
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.commandEntityToCommandFeedback
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.externalCommandToCommandFeedback
-import org.gxf.crestdeviceservice.command.entity.Command as CommandEntity
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service

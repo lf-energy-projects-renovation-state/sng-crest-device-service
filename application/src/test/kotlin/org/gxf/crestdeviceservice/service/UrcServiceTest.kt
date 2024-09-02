@@ -49,8 +49,7 @@ class UrcServiceTest {
                 listOf("PSK:DLER"),
                 listOf("PSK:HSER"),
                 listOf("TS:ERR", "PSK:DLER"),
-                listOf("PSK:DLER", "PSK:EQER")
-            )
+                listOf("PSK:DLER", "PSK:EQER"))
 
         @JvmStatic
         private fun notContainingPSKUrcs() =
@@ -91,12 +90,12 @@ class UrcServiceTest {
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(listOf(pskCommandInProgress, pskSetCommandInProgress))
         whenever(
-            commandService.saveCommandWithNewStatus(
-                pskCommandInProgress, Command.CommandStatus.ERROR))
+                commandService.saveCommandWithNewStatus(
+                    pskCommandInProgress, Command.CommandStatus.ERROR))
             .thenReturn(pskCommandError)
         whenever(
-            commandService.saveCommandWithNewStatus(
-                pskSetCommandInProgress, Command.CommandStatus.ERROR))
+                commandService.saveCommandWithNewStatus(
+                    pskSetCommandInProgress, Command.CommandStatus.ERROR))
             .thenReturn(pskSetCommandError)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 

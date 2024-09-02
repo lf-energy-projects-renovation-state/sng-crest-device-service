@@ -30,7 +30,7 @@ class DownlinkService(
     fun getDownlinkForDevice(deviceId: String, body: JsonNode): String {
         val pendingCommands = commandService.getAllPendingCommandsForDevice(deviceId)
         val commandsToSend = commandsToSend(pendingCommands)
-        if(commandsToSend.isNotEmpty()) {
+        if (commandsToSend.isNotEmpty()) {
             return getDownlinkFromCommands(deviceId, commandsToSend)
         }
         return RESPONSE_SUCCESS
@@ -41,28 +41,33 @@ class DownlinkService(
 
     // if command is psk set and pending psk exists in repository
     fun commandCanBeSent(command: Command) =
-        command.type != Command.CommandType.PSK_SET || pskService.readyForPskSetCommand(command.deviceId)
+        command.type != Command.CommandType.PSK_SET ||
+            pskService.readyForPskSetCommand(command.deviceId)
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
         val types = pendingCommands.joinToString(", ") { command -> command.type.toString() }
-        logger.info { "Device $deviceId has pending commands of types: $types. These commands will be sent to the device." }
+        logger.info {
+            "Device $deviceId has pending commands of types: $types. These commands will be sent to the device."
+        }
 
         return pendingCommands
             .filter { command -> fitsInMaxMessageSize(command) }
             .map { command ->
                 commandService.saveCommandWithNewStatus(command, Command.CommandStatus.IN_PROGRESS)
-            }.joinToString(";") { command -> getDownlinkPerCommand(command) }
+            }
+            .joinToString(";") { command -> getDownlinkPerCommand(command) }
     }
 
     private fun fitsInMaxMessageSize(command: Command) = true // todo
 
     private fun getDownlinkPerCommand(command: Command): String {
-        if(command.type == Command.CommandType.PSK) {
-            val newKey = pskService.getCurrentReadyPsk(command.deviceId)
-                ?: throw NoExistingPskException("There is no new key ready to be set")
+        if (command.type == Command.CommandType.PSK) {
+            val newKey =
+                pskService.getCurrentReadyPsk(command.deviceId)
+                    ?: throw NoExistingPskException("There is no new key ready to be set")
             return createPskCommand(newKey)
         }
-        if(command.type == Command.CommandType.PSK_SET) {
+        if (command.type == Command.CommandType.PSK_SET) {
             val newKey = preparePskChange(command.deviceId)
             logger.debug {
                 "Create PSK set command for key for device ${newKey.identity} with revision ${newKey.revision} and status ${newKey.status}"

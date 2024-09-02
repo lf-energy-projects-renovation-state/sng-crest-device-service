@@ -37,8 +37,7 @@ object TestHelper {
             timestampIssued = Instant.now(),
             type = Command.CommandType.PSK,
             commandValue = null,
-            status = Command.CommandStatus.PENDING
-        )
+            status = Command.CommandStatus.PENDING)
 
     fun pendingPskSetCommand() =
         Command(
@@ -48,8 +47,7 @@ object TestHelper {
             timestampIssued = Instant.now(),
             type = Command.CommandType.PSK_SET,
             commandValue = null,
-            status = Command.CommandStatus.PENDING
-        )
+            status = Command.CommandStatus.PENDING)
 
     fun pendingRebootCommand() =
         Command(
@@ -61,8 +59,7 @@ object TestHelper {
             commandValue = null,
             status = Command.CommandStatus.PENDING)
 
-    fun pendingPskCommands() =
-        listOf(pendingPskCommand(), pendingPskSetCommand())
+    fun pendingPskCommands() = listOf(pendingPskCommand(), pendingPskSetCommand())
 
     fun rebootCommandInProgress() =
         pendingRebootCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
@@ -73,6 +70,5 @@ object TestHelper {
     fun pskSetCommandInProgress() =
         pendingPskSetCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
 
-    fun pskCommandsInProgress() =
-        listOf(pskCommandInProgress(), pskSetCommandInProgress())
+    fun pskCommandsInProgress() = listOf(pskCommandInProgress(), pskSetCommandInProgress())
 }
