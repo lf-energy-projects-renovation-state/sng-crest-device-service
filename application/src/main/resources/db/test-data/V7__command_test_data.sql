@@ -4,5 +4,5 @@ values ('33836a60-c1d7-4b32-88c2-3827b0e7c611',
         'c9406f63-7247-4206-bd74-12b775124b3e',
         now(),
         'REBOOT',
-        'reboot',
+        null,
         'PENDING');
