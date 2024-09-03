@@ -49,20 +49,29 @@ class DownlinkService(
             pskService.readyForPskSetCommand(command.deviceId)
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
-        val types = pendingCommands.joinToString(", ") { command -> command.type.toString() }
         logger.info {
-            "Device $deviceId has pending commands of types: $types. These commands will be sent to the device."
+            "Device $deviceId has pending commands of types: ${printableCommandTypes(pendingCommands)}."
         }
 
-        val downlink =
-            pendingCommands
-                .map { command -> getDownlinkPerCommand(command) }
-                .filter { downlink -> fitsInMaxMessageSize(downlink) }
-                .joinToString(";")
-        pendingCommands.forEach { command -> setCommandInProgress(command) }
+        val commandsToSend =
+            pendingCommands.filter { command ->
+                fitsInMaxMessageSize(getDownlinkPerCommand(command))
+            }
         downlinkCumulative = ""
+
+        logger.info { "Commands that will be sent: ${printableCommandTypes(commandsToSend)}." }
+
+        val downlink =
+            commandsToSend.joinToString(";") { command -> getDownlinkPerCommand(command) }
+
+        commandsToSend.forEach { command -> setCommandInProgress(command) }
+
+        logger.debug { "Downlink that will be sent: $downlink" }
         return downlink
     }
+
+    private fun printableCommandTypes(commands: List<Command>) =
+        commands.joinToString(", ") { command -> command.type.toString() }
 
     private fun setCommandInProgress(command: Command) {
         if (command.type == Command.CommandType.PSK_SET) {

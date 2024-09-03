@@ -51,10 +51,13 @@ class IncomingDeviceCredentialsConsumer(
         val decryptedSecret =
             pskDecryptionService.decryptSecret(deviceCredentials.secret, deviceCredentials.keyRef)
 
-        pskService.setInitialKeyForIdentity(deviceId, decryptedPsk, decryptedSecret)
+        pskService.setInitialKeyForDevice(deviceId, decryptedPsk, decryptedSecret)
     }
 
     private fun preparePskCommands(deviceId: String) {
+        logger.info {
+            "Prepare pending PSK and PSK_SET commands for PSK change for device $deviceId."
+        }
         val pskCommand =
             Command(
                 id = UUID.randomUUID(),

@@ -25,12 +25,15 @@ class CommandConsumer(
         id = "command", idIsGroup = false, topics = ["\${kafka.consumers.command.topic}"])
     fun handleIncomingCommand(command: ExternalCommand) {
         logger.info {
-            "Received command for device: ${command.deviceId}, with correlation id: ${command.correlationId}"
+            "Received command ${command.command} for device: ${command.deviceId}, with correlation id: ${command.correlationId}"
         }
 
         // reject command if unknown or if newer same command exists
         val reasonForRejection = commandService.shouldBeRejected(command)
         if (reasonForRejection.isPresent) {
+            logger.warn {
+                "Command ${command.command} for device ${command.deviceId} is rejected. Reason: $reasonForRejection"
+            }
             sendRejectionFeedback(reasonForRejection.get(), command)
             return
         }
@@ -59,8 +62,8 @@ class CommandConsumer(
         command.command.lowercase().contains("psk")
 
     private fun cancelExistingCommand(command: ExternalCommand, commandToBeCanceled: Command) {
-        logger.info {
-            "Device with id ${command.deviceId} already has a pending command of the same type. The existing command will be canceled."
+        logger.warn {
+            "Device ${command.deviceId} already has a pending command of type ${commandToBeCanceled.type}. The first command will be canceled."
         }
         val message =
             "Command canceled by newer same command with correlation id: ${command.correlationId}"

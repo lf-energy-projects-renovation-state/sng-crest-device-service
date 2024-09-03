@@ -30,7 +30,7 @@ class PskService(
 
     private val secureRandom = SecureRandom.getInstanceStrong()
 
-    fun getCurrentActiveKey(identity: String) = getCurrentActivePsk(identity)?.preSharedKey
+    fun getCurrentActiveKey(deviceId: String) = getCurrentActivePsk(deviceId)?.preSharedKey
 
     private fun getCurrentActivePsk(deviceId: String) =
         pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
@@ -58,21 +58,22 @@ class PskService(
 
     private fun isReadyPskPresent(deviceId: String) = getCurrentReadyPsk(deviceId) != null
 
-    fun setPendingKeyAsInvalid(identity: String) {
+    fun setPendingKeyAsInvalid(deviceId: String) {
+        logger.warn { "Pending key for device $deviceId is set to invalid." }
         val psk =
-            getCurrentPendingPsk(identity)
+            getCurrentPendingPsk(deviceId)
                 ?: throw NoExistingPskException("No pending key exists to set as invalid")
         psk.status = PreSharedKeyStatus.INVALID
         pskRepository.save(psk)
     }
 
-    fun setInitialKeyForIdentity(identity: String, psk: String, secret: String) {
-        if (pskRepository.countByIdentityAndStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {
-            throw InitialKeySetException(
-                "Key already exists for identity. Key cannot be overridden")
+    fun setInitialKeyForDevice(deviceId: String, psk: String, secret: String) {
+        logger.info { "Prepare initial key for device $deviceId" }
+        if (pskRepository.countByIdentityAndStatus(deviceId, PreSharedKeyStatus.ACTIVE) != 0L) {
+            throw InitialKeySetException("Key already exists for device. Key cannot be overridden")
         }
         pskRepository.save(
-            PreSharedKey(identity, 0, Instant.now(), psk, secret, PreSharedKeyStatus.ACTIVE))
+            PreSharedKey(deviceId, 0, Instant.now(), psk, secret, PreSharedKeyStatus.ACTIVE))
     }
 
     fun generateNewReadyKeyForDevice(deviceId: String) {
