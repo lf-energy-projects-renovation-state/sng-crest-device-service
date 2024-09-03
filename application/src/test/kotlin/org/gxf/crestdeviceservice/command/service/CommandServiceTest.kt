@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice.command.service
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestHelper.pendingRebootCommand
+import org.gxf.crestdeviceservice.TestHelper.rebootCommandInProgress
 import org.gxf.crestdeviceservice.TestHelper.receivedRebootCommand
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
@@ -56,7 +57,20 @@ class CommandServiceTest {
     }
 
     @Test
-    fun `Check if existing pending same command is canceled it exists`() {
+    fun `Check if command is rejected when  same command is in progress`() {
+        whenever(
+            commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
+                any(), any(), any()))
+            .thenReturn(
+                listOf(rebootCommandInProgress())
+            )
+
+        val result = commandService.shouldBeRejected(receivedRebootCommand())
+        assertThat(result).isNotEmpty
+    }
+
+    @Test
+    fun `Check if existing pending same command is canceled if it exists`() {
         val existingPendingCommand = pendingRebootCommand()
         val newCommand = receivedRebootCommand()
         whenever(

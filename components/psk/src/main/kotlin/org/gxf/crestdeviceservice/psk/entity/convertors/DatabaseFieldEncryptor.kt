@@ -25,7 +25,7 @@ class DatabaseFieldEncryptor : AttributeConverter<String, String> {
         private const val IV_SIZE = 16
     }
 
-    @Value("\${crest-device-service.database.encryption-key}") lateinit var secret: String
+    @Value("\${database.encryption-key}") lateinit var secret: String
 
     override fun convertToDatabaseColumn(attribute: String): String {
         return Base64.getEncoder()

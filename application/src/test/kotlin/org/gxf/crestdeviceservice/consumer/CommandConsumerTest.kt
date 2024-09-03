@@ -29,6 +29,16 @@ class CommandConsumerTest {
     private val externalCommand = TestHelper.receivedRebootCommand()
 
     @Test
+    fun commandSaved() {
+        whenever(commandService.shouldBeRejected(externalCommand)).thenReturn(Optional.empty())
+        whenever(commandService.existingCommandToBeCanceled(externalCommand)).thenReturn(null)
+
+        commandConsumer.handleIncomingCommand(externalCommand)
+
+        verify(commandService).saveExternalCommandAsPending(externalCommand)
+    }
+
+    @Test
     fun commandRejected() {
         whenever(commandService.shouldBeRejected(externalCommand))
             .thenReturn(Optional.of("rejected"))
@@ -55,16 +65,6 @@ class CommandConsumerTest {
 
         verify(commandService)
             .saveCommandWithNewStatus(existingPendingCommand, Command.CommandStatus.CANCELED)
-        verify(commandService).saveExternalCommandAsPending(externalCommand)
-    }
-
-    @Test
-    fun noExistingSameCommand() {
-        whenever(commandService.shouldBeRejected(externalCommand)).thenReturn(Optional.empty())
-        whenever(commandService.existingCommandToBeCanceled(externalCommand)).thenReturn(null)
-
-        commandConsumer.handleIncomingCommand(externalCommand)
-
         verify(commandService).saveExternalCommandAsPending(externalCommand)
     }
 }

@@ -23,7 +23,7 @@ data class Command(
 ) {
     enum class CommandType(
         val downlink: String,
-        val prefix: List<String>,
+        val parts: List<String>,
         val urcsSuccess: List<String>,
         val urcsError: List<String>
     ) {

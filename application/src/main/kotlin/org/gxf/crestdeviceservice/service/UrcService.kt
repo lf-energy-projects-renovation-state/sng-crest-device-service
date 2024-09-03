@@ -37,7 +37,7 @@ class UrcService(
             logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
         }
 
-        val downlinks = getDownlinksFromMessage(body).filter { downlink -> !downlink.equals("0") }
+        val downlinks = getDownlinksFromMessage(body).filter { downlink -> downlink != "0" }
         downlinks.forEach { downlink -> handleDownlinkFromMessage(deviceId, downlink, urcs) }
     }
 
@@ -77,8 +77,8 @@ class UrcService(
         if (commandInProgress.type == Command.CommandType.PSK && downlink.contains("SET")) {
             return false
         } else {
-            val prefixes = commandInProgress.type.prefix
-            return prefixes.all { prefix -> downlink.contains(prefix) }
+            val parts = commandInProgress.type.parts
+            return parts.all { part -> downlink.contains(part) }
         }
     }
 

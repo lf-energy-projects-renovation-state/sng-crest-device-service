@@ -51,7 +51,7 @@ class PskService(
         return getCurrentPendingPsk(deviceId) != null
     }
 
-    fun isReadyPskPresent(deviceId: String) = getCurrentReadyPsk(deviceId) != null
+    private fun isReadyPskPresent(deviceId: String) = getCurrentReadyPsk(deviceId) != null
 
     @Throws(NoExistingPskException::class)
     fun setPendingKeyAsInvalid(identity: String) {

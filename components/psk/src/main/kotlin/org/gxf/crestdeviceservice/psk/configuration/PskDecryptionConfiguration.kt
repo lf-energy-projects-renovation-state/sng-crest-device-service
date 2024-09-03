@@ -6,5 +6,5 @@ package org.gxf.crestdeviceservice.psk.configuration
 import java.security.interfaces.RSAPrivateKey
 import org.springframework.boot.context.properties.ConfigurationProperties
 
-@ConfigurationProperties("crest-device-service.psk.decryption")
+@ConfigurationProperties("psk.decryption")
 class PskDecryptionConfiguration(val privateKey: Map<String, RSAPrivateKey>, val method: String)
