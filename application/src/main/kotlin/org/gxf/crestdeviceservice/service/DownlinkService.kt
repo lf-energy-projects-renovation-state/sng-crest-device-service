@@ -4,11 +4,13 @@
 package org.gxf.crestdeviceservice.service
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.fzakaria.ascii85.Ascii85
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.apache.commons.codec.digest.DigestUtils
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
+import org.gxf.crestdeviceservice.config.MessageProperties
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -17,13 +19,15 @@ import org.springframework.stereotype.Service
 @Service
 class DownlinkService(
     private val pskService: PskService,
-    private val commandService: CommandService
+    private val commandService: CommandService,
+    private val messageProperties: MessageProperties
 ) {
     companion object {
         private const val RESPONSE_SUCCESS = "0"
     }
 
     private val logger = KotlinLogging.logger {}
+    var downlinkCumulative = ""
 
     @Transactional
     @Throws(NoExistingPskException::class)
@@ -50,15 +54,35 @@ class DownlinkService(
             "Device $deviceId has pending commands of types: $types. These commands will be sent to the device."
         }
 
-        return pendingCommands
-            .filter { command -> fitsInMaxMessageSize(command) }
+        val downlink = pendingCommands
+            .filter { command -> fitsInMaxMessageSize(getDownlinkPerCommand(command)) }
             .map { command ->
                 commandService.saveCommandWithNewStatus(command, Command.CommandStatus.IN_PROGRESS)
             }
             .joinToString(";") { command -> getDownlinkPerCommand(command) }
+        downlinkCumulative = ""
+        return downlink
     }
 
-    private fun fitsInMaxMessageSize(command: Command) = true // todo
+    fun fitsInMaxMessageSize(downlinkToAdd: String): Boolean {
+        val currentSize = Ascii85.encode(downlinkCumulative.toByteArray()).toByteArray().size
+
+        val newCumulative = if(downlinkCumulative.isEmpty()) {
+            downlinkToAdd
+        } else {
+            downlinkCumulative.plus(";$downlinkToAdd")
+        }
+        val newSize = Ascii85.encode(newCumulative.toByteArray()).toByteArray().size
+        logger.debug {
+            "Trying to add a downlink '$downlinkToAdd' to existing downlink '$downlinkCumulative'. " +
+                    "Current downlink size: $currentSize. Downlink size after after adding: $newSize."
+        }
+        if(newSize <= messageProperties.maxBytes) {
+            downlinkCumulative = newCumulative
+            return true
+        }
+        return false
+    }
 
     private fun getDownlinkPerCommand(command: Command): String {
         if (command.type == Command.CommandType.PSK) {
