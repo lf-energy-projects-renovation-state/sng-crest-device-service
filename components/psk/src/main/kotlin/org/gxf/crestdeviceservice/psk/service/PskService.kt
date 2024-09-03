@@ -40,9 +40,14 @@ class PskService(
         pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
             deviceId, PreSharedKeyStatus.PENDING)
 
-    fun getCurrentReadyPsk(deviceId: String) =
-        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-            deviceId, PreSharedKeyStatus.READY)
+    fun getCurrentReadyPsk(deviceId: String): PreSharedKey? {
+        val allKeys = pskRepository.findAll()
+        logger.debug { allKeys.joinToString { ". " } }
+        val result =
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                deviceId, PreSharedKeyStatus.READY)
+        return result
+    }
 
     fun readyForPskSetCommand(deviceId: String) =
         isReadyPskPresent(deviceId) && !isPendingPskPresent(deviceId)
@@ -53,7 +58,6 @@ class PskService(
 
     private fun isReadyPskPresent(deviceId: String) = getCurrentReadyPsk(deviceId) != null
 
-    @Throws(NoExistingPskException::class)
     fun setPendingKeyAsInvalid(identity: String) {
         val psk =
             getCurrentPendingPsk(identity)
@@ -62,7 +66,6 @@ class PskService(
         pskRepository.save(psk)
     }
 
-    @Throws(InitialKeySetException::class)
     fun setInitialKeyForIdentity(identity: String, psk: String, secret: String) {
         if (pskRepository.countByIdentityAndStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {
             throw InitialKeySetException(
@@ -72,7 +75,6 @@ class PskService(
             PreSharedKey(identity, 0, Instant.now(), psk, secret, PreSharedKeyStatus.ACTIVE))
     }
 
-    @Throws(NoExistingPskException::class)
     fun generateNewReadyKeyForDevice(deviceId: String) {
         logger.info { "Creating new ready key for device $deviceId" }
         val newKey = generatePsk()
@@ -97,12 +99,12 @@ class PskService(
         }
 
     fun setPskToPendingForDevice(deviceId: String): PreSharedKey {
-        val readyPsk =
+        val psk =
             getCurrentReadyPsk(deviceId)
                 ?: throw NoExistingPskException("There is no new key ready to be set")
-        readyPsk.status = PreSharedKeyStatus.PENDING
+        psk.status = PreSharedKeyStatus.PENDING
         logger.debug { "Save ready psk as pending" }
-        return pskRepository.save(readyPsk)
+        return pskRepository.save(psk)
     }
 
     fun changeInitialPsk() = pskConfiguration.changeInitialPsk

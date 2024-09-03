@@ -54,30 +54,40 @@ class DownlinkService(
             "Device $deviceId has pending commands of types: $types. These commands will be sent to the device."
         }
 
-        val downlink = pendingCommands
-            .filter { command -> fitsInMaxMessageSize(getDownlinkPerCommand(command)) }
-            .map { command ->
-                commandService.saveCommandWithNewStatus(command, Command.CommandStatus.IN_PROGRESS)
-            }
-            .joinToString(";") { command -> getDownlinkPerCommand(command) }
+        val downlink =
+            pendingCommands
+                .map { command -> getDownlinkPerCommand(command) }
+                .filter { downlink -> fitsInMaxMessageSize(downlink) }
+                .joinToString(";")
+        pendingCommands.forEach { command -> setCommandInProgress(command) }
         downlinkCumulative = ""
         return downlink
+    }
+
+    private fun setCommandInProgress(command: Command) {
+        if (command.type == Command.CommandType.PSK_SET) {
+            val deviceId = command.deviceId
+            logger.info { "Device $deviceId needs key change" }
+            pskService.setPskToPendingForDevice(deviceId)
+        }
+        commandService.saveCommandWithNewStatus(command, Command.CommandStatus.IN_PROGRESS)
     }
 
     fun fitsInMaxMessageSize(downlinkToAdd: String): Boolean {
         val currentSize = Ascii85.encode(downlinkCumulative.toByteArray()).toByteArray().size
 
-        val newCumulative = if(downlinkCumulative.isEmpty()) {
-            downlinkToAdd
-        } else {
-            downlinkCumulative.plus(";$downlinkToAdd")
-        }
+        val newCumulative =
+            if (downlinkCumulative.isEmpty()) {
+                downlinkToAdd
+            } else {
+                downlinkCumulative.plus(";$downlinkToAdd")
+            }
         val newSize = Ascii85.encode(newCumulative.toByteArray()).toByteArray().size
         logger.debug {
             "Trying to add a downlink '$downlinkToAdd' to existing downlink '$downlinkCumulative'. " +
-                    "Current downlink size: $currentSize. Downlink size after after adding: $newSize."
+                "Current downlink size: $currentSize. Downlink size after after adding: $newSize."
         }
-        if(newSize <= messageProperties.maxBytes) {
+        if (newSize <= messageProperties.maxBytes) {
             downlinkCumulative = newCumulative
             return true
         }
@@ -86,13 +96,12 @@ class DownlinkService(
 
     private fun getDownlinkPerCommand(command: Command): String {
         if (command.type == Command.CommandType.PSK) {
-            val newKey =
-                pskService.getCurrentReadyPsk(command.deviceId)
-                    ?: throw NoExistingPskException("There is no new key ready to be set")
+            val newKey = getCurrentReadyPsk(command)
+
             return createPskCommand(newKey)
         }
         if (command.type == Command.CommandType.PSK_SET) {
-            val newKey = preparePskChange(command.deviceId)
+            val newKey = getCurrentReadyPsk(command)
             logger.debug {
                 "Create PSK set command for key for device ${newKey.identity} with revision ${newKey.revision} and status ${newKey.status}"
             }
@@ -102,10 +111,9 @@ class DownlinkService(
         return "!${command.type.downlink}"
     }
 
-    private fun preparePskChange(deviceId: String): PreSharedKey {
-        logger.info { "Device $deviceId needs key change" }
-        return pskService.setPskToPendingForDevice(deviceId)
-    }
+    private fun getCurrentReadyPsk(command: Command) =
+        pskService.getCurrentReadyPsk(command.deviceId)
+            ?: throw NoExistingPskException("There is no new key ready to be set")
 
     fun createPskCommand(newPreSharedKey: PreSharedKey): String {
         val newKey = newPreSharedKey.preSharedKey

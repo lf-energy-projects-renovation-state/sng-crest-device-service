@@ -59,11 +59,9 @@ class CommandServiceTest {
     @Test
     fun `Check if command is rejected when  same command is in progress`() {
         whenever(
-            commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
-                any(), any(), any()))
-            .thenReturn(
-                listOf(rebootCommandInProgress())
-            )
+                commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
+                    any(), any(), any()))
+            .thenReturn(listOf(rebootCommandInProgress()))
 
         val result = commandService.shouldBeRejected(receivedRebootCommand())
         assertThat(result).isNotEmpty

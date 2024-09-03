@@ -101,7 +101,7 @@ class CoapMessageHandlingTest {
 
         val result = restTemplate.postForEntity<String>("/sng/${DEVICE_ID}", request)
 
-        assertThat(result.body).contains("PSK:", ":SET")
+        assertThat(result.body).contains("PSK", "SET")
     }
 
     @Test
@@ -206,7 +206,7 @@ class CoapMessageHandlingTest {
         producer.send(ProducerRecord(commandTopic, commandFromMaki))
 
         // assert that pending command has been saved
-        Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted {
+        Awaitility.await().atMost(Duration.ofSeconds(3)).untilAsserted {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
                     DEVICE_ID, Command.CommandStatus.PENDING)

@@ -145,7 +145,8 @@ class DownlinkServiceTest {
         val result = downLinkService.fitsInMaxMessageSize(downlinkToAdd)
 
         assertThat(result).isTrue()
-        assertThat(downLinkService.downlinkCumulative).isEqualTo(downlinkExisting.plus(";$downlinkToAdd"))
+        assertThat(downLinkService.downlinkCumulative)
+            .isEqualTo(downlinkExisting.plus(";$downlinkToAdd"))
     }
 
     @Test
