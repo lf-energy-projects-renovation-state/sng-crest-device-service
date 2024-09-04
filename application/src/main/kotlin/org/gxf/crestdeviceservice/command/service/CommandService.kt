@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
 
+import com.alliander.sng.Command as ExternalCommand
+import java.time.Instant
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
 import org.gxf.crestdeviceservice.command.mapper.CommandMapper.externalCommandToCommandEntity
 import org.gxf.crestdeviceservice.command.mapper.CommandMapper.translateCommand
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.springframework.stereotype.Service
-import java.time.Instant
-import com.alliander.sng.Command as ExternalCommand
 
 @Service
 class CommandService(private val commandRepository: CommandRepository) {

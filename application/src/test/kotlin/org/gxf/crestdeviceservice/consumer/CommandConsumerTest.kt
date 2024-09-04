@@ -39,8 +39,7 @@ class CommandConsumerTest {
 
     @Test
     fun commandRejected() {
-        whenever(commandService.reasonForRejection(externalCommand))
-            .thenReturn("rejected")
+        whenever(commandService.reasonForRejection(externalCommand)).thenReturn("rejected")
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
