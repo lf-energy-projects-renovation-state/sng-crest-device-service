@@ -4,7 +4,6 @@
 package org.gxf.crestdeviceservice.consumer
 
 import com.alliander.sng.CommandStatus
-import java.util.Optional
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.consumer.CommandConsumer
 import org.gxf.crestdeviceservice.command.entity.Command
@@ -30,7 +29,7 @@ class CommandConsumerTest {
 
     @Test
     fun commandSaved() {
-        whenever(commandService.shouldBeRejected(externalCommand)).thenReturn(Optional.empty())
+        whenever(commandService.reasonForRejection(externalCommand)).thenReturn(null)
         whenever(commandService.existingCommandToBeCanceled(externalCommand)).thenReturn(null)
 
         commandConsumer.handleIncomingCommand(externalCommand)
@@ -40,8 +39,8 @@ class CommandConsumerTest {
 
     @Test
     fun commandRejected() {
-        whenever(commandService.shouldBeRejected(externalCommand))
-            .thenReturn(Optional.of("rejected"))
+        whenever(commandService.reasonForRejection(externalCommand))
+            .thenReturn("rejected")
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
@@ -57,7 +56,7 @@ class CommandConsumerTest {
     fun existingCommandCanceled() {
         val existingPendingCommand = TestHelper.pendingRebootCommand()
 
-        whenever(commandService.shouldBeRejected(externalCommand)).thenReturn(Optional.empty())
+        whenever(commandService.reasonForRejection(externalCommand)).thenReturn(null)
         whenever(commandService.existingCommandToBeCanceled(externalCommand))
             .thenReturn(existingPendingCommand)
 

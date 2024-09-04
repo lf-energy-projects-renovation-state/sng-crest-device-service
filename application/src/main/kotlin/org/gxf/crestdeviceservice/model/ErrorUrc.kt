@@ -3,18 +3,18 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.model
 
-enum class ErrorUrc(val code: String, val message: String) {
-    UNK("UNK", "Downlink unknown"),
-    EQER("EQER", "Set PSK does not equal earlier PSK"),
-    DLNA("DLNA", "Downlink not allowed"),
-    DLER("DLER", "Downlink (syntax) error"),
-    HSER("HSER", "SHA256 hash error"),
-    CSER("CSER", "Checksum error"),
-    ERR("ERR", "Error processing (downlink) value");
+enum class ErrorUrc(val message: String) {
+    UNK("Downlink unknown"),
+    EQER("Set PSK does not equal earlier PSK"),
+    DLNA("Downlink not allowed"),
+    DLER("Downlink (syntax) error"),
+    HSER("SHA256 hash error"),
+    CSER("Checksum error"),
+    ERR("Error processing (downlink) value");
 
     companion object {
         fun messageFromCode(code: String): String {
-            val error = entries.firstOrNull { code.endsWith(it.code) }
+            val error = entries.firstOrNull { code.endsWith(it.name) }
             return error?.message ?: "Unknown URC"
         }
     }

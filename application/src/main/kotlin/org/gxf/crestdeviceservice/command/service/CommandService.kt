@@ -3,15 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
 
-import com.alliander.sng.Command as ExternalCommand
-import java.time.Instant
-import java.util.Optional
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
 import org.gxf.crestdeviceservice.command.mapper.CommandMapper.externalCommandToCommandEntity
 import org.gxf.crestdeviceservice.command.mapper.CommandMapper.translateCommand
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.springframework.stereotype.Service
+import java.time.Instant
+import com.alliander.sng.Command as ExternalCommand
 
 @Service
 class CommandService(private val commandRepository: CommandRepository) {
@@ -23,23 +22,23 @@ class CommandService(private val commandRepository: CommandRepository) {
      * @return An optional string with the reason for rejection, or empty if the command should be
      *   accepted.
      */
-    fun shouldBeRejected(command: ExternalCommand): Optional<String> {
+    fun reasonForRejection(command: ExternalCommand): String? {
         val translatedCommand = translateCommand(command.command)
         if (translatedCommand !in knownCommands) {
-            return Optional.of("Unknown command")
+            return "Unknown command"
         }
 
         val deviceId = command.deviceId
         val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
         if (deviceHasNewerSameCommand(deviceId, commandType, command.timestamp)) {
-            return Optional.of("There is a newer command of the same type")
+            return "There is a newer command of the same type"
         }
 
         if (deviceHasSameCommandAlreadyInProgress(deviceId, commandType)) {
-            return Optional.of("A command of the same type is already in progress.")
+            return "A command of the same type is already in progress."
         }
 
-        return Optional.empty()
+        return null
     }
 
     fun existingCommandToBeCanceled(command: ExternalCommand): Command? {

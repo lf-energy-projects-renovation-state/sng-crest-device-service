@@ -27,8 +27,8 @@ class CommandServiceTest {
             .thenReturn(
                 pendingRebootCommand().copy(timestampIssued = Instant.now().minusSeconds(100)))
 
-        val result = commandService.shouldBeRejected(receivedRebootCommand())
-        assertThat(result).isEmpty
+        val result = commandService.reasonForRejection(receivedRebootCommand())
+        assertThat(result).isNull()
     }
 
     @Test
@@ -40,8 +40,8 @@ class CommandServiceTest {
 
         val command = receivedRebootCommand()
         command.command = "UNKNOWN"
-        val result = commandService.shouldBeRejected(command)
-        assertThat(result).isNotEmpty
+        val result = commandService.reasonForRejection(command)
+        assertThat(result).isNotNull()
     }
 
     @Test
@@ -52,8 +52,8 @@ class CommandServiceTest {
             .thenReturn(
                 pendingRebootCommand().copy(timestampIssued = Instant.now().plusSeconds(100)))
 
-        val result = commandService.shouldBeRejected(receivedRebootCommand())
-        assertThat(result).isNotEmpty
+        val result = commandService.reasonForRejection(receivedRebootCommand())
+        assertThat(result).isNotNull()
     }
 
     @Test
@@ -63,8 +63,8 @@ class CommandServiceTest {
                     any(), any(), any()))
             .thenReturn(listOf(rebootCommandInProgress()))
 
-        val result = commandService.shouldBeRejected(receivedRebootCommand())
-        assertThat(result).isNotEmpty
+        val result = commandService.reasonForRejection(receivedRebootCommand())
+        assertThat(result).isNotNull()
     }
 
     @Test

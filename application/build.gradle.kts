@@ -27,8 +27,6 @@ dependencies {
 
     implementation(libs.avro)
 
-    implementation(libs.ascii85)
-
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")

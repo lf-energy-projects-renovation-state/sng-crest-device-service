@@ -4,13 +4,13 @@
 package org.gxf.crestdeviceservice.service
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.github.fzakaria.ascii85.Ascii85
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.apache.commons.codec.digest.DigestUtils
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.config.MessageProperties
+import org.gxf.crestdeviceservice.model.Downlink
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -43,7 +43,7 @@ class DownlinkService(
     private fun commandsToSend(pendingCommands: List<Command>) =
         pendingCommands.filter { command -> commandCanBeSent(command) }
 
-    // if command is psk set and pending psk exists in repository
+    // if command is psk_set and pending psk exists in repository
     private fun commandCanBeSent(command: Command) =
         command.type != Command.CommandType.PSK_SET ||
             pskService.readyForPskSetCommand(command.deviceId)
@@ -83,7 +83,7 @@ class DownlinkService(
     }
 
     fun fitsInMaxMessageSize(downlinkToAdd: String): Boolean {
-        val currentSize = Ascii85.encode(downlinkCumulative.toByteArray()).toByteArray().size
+        val currentSize = downlinkCumulative.length
 
         val newCumulative =
             if (downlinkCumulative.isEmpty()) {
@@ -91,7 +91,7 @@ class DownlinkService(
             } else {
                 downlinkCumulative.plus(";$downlinkToAdd")
             }
-        val newSize = Ascii85.encode(newCumulative.toByteArray()).toByteArray().size
+        val newSize = newCumulative.length
         logger.debug {
             "Trying to add a downlink '$downlinkToAdd' to existing downlink '$downlinkCumulative'. " +
                 "Current downlink size: $currentSize. Downlink size after after adding: $newSize."

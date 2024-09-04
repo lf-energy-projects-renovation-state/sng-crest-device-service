@@ -28,13 +28,12 @@ class CommandConsumer(
             "Received command ${command.command} for device: ${command.deviceId}, with correlation id: ${command.correlationId}"
         }
 
-        // reject command if unknown or if newer same command exists
-        val reasonForRejection = commandService.shouldBeRejected(command)
-        if (reasonForRejection.isPresent) {
+        // reject command if unknown, if newer same command exists or if same command is already in progress
+        commandService.reasonForRejection(command)?.let { reason ->
             logger.warn {
-                "Command ${command.command} for device ${command.deviceId} is rejected. Reason: $reasonForRejection"
+                "Command ${command.command} for device ${command.deviceId} is rejected. Reason: $reason"
             }
-            sendRejectionFeedback(reasonForRejection.get(), command)
+            sendRejectionFeedback(reason, command)
             return
         }
 
