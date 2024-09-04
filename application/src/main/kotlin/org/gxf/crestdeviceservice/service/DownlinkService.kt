@@ -27,7 +27,6 @@ class DownlinkService(
     }
 
     private val logger = KotlinLogging.logger {}
-    var downlinkCumulative = ""
 
     @Transactional
     @Throws(NoExistingPskException::class)
@@ -53,21 +52,19 @@ class DownlinkService(
             "Device $deviceId has pending commands of types: ${printableCommandTypes(pendingCommands)}."
         }
 
+        val downlink = Downlink(messageProperties.maxBytes)
+
         val commandsToSend =
             pendingCommands.filter { command ->
-                fitsInMaxMessageSize(getDownlinkPerCommand(command))
+                downlink.addIfItFits(getDownlinkPerCommand(command))
             }
-        downlinkCumulative = ""
 
         logger.info { "Commands that will be sent: ${printableCommandTypes(commandsToSend)}." }
-
-        val downlink =
-            commandsToSend.joinToString(";") { command -> getDownlinkPerCommand(command) }
-
         commandsToSend.forEach { command -> setCommandInProgress(command) }
 
-        logger.debug { "Downlink that will be sent: $downlink" }
-        return downlink
+        val completeDownlink = downlink.downlink
+        logger.debug { "Downlink that will be sent: $completeDownlink" }
+        return completeDownlink
     }
 
     private fun printableCommandTypes(commands: List<Command>) =
@@ -80,27 +77,6 @@ class DownlinkService(
             pskService.setPskToPendingForDevice(deviceId)
         }
         commandService.saveCommandWithNewStatus(command, Command.CommandStatus.IN_PROGRESS)
-    }
-
-    fun fitsInMaxMessageSize(downlinkToAdd: String): Boolean {
-        val currentSize = downlinkCumulative.length
-
-        val newCumulative =
-            if (downlinkCumulative.isEmpty()) {
-                downlinkToAdd
-            } else {
-                downlinkCumulative.plus(";$downlinkToAdd")
-            }
-        val newSize = newCumulative.length
-        logger.debug {
-            "Trying to add a downlink '$downlinkToAdd' to existing downlink '$downlinkCumulative'. " +
-                "Current downlink size: $currentSize. Downlink size after after adding: $newSize."
-        }
-        if (newSize <= messageProperties.maxBytes) {
-            downlinkCumulative = newCumulative
-            return true
-        }
-        return false
     }
 
     private fun getDownlinkPerCommand(command: Command): String {
