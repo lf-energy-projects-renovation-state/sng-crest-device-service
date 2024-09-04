@@ -41,6 +41,6 @@ data class Command(
         IN_PROGRESS,
         SUCCESSFUL,
         ERROR,
-        CANCELED
+        CANCELLED
     }
 }

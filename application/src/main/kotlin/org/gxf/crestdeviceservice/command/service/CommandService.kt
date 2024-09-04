@@ -41,7 +41,7 @@ class CommandService(private val commandRepository: CommandRepository) {
         return null
     }
 
-    fun existingCommandToBeCanceled(command: ExternalCommand): Command? {
+    fun existingCommandToBeCancelled(command: ExternalCommand): Command? {
         val translatedCommand = translateCommand(command.command)
         val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
 

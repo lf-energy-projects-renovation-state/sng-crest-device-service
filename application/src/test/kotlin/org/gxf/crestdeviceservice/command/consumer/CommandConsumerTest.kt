@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.consumer
+package org.gxf.crestdeviceservice.command.consumer
 
 import com.alliander.sng.CommandStatus
 import org.gxf.crestdeviceservice.TestHelper
-import org.gxf.crestdeviceservice.command.consumer.CommandConsumer
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -30,7 +29,7 @@ class CommandConsumerTest {
     @Test
     fun commandSaved() {
         whenever(commandService.reasonForRejection(externalCommand)).thenReturn(null)
-        whenever(commandService.existingCommandToBeCanceled(externalCommand)).thenReturn(null)
+        whenever(commandService.existingCommandToBeCancelled(externalCommand)).thenReturn(null)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
@@ -46,23 +45,23 @@ class CommandConsumerTest {
         verify(commandFeedbackService)
             .sendFeedback(eq(externalCommand), eq(CommandStatus.Rejected), any<String>())
         verify(commandService, times(0))
-            .existingCommandToBeCanceled(any<com.alliander.sng.Command>())
+            .existingCommandToBeCancelled(any<com.alliander.sng.Command>())
         verify(commandService, times(0))
             .saveExternalCommandAsPending(any<com.alliander.sng.Command>())
     }
 
     @Test
-    fun existingCommandCanceled() {
+    fun existingCommandCancelled() {
         val existingPendingCommand = TestHelper.pendingRebootCommand()
 
         whenever(commandService.reasonForRejection(externalCommand)).thenReturn(null)
-        whenever(commandService.existingCommandToBeCanceled(externalCommand))
+        whenever(commandService.existingCommandToBeCancelled(externalCommand))
             .thenReturn(existingPendingCommand)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
         verify(commandService)
-            .saveCommandWithNewStatus(existingPendingCommand, Command.CommandStatus.CANCELED)
+            .saveCommandWithNewStatus(existingPendingCommand, Command.CommandStatus.CANCELLED)
         verify(commandService).saveExternalCommandAsPending(externalCommand)
     }
 }

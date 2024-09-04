@@ -68,7 +68,7 @@ class CommandServiceTest {
     }
 
     @Test
-    fun `Check if existing pending same command is canceled if it exists`() {
+    fun `Check if existing pending same command is cancelled if it exists`() {
         val existingPendingCommand = pendingRebootCommand()
         val newCommand = receivedRebootCommand()
         whenever(
@@ -76,21 +76,21 @@ class CommandServiceTest {
                     any(), any()))
             .thenReturn(existingPendingCommand)
 
-        val commandToBeCanceled = commandService.existingCommandToBeCanceled(newCommand)
+        val commandToBeCancelled = commandService.existingCommandToBeCancelled(newCommand)
 
-        assertThat(commandToBeCanceled).isEqualTo(existingPendingCommand)
+        assertThat(commandToBeCancelled).isEqualTo(existingPendingCommand)
     }
 
     @Test
-    fun `Check if no command is canceled if no existing same pending command exists`() {
+    fun `Check if no command is cancelled if no existing same pending command exists`() {
         val newCommand = receivedRebootCommand()
         whenever(
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))
             .thenReturn(null)
 
-        val commandToBeCanceled = commandService.existingCommandToBeCanceled(newCommand)
+        val commandToBeCancelled = commandService.existingCommandToBeCancelled(newCommand)
 
-        assertThat(commandToBeCanceled).isNull()
+        assertThat(commandToBeCancelled).isNull()
     }
 }

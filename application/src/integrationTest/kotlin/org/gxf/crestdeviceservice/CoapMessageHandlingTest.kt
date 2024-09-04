@@ -260,7 +260,7 @@ class CoapMessageHandlingTest {
 
         assertThat(result.body).isEqualTo("0")
 
-        // check if reboot command is in database with status IN_PROGRESS
+        // check if reboot command is in database with status SUCCESSFUL
         Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(

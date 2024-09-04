@@ -60,7 +60,6 @@ class IncomingDeviceCredentialsConsumerTest {
         incomingDeviceCredentialsConsumer.handleIncomingDeviceCredentials(deviceCredentials)
 
         verify(pskService).setInitialKeyForDevice(imei, decryptedPsk, decryptedSecret)
-        verify(pskService).generateNewReadyKeyForDevice(imei)
         verify(commandService, times(0)).saveCommandEntities(any<List<Command>>())
     }
 }

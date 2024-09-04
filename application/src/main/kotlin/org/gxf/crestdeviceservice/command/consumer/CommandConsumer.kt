@@ -41,9 +41,9 @@ class CommandConsumer(
         commandFeedbackService.sendFeedback(command, CommandStatus.Received, "Command received")
 
         // if a same command is already pending, cancel the existing pending command
-        val commandToBeCanceled = commandService.existingCommandToBeCanceled(command)
-        if (commandToBeCanceled != null) {
-            cancelExistingCommand(command, commandToBeCanceled)
+        val commandToBeCancelled = commandService.existingCommandToBeCancelled(command)
+        if (commandToBeCancelled != null) {
+            cancelExistingCommand(command, commandToBeCancelled)
         }
 
         if (isPskCommand(command)) {
@@ -61,13 +61,14 @@ class CommandConsumer(
     private fun isPskCommand(command: com.alliander.sng.Command) =
         command.command.lowercase().contains("psk")
 
-    private fun cancelExistingCommand(command: ExternalCommand, commandToBeCanceled: Command) {
+    private fun cancelExistingCommand(command: ExternalCommand, commandToBeCancelled: Command) {
         logger.warn {
-            "Device ${command.deviceId} already has a pending command of type ${commandToBeCanceled.type}. The first command will be canceled."
+            "Device ${command.deviceId} already has a pending command of type ${commandToBeCancelled.type}. The first command will be cancelled."
         }
         val message =
-            "Command canceled by newer same command with correlation id: ${command.correlationId}"
-        commandFeedbackService.sendFeedback(commandToBeCanceled, CommandStatus.Cancelled, message)
-        commandService.saveCommandWithNewStatus(commandToBeCanceled, Command.CommandStatus.CANCELED)
+            "Command cancelled by newer same command with correlation id: ${command.correlationId}"
+        commandFeedbackService.sendFeedback(commandToBeCancelled, CommandStatus.Cancelled, message)
+        commandService.saveCommandWithNewStatus(
+            commandToBeCancelled, Command.CommandStatus.CANCELLED)
     }
 }
