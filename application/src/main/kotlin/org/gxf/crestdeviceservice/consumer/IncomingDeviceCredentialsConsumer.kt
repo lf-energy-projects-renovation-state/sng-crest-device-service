@@ -36,8 +36,8 @@ class IncomingDeviceCredentialsConsumer(
         try {
             setInitialKey(deviceCredentials, deviceId)
 
-            pskService.generateNewReadyKeyForDevice(deviceId)
             if (pskService.changeInitialPsk()) {
+                pskService.generateNewReadyKeyForDevice(deviceId)
                 preparePskCommands(deviceId)
             }
         } catch (e: Exception) {
