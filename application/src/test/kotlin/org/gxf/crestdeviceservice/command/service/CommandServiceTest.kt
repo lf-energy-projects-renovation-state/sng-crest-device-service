@@ -56,7 +56,7 @@ class CommandServiceTest {
     }
 
     @Test
-    fun `Check if command is rejected when  same command is in progress`() {
+    fun `Check if command is rejected when same command is in progress`() {
         whenever(
                 commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
                     any(), any(), any()))
