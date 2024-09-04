@@ -5,9 +5,8 @@ package org.gxf.crestdeviceservice.command.service
 
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
-import org.gxf.crestdeviceservice.TestHelper.pendingRebootCommand
-import org.gxf.crestdeviceservice.TestHelper.rebootCommandInProgress
-import org.gxf.crestdeviceservice.TestHelper.receivedRebootCommand
+import org.gxf.crestdeviceservice.CommandFactory
+import org.gxf.crestdeviceservice.ExternalCommandFactory.externalRebootCommand
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.junit.jupiter.api.Test
@@ -25,9 +24,9 @@ class CommandServiceTest {
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))
             .thenReturn(
-                pendingRebootCommand().copy(timestampIssued = Instant.now().minusSeconds(100)))
+                CommandFactory.pendingRebootCommand().copy(timestampIssued = Instant.now().minusSeconds(100)))
 
-        val result = commandService.reasonForRejection(receivedRebootCommand())
+        val result = commandService.reasonForRejection(externalRebootCommand())
         assertThat(result).isNull()
     }
 
@@ -36,9 +35,9 @@ class CommandServiceTest {
         whenever(
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))
-            .thenReturn(pendingRebootCommand().copy(status = Command.CommandStatus.PENDING))
+            .thenReturn(CommandFactory.pendingRebootCommand().copy(status = Command.CommandStatus.PENDING))
 
-        val command = receivedRebootCommand()
+        val command = externalRebootCommand()
         command.command = "UNKNOWN"
         val result = commandService.reasonForRejection(command)
         assertThat(result).isNotNull()
@@ -50,9 +49,9 @@ class CommandServiceTest {
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))
             .thenReturn(
-                pendingRebootCommand().copy(timestampIssued = Instant.now().plusSeconds(100)))
+                CommandFactory.pendingRebootCommand().copy(timestampIssued = Instant.now().plusSeconds(100)))
 
-        val result = commandService.reasonForRejection(receivedRebootCommand())
+        val result = commandService.reasonForRejection(externalRebootCommand())
         assertThat(result).isNotNull()
     }
 
@@ -61,16 +60,16 @@ class CommandServiceTest {
         whenever(
                 commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
                     any(), any(), any()))
-            .thenReturn(listOf(rebootCommandInProgress()))
+            .thenReturn(listOf(CommandFactory.rebootCommandInProgress()))
 
-        val result = commandService.reasonForRejection(receivedRebootCommand())
+        val result = commandService.reasonForRejection(externalRebootCommand())
         assertThat(result).isNotNull()
     }
 
     @Test
     fun `Check if existing pending same command is cancelled if it exists`() {
-        val existingPendingCommand = pendingRebootCommand()
-        val newCommand = receivedRebootCommand()
+        val existingPendingCommand = CommandFactory.pendingRebootCommand()
+        val newCommand = externalRebootCommand()
         whenever(
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))
@@ -83,7 +82,7 @@ class CommandServiceTest {
 
     @Test
     fun `Check if no command is cancelled if no existing same pending command exists`() {
-        val newCommand = receivedRebootCommand()
+        val newCommand = externalRebootCommand()
         whenever(
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))

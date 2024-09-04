@@ -5,6 +5,7 @@ package org.gxf.crestdeviceservice.service
 
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
+import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -36,8 +37,8 @@ class DownlinkServiceTest {
         val pskPending =
             PreSharedKey(
                 deviceId, 1, Instant.now(), expectedKey, "secret", PreSharedKeyStatus.PENDING)
-        val pskCommandPending = TestHelper.pendingPskCommand()
-        val pskSetCommandPending = TestHelper.pendingPskSetCommand()
+        val pskCommandPending = CommandFactory.pendingPskCommand()
+        val pskSetCommandPending = CommandFactory.pendingPskSetCommand()
         val pskCommandsPending = listOf(pskCommandPending, pskSetCommandPending)
         val pskCommandInProgress =
             pskCommandPending.copy(status = Command.CommandStatus.IN_PROGRESS)
@@ -67,7 +68,7 @@ class DownlinkServiceTest {
 
     @Test
     fun shouldSendPendingCommandsIfNoCommandInProgress() {
-        val rebootCommand = TestHelper.pendingRebootCommand()
+        val rebootCommand = CommandFactory.pendingRebootCommand()
         val pendingCommands = listOf(rebootCommand)
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(false)
         whenever(commandService.getAllPendingCommandsForDevice(deviceId))
@@ -89,7 +90,7 @@ class DownlinkServiceTest {
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(false)
         whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(listOf())
         whenever(commandService.getFirstCommandInProgressForDevice(deviceId))
-            .thenReturn(TestHelper.rebootCommandInProgress())
+            .thenReturn(CommandFactory.rebootCommandInProgress())
 
         val result = downlinkService.getDownlinkForDevice(deviceId, message)
 

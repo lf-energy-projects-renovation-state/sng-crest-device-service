@@ -14,7 +14,7 @@ object CommandFeedbackMapper {
         command: ExternalCommand,
         status: ExternalCommandStatus,
         message: String
-    ) =
+    ): CommandFeedback =
         CommandFeedback.newBuilder()
             .setDeviceId(command.deviceId)
             .setCorrelationId(command.correlationId)
@@ -27,7 +27,7 @@ object CommandFeedbackMapper {
         command: Command,
         status: ExternalCommandStatus,
         message: String
-    ) =
+    ): CommandFeedback =
         CommandFeedback.newBuilder()
             .setDeviceId(command.deviceId)
             .setCorrelationId(command.correlationId)

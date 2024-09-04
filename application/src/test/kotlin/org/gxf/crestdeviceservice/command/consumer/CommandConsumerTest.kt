@@ -4,15 +4,19 @@
 package org.gxf.crestdeviceservice.command.consumer
 
 import com.alliander.sng.CommandStatus
-import org.gxf.crestdeviceservice.TestHelper
+import org.gxf.crestdeviceservice.CommandFactory
+import org.gxf.crestdeviceservice.ExternalCommandFactory
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.externalCommandToCommandFeedback
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.cmpEq
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.refEq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -24,7 +28,7 @@ class CommandConsumerTest {
     private val commandConsumer =
         CommandConsumer(commandService, commandFeedbackService, pskService)
 
-    private val externalCommand = TestHelper.receivedRebootCommand()
+    private val externalCommand = ExternalCommandFactory.externalRebootCommand()
 
     @Test
     fun commandSaved() {
@@ -38,12 +42,14 @@ class CommandConsumerTest {
 
     @Test
     fun commandRejected() {
-        whenever(commandService.reasonForRejection(externalCommand)).thenReturn("rejected")
+        val reason = "Because reasons"
+        val commandFeedback = externalCommandToCommandFeedback(externalCommand, CommandStatus.Rejected, reason)
+            whenever(commandService.reasonForRejection(externalCommand)).thenReturn(reason)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
         verify(commandFeedbackService)
-            .sendFeedback(eq(externalCommand), eq(CommandStatus.Rejected), any<String>())
+            .sendFeedback(refEq(commandFeedback, "timestampStatus"))
         verify(commandService, times(0))
             .existingCommandToBeCancelled(any<com.alliander.sng.Command>())
         verify(commandService, times(0))
@@ -52,7 +58,7 @@ class CommandConsumerTest {
 
     @Test
     fun existingCommandCancelled() {
-        val existingPendingCommand = TestHelper.pendingRebootCommand()
+        val existingPendingCommand = CommandFactory.pendingRebootCommand()
 
         whenever(commandService.reasonForRejection(externalCommand)).thenReturn(null)
         whenever(commandService.existingCommandToBeCancelled(externalCommand))

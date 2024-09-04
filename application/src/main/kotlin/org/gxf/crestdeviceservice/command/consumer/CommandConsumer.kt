@@ -7,6 +7,8 @@ import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandStatus
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.commandEntityToCommandFeedback
+import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.externalCommandToCommandFeedback
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -38,7 +40,8 @@ class CommandConsumer(
             return
         }
 
-        commandFeedbackService.sendFeedback(command, CommandStatus.Received, "Command received")
+        val commandFeedback = externalCommandToCommandFeedback(command, CommandStatus.Received, "Command received")
+        commandFeedbackService.sendFeedback(commandFeedback)
 
         // if a same command is already pending, cancel the existing pending command
         val commandToBeCancelled = commandService.existingCommandToBeCancelled(command)
@@ -55,7 +58,8 @@ class CommandConsumer(
 
     private fun sendRejectionFeedback(reason: String, command: ExternalCommand) {
         logger.info { "Rejecting command for device id: ${command.deviceId}, with reason: $reason" }
-        commandFeedbackService.sendFeedback(command, CommandStatus.Rejected, reason)
+        val commandFeedback = externalCommandToCommandFeedback(command, CommandStatus.Rejected, reason)
+            commandFeedbackService.sendFeedback(commandFeedback)
     }
 
     private fun isPskCommand(command: com.alliander.sng.Command) =
@@ -67,7 +71,8 @@ class CommandConsumer(
         }
         val message =
             "Command cancelled by newer same command with correlation id: ${command.correlationId}"
-        commandFeedbackService.sendFeedback(commandToBeCancelled, CommandStatus.Cancelled, message)
+        val commandFeedback = commandEntityToCommandFeedback(commandToBeCancelled, CommandStatus.Cancelled, message)
+        commandFeedbackService.sendFeedback(commandFeedback)
         commandService.saveCommandWithNewStatus(
             commandToBeCancelled, Command.CommandStatus.CANCELLED)
     }

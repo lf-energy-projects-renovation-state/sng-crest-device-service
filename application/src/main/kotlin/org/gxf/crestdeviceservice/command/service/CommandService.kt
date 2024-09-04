@@ -19,7 +19,7 @@ class CommandService(private val commandRepository: CommandRepository) {
     /**
      * Check if the incoming command should be rejected.
      *
-     * @return An optional string with the reason for rejection, or empty if the command should be
+     * @return A string with the reason for rejection, or null if the command should be
      *   accepted.
      */
     fun reasonForRejection(command: ExternalCommand): String? {

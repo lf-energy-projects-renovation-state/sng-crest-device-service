@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
 
+import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -11,9 +12,11 @@ import com.fasterxml.jackson.databind.node.BaseJsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import org.gxf.crestdeviceservice.CommandFactory
 import java.util.stream.Stream
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -52,7 +55,7 @@ class UrcServiceTest {
                 listOf("PSK:DLER", "PSK:EQER"))
 
         @JvmStatic
-        private fun notContainingPSKUrcs() =
+        private fun notContainingPskUrcs() =
             Stream.of(
                 listOf("INIT"),
                 listOf("ENPD"),
@@ -68,7 +71,7 @@ class UrcServiceTest {
     @Test
     fun shouldChangeActiveKeyWhenSuccessURCReceived() {
         val urcs = listOf("PSK:TMP", "PSK:SET")
-        val pskCommands = TestHelper.pendingPskCommands()
+        val pskCommands = CommandFactory.pendingPskCommands()
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(pskCommands)
@@ -82,8 +85,8 @@ class UrcServiceTest {
     @ParameterizedTest(name = "should set pending key as invalid for {0}")
     @MethodSource("containingPskErrorUrcs")
     fun shouldSetPendingKeyAsInvalidWhenPskFailureURCReceived(urcs: List<String>) {
-        val pskCommandInProgress = TestHelper.pskCommandInProgress()
-        val pskSetCommandInProgress = TestHelper.pskSetCommandInProgress()
+        val pskCommandInProgress = CommandFactory.pskCommandInProgress()
+        val pskSetCommandInProgress = CommandFactory.pskSetCommandInProgress()
         val pskCommandError = pskCommandInProgress.copy(status = Command.CommandStatus.ERROR)
         val pskSetCommandError = pskSetCommandInProgress.copy(status = Command.CommandStatus.ERROR)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
@@ -105,13 +108,13 @@ class UrcServiceTest {
         verify(commandService, times(2))
             .saveCommandWithNewStatus(any<Command>(), eq(Command.CommandStatus.ERROR))
         verify(commandFeedbackService, times(2))
-            .sendFeedback(any<Command>(), eq(CommandStatus.Error), any<String>())
+            .sendFeedback(any<CommandFeedback>())
     }
 
     @ParameterizedTest(name = "should not set pending key as invalid for {0}")
-    @MethodSource("notContainingPSKUrcs")
+    @MethodSource("notContainingPskUrcs")
     fun shouldNotSetPendingKeyAsInvalidWhenOtherURCReceived(urcs: List<String>) {
-        val pskCommands = TestHelper.pskCommandsInProgress()
+        val pskCommands = CommandFactory.pskCommandsInProgress()
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(pskCommands)
@@ -125,9 +128,10 @@ class UrcServiceTest {
     @Test
     fun handleSuccessUrcForRebootCommand() {
         val urcs = listOf("INIT", "WDR")
-        val commandInProgress = TestHelper.rebootCommandInProgress()
+        val commandInProgress = CommandFactory.rebootCommandInProgress()
         val commandSuccessful = commandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
+        val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(commandSuccessful, CommandStatus.Successful, "Command handled successfully")
 
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
@@ -142,13 +146,13 @@ class UrcServiceTest {
         verify(commandService)
             .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
         verify(commandFeedbackService)
-            .sendFeedback(eq(commandSuccessful), eq(CommandStatus.Successful), any<String>())
+            .sendFeedback(commandFeedback)
     }
 
     @Test
     fun shouldDoNothingIfUrcDoesNotConcernCommandInProgress() {
         val urcs = listOf("ENPD")
-        val commandInProgress = TestHelper.rebootCommandInProgress()
+        val commandInProgress = CommandFactory.rebootCommandInProgress()
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
@@ -159,7 +163,7 @@ class UrcServiceTest {
 
         verify(commandService, times(0)).saveCommandEntities(any<List<Command>>())
         verify(commandFeedbackService, times(0))
-            .sendFeedback(any<Command>(), any<CommandStatus>(), any<String>())
+            .sendFeedback(any<CommandFeedback>())
     }
 
     private fun updateUrcInMessage(urcs: List<String>, downlink: String): JsonNode {

@@ -9,6 +9,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
 import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
+import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.messageFromCode
@@ -73,7 +74,7 @@ class UrcService(
         downlink: String,
         commandInProgress: Command
     ): Boolean {
-        // do not treat PSK SET downlink as PSK command
+        // do not treat PSK_SET downlink as PSK command
         if (commandInProgress.type == Command.CommandType.PSK && downlink.contains("SET")) {
             return false
         } else {
@@ -114,13 +115,8 @@ class UrcService(
             "Command ${command.type} failed for device with id ${command.deviceId}. Error(s): $errorMessages."
         }
 
-        val commandWithErrorStatus =
-            commandService.saveCommandWithNewStatus(command, CommandStatus.ERROR)
-
-        commandFeedbackService.sendFeedback(
-            commandWithErrorStatus,
-            ExternalCommandStatus.Error,
-            "Command failed. Error(s): $errorMessages.")
+        val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(command, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
+        commandFeedbackService.sendFeedback(commandFeedback)
     }
 
     private fun handlePskErrors(deviceId: String) {
@@ -142,8 +138,8 @@ class UrcService(
         val successfulCommand =
             commandService.saveCommandWithNewStatus(command, CommandStatus.SUCCESSFUL)
 
-        commandFeedbackService.sendFeedback(
-            successfulCommand, ExternalCommandStatus.Successful, "Command handled successfully")
+        val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(successfulCommand, ExternalCommandStatus.Successful, "Command handled successfully")
+        commandFeedbackService.sendFeedback(commandFeedback)
     }
 
     private fun handlePskSetSuccess(command: Command) {

@@ -4,6 +4,8 @@
 package org.gxf.crestdeviceservice.command.mapper
 
 import org.assertj.core.api.Assertions.assertThat
+import org.gxf.crestdeviceservice.CommandFactory
+import org.gxf.crestdeviceservice.ExternalCommandFactory
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.junit.jupiter.api.Test
@@ -11,9 +13,9 @@ import org.junit.jupiter.api.Test
 class CommandMapperTest {
     @Test
     fun externalCommandToCommandEntity() {
-        val externalCommand = TestHelper.receivedRebootCommand()
+        val externalCommand = ExternalCommandFactory.externalRebootCommand()
         val status = Command.CommandStatus.PENDING
-        val expected = TestHelper.pendingRebootCommand()
+        val expected = CommandFactory.pendingRebootCommand()
 
         val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
 
