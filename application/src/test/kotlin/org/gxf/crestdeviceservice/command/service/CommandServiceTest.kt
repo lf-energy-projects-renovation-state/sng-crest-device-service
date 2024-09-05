@@ -26,7 +26,7 @@ class CommandServiceTest {
             .thenReturn(
                 CommandFactory.pendingRebootCommand().copy(timestampIssued = Instant.now().minusSeconds(100)))
 
-        val result = commandService.reasonForRejection(externalRebootCommand())
+        val result = commandService.validate(externalRebootCommand())
         assertThat(result).isNull()
     }
 
@@ -39,7 +39,7 @@ class CommandServiceTest {
 
         val command = externalRebootCommand()
         command.command = "UNKNOWN"
-        val result = commandService.reasonForRejection(command)
+        val result = commandService.validate(command)
         assertThat(result).isNotNull()
     }
 
@@ -51,7 +51,7 @@ class CommandServiceTest {
             .thenReturn(
                 CommandFactory.pendingRebootCommand().copy(timestampIssued = Instant.now().plusSeconds(100)))
 
-        val result = commandService.reasonForRejection(externalRebootCommand())
+        val result = commandService.validate(externalRebootCommand())
         assertThat(result).isNotNull()
     }
 
@@ -62,7 +62,7 @@ class CommandServiceTest {
                     any(), any(), any()))
             .thenReturn(listOf(CommandFactory.rebootCommandInProgress()))
 
-        val result = commandService.reasonForRejection(externalRebootCommand())
+        val result = commandService.validate(externalRebootCommand())
         assertThat(result).isNotNull()
     }
 

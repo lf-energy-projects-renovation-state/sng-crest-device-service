@@ -10,8 +10,8 @@ import java.time.Instant
 import org.gxf.crestdeviceservice.command.entity.Command
 
 object CommandFeedbackMapper {
-    fun externalCommandToCommandFeedback(
-        command: ExternalCommand,
+    fun commandEntityToCommandFeedback(
+        command: Command,
         status: ExternalCommandStatus,
         message: String
     ): CommandFeedback =
@@ -23,8 +23,8 @@ object CommandFeedbackMapper {
             .setMessage(message)
             .build()
 
-    fun commandEntityToCommandFeedback(
-        command: Command,
+    fun externalCommandToCommandFeedback(
+        command: ExternalCommand,
         status: ExternalCommandStatus,
         message: String
     ): CommandFeedback =

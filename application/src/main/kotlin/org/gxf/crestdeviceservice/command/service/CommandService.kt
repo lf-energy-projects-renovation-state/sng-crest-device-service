@@ -3,49 +3,33 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
 
-import com.alliander.sng.Command as ExternalCommand
-import java.time.Instant
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
-import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
-import org.gxf.crestdeviceservice.command.mapper.CommandMapper.externalCommandToCommandEntity
-import org.gxf.crestdeviceservice.command.mapper.CommandMapper.translateCommand
+import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.util.UUID
 
 @Service
-class CommandService(private val commandRepository: CommandRepository) {
-    private val knownCommands = Command.CommandType.entries.map { it.name }
+class CommandService(
+    private val commandRepository: CommandRepository,
+    private val commandFeedbackService: CommandFeedbackService
+) {
+    private val logger = KotlinLogging.logger {}
 
     /**
-     * Check if the incoming command should be rejected.
-     *
-     * @return A string with the reason for rejection, or null if the command should be
-     *   accepted.
+     * Validate the Command.
+     * @throws CommandValidationException if validation fails
      */
-    fun reasonForRejection(command: ExternalCommand): String? {
-        val translatedCommand = translateCommand(command.command)
-        if (translatedCommand !in knownCommands) {
-            return "Unknown command"
+    fun validate(command: Command) {
+        if (deviceHasNewerSameCommand(command.deviceId, command.type, command.timestampIssued)) {
+            throw CommandValidationException("There is a newer command of the same type")
         }
 
-        val deviceId = command.deviceId
-        val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
-        if (deviceHasNewerSameCommand(deviceId, commandType, command.timestamp)) {
-            return "There is a newer command of the same type"
+        if (deviceHasSameCommandAlreadyInProgress(command.deviceId, command.type)) {
+            throw CommandValidationException("A command of the same type is already in progress.")
         }
-
-        if (deviceHasSameCommandAlreadyInProgress(deviceId, commandType)) {
-            return "A command of the same type is already in progress."
-        }
-
-        return null
-    }
-
-    fun existingCommandToBeCancelled(command: ExternalCommand): Command? {
-        val translatedCommand = translateCommand(command.command)
-        val commandType: Command.CommandType = Command.CommandType.valueOf(translatedCommand)
-
-        return sameCommandForDeviceAlreadyPending(command.deviceId, commandType)
     }
 
     /**
@@ -70,49 +54,70 @@ class CommandService(private val commandRepository: CommandRepository) {
     ) =
         commandRepository
             .findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
-                deviceId, commandType, CommandStatus.IN_PROGRESS)
+                deviceId, commandType, Command.CommandStatus.IN_PROGRESS)
             .isNotEmpty()
 
     private fun latestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
         commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
             deviceId, commandType)
 
-    private fun sameCommandForDeviceAlreadyPending(
-        deviceId: String,
-        commandType: Command.CommandType
-    ): Command? {
-        val latestCommandInDatabase = latestCommandInDatabase(deviceId, commandType) ?: return null
+    fun cancelOlderCommandIfNecessary(pendingCommand: Command) {
+        sameCommandForDeviceAlreadyPending(pendingCommand)
+            ?.let { commandToBeCancelled ->
+                {
+                    logger.warn {
+                        "Device ${commandToBeCancelled.deviceId} already has a pending command of type ${commandToBeCancelled.type}. The first command will be cancelled."
+                    }
+                    cancelExistingCommand(
+                        pendingCommand.correlationId,
+                        commandToBeCancelled
+                    )
+                }
+            }
+    }
 
-        // The latest command is pending
-        if (latestCommandInDatabase.status == CommandStatus.PENDING) {
+    fun sameCommandForDeviceAlreadyPending(
+        command: Command
+    ): Command? {
+        val latestCommandInDatabase = latestCommandInDatabase(command.deviceId, command.type) ?: return null
+
+        if (latestCommandInDatabase.status == Command.CommandStatus.PENDING) {
             return latestCommandInDatabase
         }
 
         return null
     }
 
+    fun cancelExistingCommand(newCorrelationId: UUID, commandToBeCancelled: Command) {
+        val message =
+            "Command cancelled by newer same command with correlation id: $newCorrelationId"
+        commandFeedbackService.sendCancellationFeedback(commandToBeCancelled, message)
+        saveCommandWithNewStatus(commandToBeCancelled, Command.CommandStatus.CANCELLED)
+    }
+
+    fun isPskCommand(command: Command) =
+        command.type == Command.CommandType.PSK || command.type == Command.CommandType.PSK_SET
+
     fun getFirstCommandInProgressForDevice(deviceId: String) =
         commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-            deviceId, CommandStatus.IN_PROGRESS)
+            deviceId, Command.CommandStatus.IN_PROGRESS)
 
     fun getAllPendingCommandsForDevice(deviceId: String) =
         commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-            deviceId, CommandStatus.PENDING)
+            deviceId, Command.CommandStatus.PENDING)
 
     fun getAllCommandsInProgressForDevice(deviceId: String) =
         commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-            deviceId, CommandStatus.IN_PROGRESS)
+            deviceId, Command.CommandStatus.IN_PROGRESS)
 
-    fun saveExternalCommandAsPending(incomingCommand: ExternalCommand) {
-        val commandEntity = externalCommandToCommandEntity(incomingCommand, CommandStatus.PENDING)
-
-        commandRepository.save(commandEntity)
+    fun save(command: Command) {
+        commandRepository.save(command)
     }
 
     fun saveCommandEntities(commands: List<Command>): MutableIterable<Command> =
         commandRepository.saveAll(commands)
 
-    fun saveCommandWithNewStatus(command: Command, status: CommandStatus): Command {
+    fun saveCommandWithNewStatus(command: Command, status: Command.CommandStatus): Command {
         command.status = status
         return commandRepository.save(command)
     }

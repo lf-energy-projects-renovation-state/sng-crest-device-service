@@ -3,17 +3,18 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.consumer
 
-import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandStatus
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
-import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.commandEntityToCommandFeedback
-import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.externalCommandToCommandFeedback
+import org.gxf.crestdeviceservice.command.exception.CommandValidationException
+import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
+import org.gxf.crestdeviceservice.command.mapper.CommandMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
+import com.alliander.sng.Command as ExternalCommand
 
 @Service
 class CommandConsumer(
@@ -25,55 +26,33 @@ class CommandConsumer(
 
     @KafkaListener(
         id = "command", idIsGroup = false, topics = ["\${kafka.consumers.command.topic}"])
-    fun handleIncomingCommand(command: ExternalCommand) {
+    fun handleIncomingCommand(externalCommand: ExternalCommand) {
         logger.info {
-            "Received command ${command.command} for device: ${command.deviceId}, with correlation id: ${command.correlationId}"
+            "Received command ${externalCommand.command} for device: ${externalCommand.deviceId}, with correlation id: ${externalCommand.correlationId}"
         }
+        try {
+            val pendingCommand = CommandMapper.externalCommandToCommandEntity(externalCommand, Command.CommandStatus.PENDING)
 
-        // reject command if unknown, if newer same command exists or if same command is already in
-        // progress
-        commandService.reasonForRejection(command)?.let { reason ->
-            logger.warn {
-                "Command ${command.command} for device ${command.deviceId} is rejected. Reason: $reason"
+            commandService.validate(pendingCommand)
+            commandFeedbackService.sendReceivedFeedback(pendingCommand)
+            commandService.cancelOlderCommandIfNecessary(pendingCommand)
+
+            if (commandService.isPskCommand(pendingCommand)) {
+                pskService.generateNewReadyKeyForDevice(externalCommand.deviceId)
             }
-            sendRejectionFeedback(reason, command)
-            return
+
+            commandService.save(pendingCommand)
+        } catch (exception: CommandValidationException) {
+            val reason = exception.message?:""
+            logger.warn {
+                "Command ${externalCommand.command} for device ${externalCommand.deviceId} is rejected. Reason: $reason"
+            }
+            sendRejectionFeedback(reason, externalCommand)
         }
-
-        val commandFeedback = externalCommandToCommandFeedback(command, CommandStatus.Received, "Command received")
-        commandFeedbackService.sendFeedback(commandFeedback)
-
-        // if a same command is already pending, cancel the existing pending command
-        val commandToBeCancelled = commandService.existingCommandToBeCancelled(command)
-        if (commandToBeCancelled != null) {
-            cancelExistingCommand(command, commandToBeCancelled)
-        }
-
-        if (isPskCommand(command)) {
-            pskService.generateNewReadyKeyForDevice(command.deviceId)
-        }
-
-        commandService.saveExternalCommandAsPending(command)
     }
 
-    private fun sendRejectionFeedback(reason: String, command: ExternalCommand) {
-        logger.info { "Rejecting command for device id: ${command.deviceId}, with reason: $reason" }
-        val commandFeedback = externalCommandToCommandFeedback(command, CommandStatus.Rejected, reason)
-            commandFeedbackService.sendFeedback(commandFeedback)
-    }
-
-    private fun isPskCommand(command: com.alliander.sng.Command) =
-        command.command.lowercase().contains("psk")
-
-    private fun cancelExistingCommand(command: ExternalCommand, commandToBeCancelled: Command) {
-        logger.warn {
-            "Device ${command.deviceId} already has a pending command of type ${commandToBeCancelled.type}. The first command will be cancelled."
-        }
-        val message =
-            "Command cancelled by newer same command with correlation id: ${command.correlationId}"
-        val commandFeedback = commandEntityToCommandFeedback(commandToBeCancelled, CommandStatus.Cancelled, message)
+    fun sendRejectionFeedback(reason: String, command: ExternalCommand) {
+        val commandFeedback = CommandFeedbackMapper.externalCommandToCommandFeedback(command, CommandStatus.Rejected, reason)
         commandFeedbackService.sendFeedback(commandFeedback)
-        commandService.saveCommandWithNewStatus(
-            commandToBeCancelled, Command.CommandStatus.CANCELLED)
     }
 }

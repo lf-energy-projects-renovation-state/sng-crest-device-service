@@ -13,8 +13,6 @@ import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.cmpEq
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.refEq
 import org.mockito.kotlin.times
@@ -32,7 +30,7 @@ class CommandConsumerTest {
 
     @Test
     fun commandSaved() {
-        whenever(commandService.reasonForRejection(externalCommand)).thenReturn(null)
+        whenever(commandService.validate(externalCommand)).thenReturn(null)
         whenever(commandService.existingCommandToBeCancelled(externalCommand)).thenReturn(null)
 
         commandConsumer.handleIncomingCommand(externalCommand)
@@ -44,7 +42,7 @@ class CommandConsumerTest {
     fun commandRejected() {
         val reason = "Because reasons"
         val commandFeedback = externalCommandToCommandFeedback(externalCommand, CommandStatus.Rejected, reason)
-            whenever(commandService.reasonForRejection(externalCommand)).thenReturn(reason)
+            whenever(commandService.validate(externalCommand)).thenReturn(reason)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
@@ -60,7 +58,7 @@ class CommandConsumerTest {
     fun existingCommandCancelled() {
         val existingPendingCommand = CommandFactory.pendingRebootCommand()
 
-        whenever(commandService.reasonForRejection(externalCommand)).thenReturn(null)
+        whenever(commandService.validate(externalCommand)).thenReturn(null)
         whenever(commandService.existingCommandToBeCancelled(externalCommand))
             .thenReturn(existingPendingCommand)
 
