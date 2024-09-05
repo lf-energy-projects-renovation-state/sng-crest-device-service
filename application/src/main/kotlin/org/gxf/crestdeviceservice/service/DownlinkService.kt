@@ -42,10 +42,10 @@ class DownlinkService(
     private fun commandsToSend(pendingCommands: List<Command>) =
         pendingCommands.filter { command -> commandCanBeSent(command) }
 
-    // if command is psk_set and pending psk exists in repository
-    private fun commandCanBeSent(command: Command) =
-        command.type != Command.CommandType.PSK_SET ||
-            pskService.readyForPskSetCommand(command.deviceId)
+    private fun commandCanBeSent(command: Command) = when(command.type) {
+        Command.CommandType.PSK_SET -> pskService.readyForPskSetCommand(command.deviceId)
+        else -> true
+    }
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
         logger.info {
