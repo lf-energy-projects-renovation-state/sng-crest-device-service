@@ -23,7 +23,7 @@ class IncomingDeviceCredentialsConsumerTest {
         IncomingDeviceCredentialsConsumer(pskService, pskDecryptionService, commandService)
 
     @Test
-    fun handleIncomingDeviceCredentials() {
+    fun handleIncomingDeviceCredentialsChangeInitialPsk() {
         val imei = "imei"
         val psk = "encrypted-psk"
         val decryptedPsk = "psk"
@@ -44,7 +44,7 @@ class IncomingDeviceCredentialsConsumerTest {
     }
 
     @Test
-    fun noPskCommands() {
+    fun handleIncomingDeviceCredentialsWithoutChangingInitialPsk() {
         val imei = "imei"
         val psk = "encrypted-psk"
         val decryptedPsk = "psk"
@@ -60,6 +60,7 @@ class IncomingDeviceCredentialsConsumerTest {
         incomingDeviceCredentialsConsumer.handleIncomingDeviceCredentials(deviceCredentials)
 
         verify(pskService).setInitialKeyForDevice(imei, decryptedPsk, decryptedSecret)
+        verify(pskService, times(0)).generateNewReadyKeyForDevice(imei)
         verify(commandService, times(0)).saveCommandEntities(any<List<Command>>())
     }
 }
