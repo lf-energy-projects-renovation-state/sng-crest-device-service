@@ -47,12 +47,7 @@ class CommandConsumer(
             logger.warn {
                 "Command ${externalCommand.command} for device ${externalCommand.deviceId} is rejected. Reason: $reason"
             }
-            sendRejectionFeedback(reason, externalCommand)
+            commandFeedbackService.sendRejectionFeedback(reason, externalCommand)
         }
-    }
-
-    fun sendRejectionFeedback(reason: String, command: ExternalCommand) {
-        val commandFeedback = CommandFeedbackMapper.externalCommandToCommandFeedback(command, CommandStatus.Rejected, reason)
-        commandFeedbackService.sendFeedback(commandFeedback)
     }
 }
