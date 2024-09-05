@@ -16,7 +16,7 @@ data class Downlink(val maxSize: Int) {
 
         val newCumulative =
             if (downlink.isEmpty()) {
-                downlinkToAdd
+                "!$downlinkToAdd"
             } else {
                 downlink.plus(";$downlinkToAdd")
             }

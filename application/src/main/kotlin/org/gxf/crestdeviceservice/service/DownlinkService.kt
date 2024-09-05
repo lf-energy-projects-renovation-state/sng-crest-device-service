@@ -93,7 +93,7 @@ class DownlinkService(
             return createPskSetCommand(newKey)
         }
 
-        return "!${command.type.downlink}"
+        return command.type.downlink
     }
 
     private fun getCurrentReadyPsk(command: Command) =
@@ -103,7 +103,7 @@ class DownlinkService(
     fun createPskCommand(newPreSharedKey: PreSharedKey): String {
         val newKey = newPreSharedKey.preSharedKey
         val hash = DigestUtils.sha256Hex("${newPreSharedKey.secret}${newKey}")
-        return "!PSK:${newKey}:${hash}"
+        return "PSK:${newKey}:${hash}"
     }
 
     fun createPskSetCommand(newPreSharedKey: PreSharedKey): String {

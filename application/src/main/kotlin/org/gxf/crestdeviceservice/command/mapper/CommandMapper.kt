@@ -9,21 +9,22 @@ import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 
 object CommandMapper {
-    fun externalCommandToCommandEntity(command: ExternalCommand, status: Command.CommandStatus): Command {
+    fun externalCommandToCommandEntity(externalCommand: ExternalCommand, status: Command.CommandStatus): Command {
         try {
             Command(
                 id = UUID.randomUUID(),
-                deviceId = command.deviceId,
-                correlationId = command.correlationId,
-                timestampIssued = command.timestamp,
-                type = Command.CommandType.valueOf(translateCommand(command.command)),
+                deviceId = externalCommand.deviceId,
+                correlationId = externalCommand.correlationId,
+                timestampIssued = externalCommand.timestamp,
+                type = commandNameToType(externalCommand.command),
                 status = status,
-                commandValue = command.value
+                commandValue = externalCommand.value
             )
         }  catch (exception: IllegalArgumentException) {
             throw CommandValidationException("Command unknown")
         }
     }
 
-    fun translateCommand(command: String) = command.trim('!').uppercase()
+    private fun commandNameToType(command: String) =
+        Command.CommandType.valueOf(command.uppercase())
 }
