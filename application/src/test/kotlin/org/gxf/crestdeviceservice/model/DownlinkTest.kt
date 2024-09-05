@@ -23,8 +23,8 @@ class DownlinkTest {
     @Test
     fun multipleCommandsFitMaxMessageSize() {
         val downlink = Downlink(maxSize)
-        val downlinkExisting = "!CMD:REBOOT;!CMD:REBOOT"
-        val downlinkToAdd = "!CMD:REBOOT"
+        val downlinkExisting = "!CMD:REBOOT;CMD:REBOOT"
+        val downlinkToAdd = "CMD:REBOOT"
 
         val existingFits = downlink.addIfItFits(downlinkExisting)
         val result = downlink.addIfItFits(downlinkToAdd)

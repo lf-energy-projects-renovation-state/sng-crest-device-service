@@ -63,24 +63,28 @@ class UrcService(
         val commandsInProgress = commandService.getAllCommandsInProgressForDevice(deviceId)
         return try {
             commandsInProgress.first { command ->
-                downlinkConcernsCommandInProgress(downlink, command)
+                downlinkConcernsCommandType(downlink, command.type)
             }
         } catch (e: NoSuchElementException) {
             null
         }
     }
 
-    private fun downlinkConcernsCommandInProgress(
+    private fun downlinkConcernsCommandType(
         downlink: String,
-        commandInProgress: Command
+        commandType: Command.CommandType
     ): Boolean {
-        // do not treat PSK_SET downlink as PSK command
-        if (commandInProgress.type == Command.CommandType.PSK && downlink.contains("SET")) {
-            return false
+        return if (commandType == Command.CommandType.PSK) {
+            // do not treat PSK_SET downlink as PSK command
+            !downlinkMatchesForCommandType(downlink, Command.CommandType.PSK_SET)
         } else {
-            val parts = commandInProgress.type.parts
-            return parts.all { part -> downlink.contains(part) }
+            downlinkMatchesForCommandType(downlink, commandType)
         }
+    }
+
+    private fun downlinkMatchesForCommandType(downlink: String, commandType: Command.CommandType): Boolean {
+        val parts = commandType.downlink.split(":")
+        return parts.all { part -> downlink.contains(part) }
     }
 
     private fun handleUrcsForCommand(urcs: List<String>, command: Command, downlink: String) {
