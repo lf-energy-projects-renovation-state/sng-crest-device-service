@@ -190,7 +190,7 @@ class CoapMessageHandlingTest {
     }
 
     @Test
-    fun shouldSendCommandToProxyAndSaveWithStatusInProgress() {
+    fun shouldSaveCommandWithStatusPendingAndSendReceivedFeedbackWhenReceivingCommandFromMaki() {
         // receiving reboot command from Maki
         val producer = IntegrationTestHelper.createKafkaProducer(embeddedKafkaBroker)
         val correlationId = UUID.randomUUID()
@@ -232,6 +232,20 @@ class CoapMessageHandlingTest {
 
             assertThat(savedCommand).isNotNull
         }
+    }
+
+    @Test
+    fun shouldSendCommandInDownlinkAndSetStatusToInProgressWhenReceivingAMessageFromDevice() {
+        val pendingCommand = Command(
+            UUID.randomUUID(),
+            DEVICE_ID,
+            UUID.randomUUID(),
+            Instant.now(),
+            Command.CommandType.REBOOT,
+            null,
+            Command.CommandStatus.PENDING
+        )
+        commandRepository.save(pendingCommand)
 
         // receiving message from device
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
