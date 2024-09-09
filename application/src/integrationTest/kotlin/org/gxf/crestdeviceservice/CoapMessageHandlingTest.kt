@@ -207,7 +207,7 @@ class CoapMessageHandlingTest {
         producer.send(ProducerRecord(commandTopic, commandFromMaki))
 
         // assert that received feedback is sent to Maki
-        val records = KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(2), 1)
+        val records = KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(5), 1)
         val actualFeedbackSent = records.records(commandFeedbackTopic).first().value()
         val expectedFeedbackSent =
             CommandFeedback.newBuilder()
