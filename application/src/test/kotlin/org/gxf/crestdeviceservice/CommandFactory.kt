@@ -1,10 +1,13 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
 
+import java.util.UUID
 import org.gxf.crestdeviceservice.TestHelper.CORRELATION_ID
 import org.gxf.crestdeviceservice.TestHelper.DEVICE_ID
 import org.gxf.crestdeviceservice.TestHelper.timestamp
 import org.gxf.crestdeviceservice.command.entity.Command
-import java.util.UUID
 
 object CommandFactory {
     fun pendingPskCommand() =

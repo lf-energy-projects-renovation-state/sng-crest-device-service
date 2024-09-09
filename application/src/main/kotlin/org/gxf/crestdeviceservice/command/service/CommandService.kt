@@ -4,13 +4,13 @@
 package org.gxf.crestdeviceservice.command.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import java.time.Instant
+import java.util.UUID
+import kotlin.jvm.Throws
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.springframework.stereotype.Service
-import java.time.Instant
-import java.util.UUID
-import kotlin.jvm.Throws
 
 @Service
 class CommandService(
@@ -21,6 +21,7 @@ class CommandService(
 
     /**
      * Validate the Command.
+     *
      * @throws CommandValidationException if validation fails
      */
     @Throws(CommandValidationException::class)
@@ -68,17 +69,13 @@ class CommandService(
             logger.warn {
                 "Device ${it.deviceId} already has a pending command of type ${it.type}. The first command will be cancelled."
             }
-            cancelCommand(
-                it,
-                pendingCommand.correlationId
-            )
+            cancelCommand(it, pendingCommand.correlationId)
         }
     }
 
-    private fun sameCommandForDeviceAlreadyPending(
-        command: Command
-    ): Command? {
-        val latestCommandInDatabase = latestCommandInDatabase(command.deviceId, command.type) ?: return null
+    private fun sameCommandForDeviceAlreadyPending(command: Command): Command? {
+        val latestCommandInDatabase =
+            latestCommandInDatabase(command.deviceId, command.type) ?: return null
 
         if (latestCommandInDatabase.status == Command.CommandStatus.PENDING) {
             return latestCommandInDatabase

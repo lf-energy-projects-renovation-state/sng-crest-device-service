@@ -9,7 +9,10 @@ import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 
 object CommandMapper {
-    fun externalCommandToCommandEntity(externalCommand: ExternalCommand, status: Command.CommandStatus): Command {
+    fun externalCommandToCommandEntity(
+        externalCommand: ExternalCommand,
+        status: Command.CommandStatus
+    ): Command {
         try {
             return Command(
                 id = UUID.randomUUID(),
@@ -18,13 +21,11 @@ object CommandMapper {
                 timestampIssued = externalCommand.timestamp,
                 type = commandNameToType(externalCommand.command),
                 status = status,
-                commandValue = externalCommand.value
-            )
-        }  catch (exception: IllegalArgumentException) {
+                commandValue = externalCommand.value)
+        } catch (exception: IllegalArgumentException) {
             throw CommandValidationException("Command unknown")
         }
     }
 
-    fun commandNameToType(command: String) =
-        Command.CommandType.valueOf(command.uppercase())
+    fun commandNameToType(command: String) = Command.CommandType.valueOf(command.uppercase())
 }

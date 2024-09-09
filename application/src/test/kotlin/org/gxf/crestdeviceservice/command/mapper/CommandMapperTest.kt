@@ -7,7 +7,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.ExternalCommandFactory
-import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 import org.junit.jupiter.api.Test
@@ -21,7 +20,10 @@ class CommandMapperTest {
 
         val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
 
-        assertThat(result).usingRecursiveComparison().ignoringFields("id", "timestampIssued").isEqualTo(expected)
+        assertThat(result)
+            .usingRecursiveComparison()
+            .ignoringFields("id", "timestampIssued")
+            .isEqualTo(expected)
     }
 
     @Test
@@ -30,9 +32,9 @@ class CommandMapperTest {
         val status = Command.CommandStatus.PENDING
         val expectedException = CommandValidationException("Command unknown")
 
-        assertThatThrownBy {
-            CommandMapper.externalCommandToCommandEntity(externalCommand, status)
-        }.usingRecursiveComparison().isEqualTo(expectedException)
+        assertThatThrownBy { CommandMapper.externalCommandToCommandEntity(externalCommand, status) }
+            .usingRecursiveComparison()
+            .isEqualTo(expectedException)
     }
 
     @Test
@@ -47,8 +49,7 @@ class CommandMapperTest {
     fun commandNameToTypeException() {
         val command = "invalid"
 
-        assertThatThrownBy {
-            CommandMapper.commandNameToType(command)
-        }.isInstanceOf(IllegalArgumentException::class.java)
+        assertThatThrownBy { CommandMapper.commandNameToType(command) }
+            .isInstanceOf(IllegalArgumentException::class.java)
     }
 }

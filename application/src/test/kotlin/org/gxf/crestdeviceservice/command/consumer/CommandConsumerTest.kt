@@ -30,27 +30,27 @@ class CommandConsumerTest {
 
     @Test
     fun rebootCommandSaved() {
-        whenever(commandService.isPskCommand(command))
-            .thenReturn(false)
+        whenever(commandService.isPskCommand(command)).thenReturn(false)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
         verify(commandService).validate(refEq(command, "id", "timestampIssued"))
         verify(commandFeedbackService).sendReceivedFeedback(refEq(command, "id", "timestampIssued"))
-        verify(commandService).cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
+        verify(commandService)
+            .cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
         verify(commandService).save(refEq(command, "id", "timestampIssued"))
     }
 
     @Test
     fun pskCommandSavedAndKeyGenerated() {
-        whenever(commandService.isPskCommand(any<Command>()))
-            .thenReturn(true)
+        whenever(commandService.isPskCommand(any<Command>())).thenReturn(true)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
         verify(commandService).validate(refEq(command, "id", "timestampIssued"))
         verify(commandFeedbackService).sendReceivedFeedback(refEq(command, "id", "timestampIssued"))
-        verify(commandService).cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
+        verify(commandService)
+            .cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
         verify(pskService).generateNewReadyKeyForDevice(command.deviceId)
         verify(commandService).save(refEq(command, "id", "timestampIssued"))
     }
@@ -69,15 +69,12 @@ class CommandConsumerTest {
     fun commandRejectedForOtherReasons() {
         val reason = "There is a newer command of the same type"
         val commandValidationException = CommandValidationException(reason)
-        whenever(commandService.validate(any<Command>()))
-            .thenThrow(commandValidationException)
+        whenever(commandService.validate(any<Command>())).thenThrow(commandValidationException)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
         verify(commandFeedbackService).sendRejectionFeedback(reason, externalCommand)
-        verify(commandFeedbackService, times(0))
-            .sendReceivedFeedback(any<Command>())
-        verify(commandService, times(0))
-            .save(any<Command>())
+        verify(commandFeedbackService, times(0)).sendReceivedFeedback(any<Command>())
+        verify(commandService, times(0)).save(any<Command>())
     }
 }

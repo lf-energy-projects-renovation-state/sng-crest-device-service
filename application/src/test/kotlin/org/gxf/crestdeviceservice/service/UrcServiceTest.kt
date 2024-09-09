@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.node.BaseJsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
-import org.gxf.crestdeviceservice.CommandFactory
 import java.util.stream.Stream
+import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
@@ -75,15 +75,20 @@ class UrcServiceTest {
         val pskCommandInProgress = CommandFactory.pskCommandInProgress()
         val savedPskCommand = pskCommandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
         val pskSetCommandInProgress = CommandFactory.pskSetCommandInProgress()
-        val savedPskSetCommand = pskSetCommandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
+        val savedPskSetCommand =
+            pskSetCommandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
         val pskCommandsInProgress = listOf(pskCommandInProgress, pskSetCommandInProgress)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(pskCommandsInProgress)
-        whenever(commandService.saveCommandWithNewStatus(pskCommandInProgress, Command.CommandStatus.SUCCESSFUL))
+        whenever(
+                commandService.saveCommandWithNewStatus(
+                    pskCommandInProgress, Command.CommandStatus.SUCCESSFUL))
             .thenReturn(savedPskCommand)
-        whenever(commandService.saveCommandWithNewStatus(pskSetCommandInProgress, Command.CommandStatus.SUCCESSFUL))
+        whenever(
+                commandService.saveCommandWithNewStatus(
+                    pskSetCommandInProgress, Command.CommandStatus.SUCCESSFUL))
             .thenReturn(savedPskSetCommand)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
@@ -116,8 +121,7 @@ class UrcServiceTest {
         verify(pskService).setPendingKeyAsInvalid(DEVICE_ID)
         verify(commandService, times(2))
             .saveCommandWithNewStatus(any<Command>(), eq(Command.CommandStatus.ERROR))
-        verify(commandFeedbackService, times(2))
-            .sendFeedback(any<CommandFeedback>())
+        verify(commandFeedbackService, times(2)).sendFeedback(any<CommandFeedback>())
     }
 
     @ParameterizedTest(name = "should not set pending key as invalid for {0}")
@@ -140,7 +144,9 @@ class UrcServiceTest {
         val commandInProgress = CommandFactory.rebootCommandInProgress()
         val commandSuccessful = commandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
-        val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(commandSuccessful, CommandStatus.Successful, "Command handled successfully")
+        val commandFeedback =
+            CommandFeedbackMapper.commandEntityToCommandFeedback(
+                commandSuccessful, CommandStatus.Successful, "Command handled successfully")
 
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
@@ -154,8 +160,7 @@ class UrcServiceTest {
 
         verify(commandService)
             .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
-        verify(commandFeedbackService)
-            .sendFeedback(refEq(commandFeedback, "timestampStatus"))
+        verify(commandFeedbackService).sendFeedback(refEq(commandFeedback, "timestampStatus"))
     }
 
     @Test
@@ -171,8 +176,7 @@ class UrcServiceTest {
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
         verify(commandService, times(0)).saveCommandEntities(any<List<Command>>())
-        verify(commandFeedbackService, times(0))
-            .sendFeedback(any<CommandFeedback>())
+        verify(commandFeedbackService, times(0)).sendFeedback(any<CommandFeedback>())
     }
 
     private fun updateUrcInMessage(urcs: List<String>, downlink: String): JsonNode {

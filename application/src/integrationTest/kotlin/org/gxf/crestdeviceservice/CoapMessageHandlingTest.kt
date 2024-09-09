@@ -202,8 +202,27 @@ class CoapMessageHandlingTest {
                 .setCommand("reboot")
                 .setValue("")
                 .build()
+        val consumer =
+            IntegrationTestHelper.createKafkaConsumer(embeddedKafkaBroker, commandFeedbackTopic)
 
         producer.send(ProducerRecord(commandTopic, commandFromMaki))
+
+        // assert that received feedback is sent to Maki
+        val records = KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(2), 1)
+        val actualFeedbackSent = records.records(commandFeedbackTopic).first().value()
+        val expectedFeedbackSent =
+            CommandFeedback.newBuilder()
+                .setDeviceId(DEVICE_ID)
+                .setCorrelationId(correlationId)
+                .setTimestampStatus(Instant.now())
+                .setStatus(CommandStatus.Received)
+                .setMessage("Command received")
+                .build()
+
+        assertThat(actualFeedbackSent)
+            .usingRecursiveComparison()
+            .ignoringFields("timestampStatus")
+            .isEqualTo(expectedFeedbackSent)
 
         // assert that pending command has been saved
         Awaitility.await().atMost(Duration.ofSeconds(3)).untilAsserted {

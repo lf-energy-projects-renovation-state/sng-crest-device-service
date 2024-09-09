@@ -82,7 +82,10 @@ class UrcService(
         }
     }
 
-    private fun downlinkMatchesForCommandType(downlink: String, commandType: Command.CommandType): Boolean {
+    private fun downlinkMatchesForCommandType(
+        downlink: String,
+        commandType: Command.CommandType
+    ): Boolean {
         val parts = commandType.downlink.split(":")
         return parts.all { part -> downlink.contains(part) }
     }
@@ -120,7 +123,11 @@ class UrcService(
         }
 
         val failedCommand = commandService.saveCommandWithNewStatus(command, CommandStatus.ERROR)
-        val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(failedCommand, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
+        val commandFeedback =
+            CommandFeedbackMapper.commandEntityToCommandFeedback(
+                failedCommand,
+                ExternalCommandStatus.Error,
+                "Command failed. Error(s): $errorMessages.")
         commandFeedbackService.sendFeedback(commandFeedback)
     }
 
@@ -142,7 +149,9 @@ class UrcService(
 
         val successfulCommand =
             commandService.saveCommandWithNewStatus(command, CommandStatus.SUCCESSFUL)
-        val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(successfulCommand, ExternalCommandStatus.Successful, "Command handled successfully")
+        val commandFeedback =
+            CommandFeedbackMapper.commandEntityToCommandFeedback(
+                successfulCommand, ExternalCommandStatus.Successful, "Command handled successfully")
         commandFeedbackService.sendFeedback(commandFeedback)
     }
 
