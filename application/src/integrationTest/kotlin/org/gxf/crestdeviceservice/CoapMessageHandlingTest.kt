@@ -115,7 +115,6 @@ class CoapMessageHandlingTest {
                 PRE_SHARED_KEY_NEW,
                 SECRET,
                 PreSharedKeyStatus.PENDING))
-
         commandRepository.save(
             Command(
                 UUID.randomUUID(),
