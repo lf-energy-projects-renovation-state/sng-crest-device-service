@@ -235,15 +235,16 @@ class CoapMessageHandlingTest {
 
     @Test
     fun shouldSendCommandInDownlinkAndSetStatusToInProgressWhenReceivingAMessageFromDevice() {
-        val pendingCommand = Command(
-            UUID.randomUUID(),
-            DEVICE_ID,
-            UUID.randomUUID(),
-            Instant.now(),
-            Command.CommandType.REBOOT,
-            null,
-            Command.CommandStatus.PENDING
-        )
+        // pending command, waiting for URC in next message from device
+        val pendingCommand =
+            Command(
+                UUID.randomUUID(),
+                DEVICE_ID,
+                UUID.randomUUID(),
+                Instant.now(),
+                Command.CommandType.REBOOT,
+                null,
+                Command.CommandStatus.PENDING)
         commandRepository.save(pendingCommand)
 
         // receiving message from device
