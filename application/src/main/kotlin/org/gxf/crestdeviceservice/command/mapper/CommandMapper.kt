@@ -23,7 +23,7 @@ object CommandMapper {
                 status = status,
                 commandValue = externalCommand.value)
         } catch (exception: IllegalArgumentException) {
-            throw CommandValidationException("Command unknown")
+            throw CommandValidationException("Command unknown: ${externalCommand.command}")
         }
     }
 
