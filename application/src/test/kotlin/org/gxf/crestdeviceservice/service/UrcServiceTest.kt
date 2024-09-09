@@ -26,6 +26,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.refEq
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -71,11 +72,19 @@ class UrcServiceTest {
     @Test
     fun shouldChangeActiveKeyWhenSuccessURCReceived() {
         val urcs = listOf("PSK:TMP", "PSK:SET")
-        val pskCommands = CommandFactory.pendingPskCommands()
+        val pskCommandInProgress = CommandFactory.pskCommandInProgress()
+        val savedPskCommand = pskCommandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
+        val pskSetCommandInProgress = CommandFactory.pskSetCommandInProgress()
+        val savedPskSetCommand = pskSetCommandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
+        val pskCommandsInProgress = listOf(pskCommandInProgress, pskSetCommandInProgress)
+        val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(pskCommands)
-        val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
+            .thenReturn(pskCommandsInProgress)
+        whenever(commandService.saveCommandWithNewStatus(pskCommandInProgress, Command.CommandStatus.SUCCESSFUL))
+            .thenReturn(savedPskCommand)
+        whenever(commandService.saveCommandWithNewStatus(pskSetCommandInProgress, Command.CommandStatus.SUCCESSFUL))
+            .thenReturn(savedPskSetCommand)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
@@ -146,7 +155,7 @@ class UrcServiceTest {
         verify(commandService)
             .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
         verify(commandFeedbackService)
-            .sendFeedback(commandFeedback)
+            .sendFeedback(refEq(commandFeedback, "timestampStatus"))
     }
 
     @Test

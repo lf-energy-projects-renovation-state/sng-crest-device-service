@@ -3,11 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.consumer
 
-import com.alliander.sng.CommandStatus
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
-import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.mapper.CommandMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService

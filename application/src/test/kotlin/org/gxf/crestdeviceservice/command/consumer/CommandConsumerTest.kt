@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.consumer
 
-import com.alliander.sng.CommandStatus
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.ExternalCommandFactory
 import org.gxf.crestdeviceservice.command.entity.Command
-import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.externalCommandToCommandFeedback
+import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -27,45 +26,58 @@ class CommandConsumerTest {
         CommandConsumer(commandService, commandFeedbackService, pskService)
 
     private val externalCommand = ExternalCommandFactory.externalRebootCommand()
+    private val command = CommandFactory.pendingRebootCommand()
 
     @Test
-    fun commandSaved() {
-        whenever(commandService.validate(externalCommand)).thenReturn(null)
-        whenever(commandService.existingCommandToBeCancelled(externalCommand)).thenReturn(null)
+    fun rebootCommandSaved() {
+        whenever(commandService.isPskCommand(command))
+            .thenReturn(false)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
-        verify(commandService).saveExternalCommandAsPending(externalCommand)
+        verify(commandService).validate(refEq(command, "id", "timestampIssued"))
+        verify(commandFeedbackService).sendReceivedFeedback(refEq(command, "id", "timestampIssued"))
+        verify(commandService).cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
+        verify(commandService).save(refEq(command, "id", "timestampIssued"))
     }
 
     @Test
-    fun commandRejected() {
-        val reason = "Because reasons"
-        val commandFeedback = externalCommandToCommandFeedback(externalCommand, CommandStatus.Rejected, reason)
-            whenever(commandService.validate(externalCommand)).thenReturn(reason)
+    fun pskCommandSavedAndKeyGenerated() {
+        whenever(commandService.isPskCommand(any<Command>()))
+            .thenReturn(true)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
-        verify(commandFeedbackService)
-            .sendFeedback(refEq(commandFeedback, "timestampStatus"))
-        verify(commandService, times(0))
-            .existingCommandToBeCancelled(any<com.alliander.sng.Command>())
-        verify(commandService, times(0))
-            .saveExternalCommandAsPending(any<com.alliander.sng.Command>())
+        verify(commandService).validate(refEq(command, "id", "timestampIssued"))
+        verify(commandFeedbackService).sendReceivedFeedback(refEq(command, "id", "timestampIssued"))
+        verify(commandService).cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
+        verify(pskService).generateNewReadyKeyForDevice(command.deviceId)
+        verify(commandService).save(refEq(command, "id", "timestampIssued"))
     }
 
     @Test
-    fun existingCommandCancelled() {
-        val existingPendingCommand = CommandFactory.pendingRebootCommand()
+    fun `Check if command is rejected when command is unknown`() {
+        val command = ExternalCommandFactory.externalRebootCommand()
+        command.command = "UNKNOWN"
 
-        whenever(commandService.validate(externalCommand)).thenReturn(null)
-        whenever(commandService.existingCommandToBeCancelled(externalCommand))
-            .thenReturn(existingPendingCommand)
+        commandConsumer.handleIncomingCommand(command)
+
+        verify(commandFeedbackService).sendRejectionFeedback("Command unknown", command)
+    }
+
+    @Test
+    fun commandRejectedForOtherReasons() {
+        val reason = "There is a newer command of the same type"
+        val commandValidationException = CommandValidationException(reason)
+        whenever(commandService.validate(any<Command>()))
+            .thenThrow(commandValidationException)
 
         commandConsumer.handleIncomingCommand(externalCommand)
 
-        verify(commandService)
-            .saveCommandWithNewStatus(existingPendingCommand, Command.CommandStatus.CANCELLED)
-        verify(commandService).saveExternalCommandAsPending(externalCommand)
+        verify(commandFeedbackService).sendRejectionFeedback(reason, externalCommand)
+        verify(commandFeedbackService, times(0))
+            .sendReceivedFeedback(any<Command>())
+        verify(commandService, times(0))
+            .save(any<Command>())
     }
 }

@@ -3,93 +3,98 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
 
-import java.time.Instant
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.gxf.crestdeviceservice.CommandFactory
-import org.gxf.crestdeviceservice.ExternalCommandFactory.externalRebootCommand
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.util.UUID
 
 class CommandServiceTest {
     private val commandRepository = mock<CommandRepository>()
-    private val commandService = CommandService(commandRepository)
+    private val commandFeedbackService = mock<CommandFeedbackService>()
+    private val commandService = CommandService(commandRepository, commandFeedbackService)
 
     @Test
-    fun `Check if command is allowed`() {
+    fun validateSucceeded() {
         whenever(
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))
             .thenReturn(
                 CommandFactory.pendingRebootCommand().copy(timestampIssued = Instant.now().minusSeconds(100)))
 
-        val result = commandService.validate(externalRebootCommand())
-        assertThat(result).isNull()
-    }
-
-    @Test
-    fun `Check if command is rejected when command is unknown`() {
-        whenever(
-                commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-                    any(), any()))
-            .thenReturn(CommandFactory.pendingRebootCommand().copy(status = Command.CommandStatus.PENDING))
-
-        val command = externalRebootCommand()
-        command.command = "UNKNOWN"
-        val result = commandService.validate(command)
-        assertThat(result).isNotNull()
+        assertDoesNotThrow {
+            commandService.validate(CommandFactory.pendingRebootCommand())
+        }
     }
 
     @Test
     fun `Check if command is rejected when latest same command is in the future`() {
+        val exceptionExpected = CommandValidationException("There is a newer command of the same type")
+
         whenever(
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))
             .thenReturn(
                 CommandFactory.pendingRebootCommand().copy(timestampIssued = Instant.now().plusSeconds(100)))
 
-        val result = commandService.validate(externalRebootCommand())
-        assertThat(result).isNotNull()
+        assertThatThrownBy { commandService.validate(CommandFactory.pendingRebootCommand()) }
+            .usingRecursiveComparison().isEqualTo(exceptionExpected)
     }
 
     @Test
     fun `Check if command is rejected when same command is in progress`() {
+        val exceptionExpected = CommandValidationException("A command of the same type is already in progress.")
         whenever(
                 commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
                     any(), any(), any()))
             .thenReturn(listOf(CommandFactory.rebootCommandInProgress()))
 
-        val result = commandService.validate(externalRebootCommand())
-        assertThat(result).isNotNull()
+        assertThatThrownBy { commandService.validate(CommandFactory.pendingRebootCommand()) }
+            .usingRecursiveComparison().isEqualTo(exceptionExpected)
     }
 
     @Test
     fun `Check if existing pending same command is cancelled if it exists`() {
-        val existingPendingCommand = CommandFactory.pendingRebootCommand()
-        val newCommand = externalRebootCommand()
+        val newCommand = CommandFactory.pendingRebootCommand()
+        val existingPendingCommand = newCommand.copy(
+            timestampIssued = Instant.now().minusSeconds(100),
+            correlationId = UUID.randomUUID()
+        )
+        val cancelledCommand = existingPendingCommand.copy(status = Command.CommandStatus.CANCELLED)
+
         whenever(
-                commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-                    any(), any()))
+            commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
+                any(), any()))
             .thenReturn(existingPendingCommand)
+        whenever(commandRepository.save(any<Command>()))
+            .thenReturn(cancelledCommand)
 
-        val commandToBeCancelled = commandService.existingCommandToBeCancelled(newCommand)
+        commandService.cancelOlderCommandIfNecessary(newCommand)
 
-        assertThat(commandToBeCancelled).isEqualTo(existingPendingCommand)
+        verify(commandFeedbackService).sendCancellationFeedback(eq(existingPendingCommand), any<String>())
+        verify(commandRepository).save(cancelledCommand)
     }
 
     @Test
     fun `Check if no command is cancelled if no existing same pending command exists`() {
-        val newCommand = externalRebootCommand()
+        val newCommand = CommandFactory.pendingRebootCommand()
         whenever(
                 commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
                     any(), any()))
             .thenReturn(null)
 
-        val commandToBeCancelled = commandService.existingCommandToBeCancelled(newCommand)
+        commandService.cancelOlderCommandIfNecessary(newCommand)
 
-        assertThat(commandToBeCancelled).isNull()
+        verify(commandFeedbackService, times(0)).sendCancellationFeedback(any<Command>(), any<String>())
     }
 }

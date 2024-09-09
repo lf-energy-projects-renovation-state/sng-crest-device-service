@@ -11,7 +11,7 @@ import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 object CommandMapper {
     fun externalCommandToCommandEntity(externalCommand: ExternalCommand, status: Command.CommandStatus): Command {
         try {
-            Command(
+            return Command(
                 id = UUID.randomUUID(),
                 deviceId = externalCommand.deviceId,
                 correlationId = externalCommand.correlationId,
@@ -25,6 +25,6 @@ object CommandMapper {
         }
     }
 
-    private fun commandNameToType(command: String) =
+    fun commandNameToType(command: String) =
         Command.CommandType.valueOf(command.uppercase())
 }

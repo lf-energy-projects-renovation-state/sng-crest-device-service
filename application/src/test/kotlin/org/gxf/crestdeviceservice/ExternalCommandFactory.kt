@@ -14,4 +14,13 @@ object ExternalCommandFactory {
             .setCommand(Command.CommandType.REBOOT.name)
             .setValue(null)
             .build()!!
+
+    fun externalRebootCommandInvalid() =
+        com.alliander.sng.Command.newBuilder()
+            .setDeviceId(DEVICE_ID)
+            .setCorrelationId(CORRELATION_ID)
+            .setTimestamp(timestamp)
+            .setCommand("unknown")
+            .setValue(null)
+            .build()!!
 }

@@ -10,6 +10,7 @@ import org.gxf.crestdeviceservice.command.repository.CommandRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.UUID
+import kotlin.jvm.Throws
 
 @Service
 class CommandService(
@@ -22,6 +23,7 @@ class CommandService(
      * Validate the Command.
      * @throws CommandValidationException if validation fails
      */
+    @Throws(CommandValidationException::class)
     fun validate(command: Command) {
         if (deviceHasNewerSameCommand(command.deviceId, command.type, command.timestampIssued)) {
             throw CommandValidationException("There is a newer command of the same type")
@@ -62,21 +64,18 @@ class CommandService(
             deviceId, commandType)
 
     fun cancelOlderCommandIfNecessary(pendingCommand: Command) {
-        sameCommandForDeviceAlreadyPending(pendingCommand)
-            ?.let { commandToBeCancelled ->
-                {
-                    logger.warn {
-                        "Device ${commandToBeCancelled.deviceId} already has a pending command of type ${commandToBeCancelled.type}. The first command will be cancelled."
-                    }
-                    cancelExistingCommand(
-                        pendingCommand.correlationId,
-                        commandToBeCancelled
-                    )
-                }
+        sameCommandForDeviceAlreadyPending(pendingCommand)?.let {
+            logger.warn {
+                "Device ${it.deviceId} already has a pending command of type ${it.type}. The first command will be cancelled."
             }
+            cancelCommand(
+                it,
+                pendingCommand.correlationId
+            )
+        }
     }
 
-    fun sameCommandForDeviceAlreadyPending(
+    private fun sameCommandForDeviceAlreadyPending(
         command: Command
     ): Command? {
         val latestCommandInDatabase = latestCommandInDatabase(command.deviceId, command.type) ?: return null
@@ -88,7 +87,7 @@ class CommandService(
         return null
     }
 
-    fun cancelExistingCommand(newCorrelationId: UUID, commandToBeCancelled: Command) {
+    private fun cancelCommand(commandToBeCancelled: Command, newCorrelationId: UUID) {
         val message =
             "Command cancelled by newer same command with correlation id: $newCorrelationId"
         commandFeedbackService.sendCancellationFeedback(commandToBeCancelled, message)

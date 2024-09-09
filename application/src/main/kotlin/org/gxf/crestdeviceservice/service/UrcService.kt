@@ -119,7 +119,8 @@ class UrcService(
             "Command ${command.type} failed for device with id ${command.deviceId}. Error(s): $errorMessages."
         }
 
-        val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(command, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
+        val failedCommand = commandService.saveCommandWithNewStatus(command, CommandStatus.ERROR)
+        val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(failedCommand, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
         commandFeedbackService.sendFeedback(commandFeedback)
     }
 
@@ -141,7 +142,6 @@ class UrcService(
 
         val successfulCommand =
             commandService.saveCommandWithNewStatus(command, CommandStatus.SUCCESSFUL)
-
         val commandFeedback = CommandFeedbackMapper.commandEntityToCommandFeedback(successfulCommand, ExternalCommandStatus.Successful, "Command handled successfully")
         commandFeedbackService.sendFeedback(commandFeedback)
     }
