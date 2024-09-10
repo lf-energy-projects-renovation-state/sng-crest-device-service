@@ -62,7 +62,7 @@ class CommandConsumerTest {
 
         commandConsumer.handleIncomingCommand(command)
 
-        verify(commandFeedbackService).sendRejectionFeedback("Command unknown", command)
+        verify(commandFeedbackService).sendRejectionFeedback("Command unknown: UNKNOWN", command)
     }
 
     @Test
