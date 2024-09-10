@@ -45,7 +45,8 @@ class CommandService(
         commandType: Command.CommandType,
         timestampNewCommand: Instant
     ): Boolean {
-        val latestCommandInDatabase = latestCommandInDatabase(deviceId, commandType) ?: return false
+        val latestCommandInDatabase =
+            getLatestCommandInDatabase(deviceId, commandType) ?: return false
 
         // If the device already has a newer command in the database
         return latestCommandInDatabase.timestampIssued.isAfter(timestampNewCommand)
@@ -60,12 +61,12 @@ class CommandService(
                 deviceId, commandType, Command.CommandStatus.IN_PROGRESS)
             .isNotEmpty()
 
-    private fun latestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
+    private fun getLatestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
         commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
             deviceId, commandType)
 
     fun cancelOlderCommandIfNecessary(pendingCommand: Command) {
-        sameCommandForDeviceAlreadyPending(pendingCommand)?.let {
+        getSameCommandForDeviceAlreadyPending(pendingCommand)?.let {
             logger.warn {
                 "Device ${it.deviceId} already has a pending command of type ${it.type}. The first command will be cancelled."
             }
@@ -73,9 +74,9 @@ class CommandService(
         }
     }
 
-    private fun sameCommandForDeviceAlreadyPending(command: Command): Command? {
+    private fun getSameCommandForDeviceAlreadyPending(command: Command): Command? {
         val latestCommandInDatabase =
-            latestCommandInDatabase(command.deviceId, command.type) ?: return null
+            getLatestCommandInDatabase(command.deviceId, command.type) ?: return null
 
         if (latestCommandInDatabase.status == Command.CommandStatus.PENDING) {
             return latestCommandInDatabase

@@ -32,14 +32,14 @@ class DownlinkService(
     @Throws(NoExistingPskException::class)
     fun getDownlinkForDevice(deviceId: String, body: JsonNode): String {
         val pendingCommands = commandService.getAllPendingCommandsForDevice(deviceId)
-        val commandsToSend = commandsToSend(pendingCommands)
+        val commandsToSend = getCommandsToSend(pendingCommands)
         if (commandsToSend.isNotEmpty()) {
             return getDownlinkFromCommands(deviceId, commandsToSend)
         }
         return RESPONSE_SUCCESS
     }
 
-    private fun commandsToSend(pendingCommands: List<Command>) =
+    private fun getCommandsToSend(pendingCommands: List<Command>) =
         pendingCommands.filter { command -> commandCanBeSent(command) }
 
     private fun commandCanBeSent(command: Command) =
@@ -50,7 +50,7 @@ class DownlinkService(
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
         logger.info {
-            "Device $deviceId has pending commands of types: ${printableCommandTypes(pendingCommands)}."
+            "Device $deviceId has pending commands of types: ${getPrintableCommandTypes(pendingCommands)}."
         }
 
         val downlink = Downlink(messageProperties.maxBytes)
@@ -60,7 +60,7 @@ class DownlinkService(
                 downlink.addIfItFits(getDownlinkPerCommand(command))
             }
 
-        logger.info { "Commands that will be sent: ${printableCommandTypes(commandsToSend)}." }
+        logger.info { "Commands that will be sent: ${getPrintableCommandTypes(commandsToSend)}." }
         commandsToSend.forEach { command -> setCommandInProgress(command) }
 
         val completeDownlink = downlink.downlink
@@ -68,7 +68,7 @@ class DownlinkService(
         return completeDownlink
     }
 
-    private fun printableCommandTypes(commands: List<Command>) =
+    private fun getPrintableCommandTypes(commands: List<Command>) =
         commands.joinToString(", ") { command -> command.type.toString() }
 
     private fun setCommandInProgress(command: Command) {

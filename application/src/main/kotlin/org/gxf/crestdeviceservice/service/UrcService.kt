@@ -12,7 +12,7 @@ import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
-import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.messageFromCode
+import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.getMessageFromCode
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.stereotype.Service
@@ -49,7 +49,7 @@ class UrcService(
         body[URC_FIELD].first { it.isObject }[DL_FIELD].asText().split(";")
 
     private fun handleDownlinkFromMessage(deviceId: String, downlink: String, urcs: List<String>) {
-        val command = commandThatDownlinkIsAbout(deviceId, downlink)
+        val command = getCommandThatDownlinkIsAbout(deviceId, downlink)
 
         if (command != null) {
             handleUrcsForCommand(urcs, command, downlink)
@@ -59,7 +59,7 @@ class UrcService(
         }
     }
 
-    private fun commandThatDownlinkIsAbout(deviceId: String, downlink: String): Command? {
+    private fun getCommandThatDownlinkIsAbout(deviceId: String, downlink: String): Command? {
         val commandsInProgress = commandService.getAllCommandsInProgressForDevice(deviceId)
         return try {
             commandsInProgress.first { command ->
@@ -116,7 +116,7 @@ class UrcService(
         if (command.type == Command.CommandType.PSK_SET) {
             handlePskErrors(command.deviceId)
         }
-        val errorMessages = urcs.joinToString(". ") { urc -> messageFromCode(urc) }
+        val errorMessages = urcs.joinToString(". ") { urc -> getMessageFromCode(urc) }
 
         logger.error {
             "Command ${command.type} failed for device with id ${command.deviceId}. Error(s): $errorMessages."

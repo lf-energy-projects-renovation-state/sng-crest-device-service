@@ -4,7 +4,7 @@
 package org.gxf.crestdeviceservice.command.mapper
 
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions.catchThrowable
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.ExternalCommandFactory
 import org.gxf.crestdeviceservice.command.entity.Command
@@ -30,26 +30,30 @@ class CommandMapperTest {
     fun externalCommandToCommandEntityException() {
         val externalCommand = ExternalCommandFactory.externalRebootCommandInvalid()
         val status = Command.CommandStatus.PENDING
-        val expectedException = CommandValidationException("Command unknown")
 
-        assertThatThrownBy { CommandMapper.externalCommandToCommandEntity(externalCommand, status) }
-            .usingRecursiveComparison()
-            .isEqualTo(expectedException)
+        val actual = catchThrowable {
+            CommandMapper.externalCommandToCommandEntity(externalCommand, status)
+        }
+
+        assertThat(actual)
+            .isInstanceOf(CommandValidationException::class.java)
+            .hasMessage("Command unknown: ${externalCommand.command}")
     }
 
     @Test
     fun commandNameToType() {
-        val command = "reboot"
-        val result = CommandMapper.commandNameToType(command)
+        val commandName = "reboot"
+        val result = CommandMapper.commandNameToType(commandName)
 
         assertThat(result).isEqualTo(Command.CommandType.REBOOT)
     }
 
     @Test
     fun commandNameToTypeException() {
-        val command = "invalid"
+        val commandName = "invalid"
 
-        assertThatThrownBy { CommandMapper.commandNameToType(command) }
-            .isInstanceOf(IllegalArgumentException::class.java)
+        val actual = catchThrowable { CommandMapper.commandNameToType(commandName) }
+
+        assertThat(actual).isInstanceOf(IllegalArgumentException::class.java)
     }
 }

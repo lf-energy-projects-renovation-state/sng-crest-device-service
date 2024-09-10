@@ -5,10 +5,10 @@ package org.gxf.crestdeviceservice
 
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
-import org.gxf.crestdeviceservice.TestHelper.CORRELATION_ID
-import org.gxf.crestdeviceservice.TestHelper.DEVICE_ID
-import org.gxf.crestdeviceservice.TestHelper.MESSAGE_RECEIVED
-import org.gxf.crestdeviceservice.TestHelper.timestamp
+import org.gxf.crestdeviceservice.TestConstants.CORRELATION_ID
+import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
+import org.gxf.crestdeviceservice.TestConstants.MESSAGE_RECEIVED
+import org.gxf.crestdeviceservice.TestConstants.timestamp
 
 object CommandFeedbackFactory {
     fun rebootCommandReceivedFeedback() =

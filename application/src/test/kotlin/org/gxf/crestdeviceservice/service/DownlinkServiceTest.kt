@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice.service
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
+import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -25,7 +26,7 @@ class DownlinkServiceTest {
     private val messageProperties = MessageProperties(1024)
     private val downlinkService = DownlinkService(pskService, commandService, messageProperties)
     private val message = TestHelper.messageTemplate()
-    private val deviceId = TestHelper.DEVICE_ID
+    private val deviceId = TestConstants.DEVICE_ID
 
     @Test
     fun shouldReturnPskDownlinkWhenThereIsANewPsk() {

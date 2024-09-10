@@ -13,7 +13,7 @@ enum class ErrorUrc(val message: String) {
     ERR("Error processing (downlink) value");
 
     companion object {
-        fun messageFromCode(code: String): String {
+        fun getMessageFromCode(code: String): String {
             val error = entries.firstOrNull { code.endsWith(it.name) }
             return error?.message ?: "Unknown URC"
         }

@@ -5,17 +5,10 @@ package org.gxf.crestdeviceservice
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import java.time.Instant
-import java.util.UUID
-import org.mockito.kotlin.spy
 import org.springframework.util.ResourceUtils
 
 object TestHelper {
-    private val mapper = spy<ObjectMapper>()
-    const val DEVICE_ID = "device-id"
-    const val MESSAGE_RECEIVED = "Command received"
-    val CORRELATION_ID = UUID.randomUUID()
-    val timestamp = Instant.now()
+    private val mapper = ObjectMapper()
 
     fun messageTemplate(): ObjectNode {
         val messageFile = ResourceUtils.getFile("classpath:message-template.json")

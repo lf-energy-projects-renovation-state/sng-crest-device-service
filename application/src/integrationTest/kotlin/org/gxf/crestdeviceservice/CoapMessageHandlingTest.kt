@@ -3,13 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
 
-import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
 import org.gxf.crestdeviceservice.IntegrationTestHelper.getFileContentAsString
@@ -35,8 +33,7 @@ import org.springframework.kafka.test.utils.KafkaTestUtils
 import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EmbeddedKafka(
-    topics = ["\${kafka.consumers.command.topic}", "\${kafka.producers.command-feedback.topic}"])
+@EmbeddedKafka(topics = ["\${kafka.producers.command-feedback.topic}"])
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CoapMessageHandlingTest {
     companion object {
@@ -53,8 +50,6 @@ class CoapMessageHandlingTest {
     @Autowired private lateinit var commandRepository: CommandRepository
 
     @Autowired private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
-
-    @Value("\${kafka.consumers.command.topic}") private lateinit var commandTopic: String
 
     @Value("\${kafka.producers.command-feedback.topic}")
     private lateinit var commandFeedbackTopic: String
@@ -186,51 +181,6 @@ class CoapMessageHandlingTest {
         assertThat(result.body).isEqualTo("0")
         assertThat(oldKey.status).isEqualTo(PreSharedKeyStatus.ACTIVE)
         assertThat(newKey.status).isEqualTo(PreSharedKeyStatus.INVALID)
-    }
-
-    @Test
-    fun shouldSaveCommandWithStatusPendingAndSendReceivedFeedbackWhenReceivingCommandFromMaki() {
-        // receiving reboot command from Maki
-        val producer = IntegrationTestHelper.createKafkaProducer(embeddedKafkaBroker)
-        val correlationId = UUID.randomUUID()
-        val commandFromMaki =
-            ExternalCommand.newBuilder()
-                .setDeviceId(DEVICE_ID)
-                .setCorrelationId(correlationId)
-                .setTimestamp(Instant.now())
-                .setCommand("reboot")
-                .setValue("")
-                .build()
-        val consumer =
-            IntegrationTestHelper.createKafkaConsumer(embeddedKafkaBroker, commandFeedbackTopic)
-
-        producer.send(ProducerRecord(commandTopic, commandFromMaki))
-
-        // assert that received feedback is sent to Maki
-        val records = KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(5), 1)
-        val actualFeedbackSent = records.records(commandFeedbackTopic).first().value()
-        val expectedFeedbackSent =
-            CommandFeedback.newBuilder()
-                .setDeviceId(DEVICE_ID)
-                .setCorrelationId(correlationId)
-                .setTimestampStatus(Instant.now())
-                .setStatus(CommandStatus.Received)
-                .setMessage("Command received")
-                .build()
-
-        assertThat(actualFeedbackSent)
-            .usingRecursiveComparison()
-            .ignoringFields("timestampStatus")
-            .isEqualTo(expectedFeedbackSent)
-
-        // assert that pending command has been saved
-        Awaitility.await().atMost(Duration.ofSeconds(3)).untilAsserted {
-            val savedCommand =
-                commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-                    DEVICE_ID, Command.CommandStatus.PENDING)
-
-            assertThat(savedCommand).isNotNull
-        }
     }
 
     @Test

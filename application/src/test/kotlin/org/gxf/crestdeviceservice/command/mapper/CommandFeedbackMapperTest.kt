@@ -8,7 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.CommandFeedbackFactory
 import org.gxf.crestdeviceservice.ExternalCommandFactory
-import org.gxf.crestdeviceservice.TestHelper.MESSAGE_RECEIVED
+import org.gxf.crestdeviceservice.TestConstants.MESSAGE_RECEIVED
 import org.junit.jupiter.api.Test
 
 class CommandFeedbackMapperTest {

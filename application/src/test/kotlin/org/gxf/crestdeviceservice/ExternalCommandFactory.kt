@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
 
-import org.gxf.crestdeviceservice.TestHelper.CORRELATION_ID
-import org.gxf.crestdeviceservice.TestHelper.DEVICE_ID
-import org.gxf.crestdeviceservice.TestHelper.timestamp
+import org.gxf.crestdeviceservice.TestConstants.CORRELATION_ID
+import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
+import org.gxf.crestdeviceservice.TestConstants.timestamp
 import org.gxf.crestdeviceservice.command.entity.Command
 
 object ExternalCommandFactory {

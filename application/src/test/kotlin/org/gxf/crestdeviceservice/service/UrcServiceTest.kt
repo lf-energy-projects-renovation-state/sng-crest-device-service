@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import java.util.stream.Stream
 import org.gxf.crestdeviceservice.CommandFactory
+import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
@@ -45,7 +46,7 @@ class UrcServiceTest {
         private const val PSK_DOWNLINK =
             "!PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3;PSK:umU6KJ4g7Ye5ZU6o:4a3cfdd487298e2f048ebfd703a1da4800c18f2167b62192cf7dc9fd6cc4bcd3:SET"
         private const val REBOOT_DOWNLINK = "!CMD:REBOOT"
-        private const val DEVICE_ID = TestHelper.DEVICE_ID
+        private const val DEVICE_ID = TestConstants.DEVICE_ID
 
         @JvmStatic
         private fun containingPskErrorUrcs() =
