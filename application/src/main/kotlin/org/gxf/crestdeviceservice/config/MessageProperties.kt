@@ -5,8 +5,4 @@ package org.gxf.crestdeviceservice.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
-@ConfigurationProperties("kafka.producers")
-class KafkaProducerProperties(
-    val deviceMessage: KafkaProducerTopicProperties,
-    val commandFeedback: KafkaProducerTopicProperties
-)
+@ConfigurationProperties("message") class MessageProperties(val maxBytes: Int)

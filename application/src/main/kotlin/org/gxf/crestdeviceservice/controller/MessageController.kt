@@ -19,7 +19,6 @@ class MessageController(
     private val downlinkService: DownlinkService,
     private val urcService: UrcService
 ) {
-
     private val logger = KotlinLogging.logger {}
 
     private val locks: MutableMap<String, Any> = mutableMapOf()
@@ -40,12 +39,12 @@ class MessageController(
 
         synchronized(lock(identity)) {
             try {
-                urcService.interpretURCInMessage(identity, body)
-                val downlink = downlinkService.getDownlinkForIdentity(identity, body)
+                urcService.interpretURCsInMessage(identity, body)
+                val downlink = downlinkService.getDownlinkForDevice(identity, body)
                 return ResponseEntity.ok(downlink)
             } catch (e: Exception) {
                 logger.error(e) {
-                    "Exception occurred while creating downlink for device $identity"
+                    "Exception occurred while interpreting message from or creating downlink for device $identity"
                 }
                 return ResponseEntity.internalServerError().build()
             }

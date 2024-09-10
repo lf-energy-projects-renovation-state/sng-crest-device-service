@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.avro.specific.SpecificRecordBase
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
+import org.gxf.crestdeviceservice.config.KafkaProducerTopicProperties
 import org.gxf.sng.avro.DeviceMessage
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,7 +22,11 @@ class MessageProducerServiceTest {
 
     @Mock private lateinit var mockedKafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
 
-    private val kafkaProducerProperties = KafkaProducerProperties("topic")
+    private val deviceMessageTopic = "device-message"
+    private val kafkaProducerProperties =
+        KafkaProducerProperties(
+            KafkaProducerTopicProperties(deviceMessageTopic),
+            KafkaProducerTopicProperties("command-feedback"))
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
@@ -38,7 +43,7 @@ class MessageProducerServiceTest {
         messageProducerService.produceMessage(jsonNode)
         verify(mockedKafkaTemplate)
             .send(
-                check { assertThat(it).isEqualTo("topic") },
+                check { assertThat(it).isEqualTo(deviceMessageTopic) },
                 check { assertThat((it as DeviceMessage).payload).isEqualTo(jsonNode.toString()) })
     }
 }

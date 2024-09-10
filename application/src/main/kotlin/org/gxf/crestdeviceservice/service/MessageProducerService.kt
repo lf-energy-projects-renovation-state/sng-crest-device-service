@@ -20,11 +20,11 @@ class MessageProducerService(
     private val logger = KotlinLogging.logger {}
 
     fun produceMessage(message: JsonNode) {
-        logger.info { "Producing message for: ${message.get("ID")}" }
+        logger.info { "Producing message for: ${message["ID"]}" }
         kafkaTemplate.send(
-            kafkaProducerProperties.topic,
+            kafkaProducerProperties.deviceMessage.topic,
             DeviceMessage().apply {
-                deviceId = message.get("ID").toString()
+                deviceId = message["ID"].toString()
                 timestamp = Instant.now().toEpochMilli()
                 payload = message.toString()
             })

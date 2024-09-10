@@ -30,48 +30,62 @@ class PskService(
 
     private val secureRandom = SecureRandom.getInstanceStrong()
 
-    fun getCurrentActiveKey(identity: String) = getCurrentActivePsk(identity)?.preSharedKey
+    fun getCurrentActiveKey(deviceId: String) = getCurrentActivePsk(deviceId)?.preSharedKey
 
-    private fun getCurrentActivePsk(identity: String) =
+    private fun getCurrentActivePsk(deviceId: String) =
         pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-            identity, PreSharedKeyStatus.ACTIVE)
+            deviceId, PreSharedKeyStatus.ACTIVE)
 
-    fun isPendingKeyPresent(identity: String) = getCurrentPendingKey(identity) != null
+    fun getCurrentPendingPsk(deviceId: String) =
+        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+            deviceId, PreSharedKeyStatus.PENDING)
 
-    @Throws(NoExistingPskException::class)
-    fun setPendingKeyAsInvalid(identity: String) {
+    fun getCurrentReadyPsk(deviceId: String): PreSharedKey? {
+        val allKeys = pskRepository.findAll()
+        logger.debug { allKeys.joinToString { ". " } }
+        val result =
+            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
+                deviceId, PreSharedKeyStatus.READY)
+        return result
+    }
+
+    fun readyForPskSetCommand(deviceId: String) =
+        isReadyPskPresent(deviceId) && !isPendingPskPresent(deviceId)
+
+    fun isPendingPskPresent(deviceId: String): Boolean {
+        return getCurrentPendingPsk(deviceId) != null
+    }
+
+    private fun isReadyPskPresent(deviceId: String) = getCurrentReadyPsk(deviceId) != null
+
+    fun setPendingKeyAsInvalid(deviceId: String) {
+        logger.warn { "Pending key for device $deviceId is set to invalid." }
         val psk =
-            getCurrentPendingKey(identity)
+            getCurrentPendingPsk(deviceId)
                 ?: throw NoExistingPskException("No pending key exists to set as invalid")
         psk.status = PreSharedKeyStatus.INVALID
         pskRepository.save(psk)
     }
 
-    private fun getCurrentPendingKey(identity: String) =
-        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-            identity, PreSharedKeyStatus.PENDING)
-
-    @Throws(InitialKeySetException::class)
-    fun setInitialKeyForIdentity(identity: String, psk: String, secret: String) {
-        if (pskRepository.countByIdentityAndStatus(identity, PreSharedKeyStatus.ACTIVE) != 0L) {
-            throw InitialKeySetException(
-                "Key already exists for identity. Key cannot be overridden")
+    fun setInitialKeyForDevice(deviceId: String, psk: String, secret: String) {
+        logger.info { "Prepare initial key for device $deviceId" }
+        if (pskRepository.countByIdentityAndStatus(deviceId, PreSharedKeyStatus.ACTIVE) != 0L) {
+            throw InitialKeySetException("Key already exists for device. Key cannot be overridden")
         }
         pskRepository.save(
-            PreSharedKey(identity, 0, Instant.now(), psk, secret, PreSharedKeyStatus.ACTIVE))
+            PreSharedKey(deviceId, 0, Instant.now(), psk, secret, PreSharedKeyStatus.ACTIVE))
     }
 
-    @Throws(NoExistingPskException::class)
-    fun generateNewReadyKeyForIdentity(identity: String) {
+    fun generateNewReadyKeyForDevice(deviceId: String) {
+        logger.info { "Creating new ready key for device $deviceId" }
         val newKey = generatePsk()
         val previousPSK =
-            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                identity, PreSharedKeyStatus.ACTIVE)
+            getCurrentActivePsk(deviceId)
                 ?: throw NoExistingPskException("There is no active key present")
         val newVersion = previousPSK.revision + 1
         pskRepository.save(
             PreSharedKey(
-                identity,
+                deviceId,
                 newVersion,
                 Instant.now(),
                 newKey,
@@ -85,26 +99,14 @@ class PskService(
             acc + ALLOWED_CHARACTERS[next]
         }
 
-    fun setReadyKeyForIdentityAsPending(identity: String): PreSharedKey {
-        val readyPsk =
-            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                identity, PreSharedKeyStatus.READY)
+    fun setPskToPendingForDevice(deviceId: String): PreSharedKey {
+        val psk =
+            getCurrentReadyPsk(deviceId)
                 ?: throw NoExistingPskException("There is no new key ready to be set")
-        readyPsk.status = PreSharedKeyStatus.PENDING
+        psk.status = PreSharedKeyStatus.PENDING
         logger.debug { "Save ready psk as pending" }
-        return pskRepository.save(readyPsk)
+        return pskRepository.save(psk)
     }
-
-    fun needsKeyChange(identity: String) =
-        changeInitialPsk() && readyKeyExists(identity) && !pendingKeyExists(identity)
-
-    private fun readyKeyExists(identity: String) =
-        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-            identity, PreSharedKeyStatus.READY) != null
-
-    private fun pendingKeyExists(identity: String) =
-        pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-            identity, PreSharedKeyStatus.PENDING) != null
 
     fun changeInitialPsk() = pskConfiguration.changeInitialPsk
 
@@ -112,16 +114,12 @@ class PskService(
      * Sets the current, active, key to inactive and the new, pending, key to active and saves both
      * to the pskRepository
      *
-     * @param identity: identity of device for which to change the keys
+     * @param deviceId: identity of device for which to change the keys
      */
     @Throws(NoExistingPskException::class)
-    fun changeActiveKey(identity: String) {
-        val currentPsk =
-            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                identity, PreSharedKeyStatus.ACTIVE)
-        val newPsk =
-            pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(
-                identity, PreSharedKeyStatus.PENDING)
+    fun changeActiveKey(deviceId: String) {
+        val currentPsk = getCurrentActivePsk(deviceId)
+        val newPsk = getCurrentPendingPsk(deviceId)
 
         if (currentPsk == null || newPsk == null) {
             throw NoExistingPskException("No current or new psk, impossible to change active key")
