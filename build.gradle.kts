@@ -81,6 +81,8 @@ subprojects {
     }
 
     tasks.register<Copy>("updateGitHooks") {
+        description = "Copies the pre-commit Git Hook to the .git/hooks folder."
+        group = "verification"
         from("${project.rootDir}/scripts/pre-commit")
         into("${project.rootDir}/.git/hooks")
     }
