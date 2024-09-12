@@ -28,6 +28,7 @@
         "type": "enum",
         "symbols": [
           "Received",
+          "Progress",
           "Successful",
           "Error",
           "Rejected",
