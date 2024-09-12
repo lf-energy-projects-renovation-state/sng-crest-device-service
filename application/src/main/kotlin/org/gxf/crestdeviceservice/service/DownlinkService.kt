@@ -48,7 +48,7 @@ class DownlinkService(
             else ->
                 run {
                     return true
-                } // todo restore to simply true
+                } // todo fix
         }
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
