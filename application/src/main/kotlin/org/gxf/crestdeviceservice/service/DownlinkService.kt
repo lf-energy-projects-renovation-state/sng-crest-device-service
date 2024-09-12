@@ -45,7 +45,10 @@ class DownlinkService(
     private fun commandCanBeSent(command: Command) =
         when (command.type) {
             Command.CommandType.PSK_SET -> pskService.readyForPskSetCommand(command.deviceId)
-            else -> true
+            else ->
+                run {
+                    return true
+                } // todo restore to simply true
         }
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
