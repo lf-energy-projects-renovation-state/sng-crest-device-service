@@ -42,6 +42,7 @@ psk:
   change-initial-psk: false
   decryption:
     method: "RSA"
+    # Test decryption key for psk's.
     private-key:
       1: |-
         -----BEGIN PRIVATE KEY-----
