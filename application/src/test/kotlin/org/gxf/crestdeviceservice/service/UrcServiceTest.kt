@@ -180,6 +180,17 @@ class UrcServiceTest {
         verify(commandFeedbackService, times(0)).sendFeedback(any<CommandFeedback>())
     }
 
+    @Test
+    fun doNothingWhenDownlinkIsBlank() {
+        val urcs = listOf("INIT")
+        val downlink = ""
+        val message = updateUrcInMessage(urcs, downlink)
+
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf())
+
+        urcService.interpretURCsInMessage(DEVICE_ID, message)
+    }
+
     private fun updateUrcInMessage(urcs: List<String>, downlink: String): JsonNode {
         val message = TestHelper.messageTemplate()
         val urcFieldValue = urcFieldValue(urcs, downlink)
