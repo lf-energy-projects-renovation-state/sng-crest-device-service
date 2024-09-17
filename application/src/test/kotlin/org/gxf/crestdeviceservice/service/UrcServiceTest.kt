@@ -24,6 +24,7 @@ import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -178,6 +179,17 @@ class UrcServiceTest {
 
         verify(commandService, times(0)).saveCommandEntities(any<List<Command>>())
         verify(commandFeedbackService, times(0)).sendFeedback(any<CommandFeedback>())
+    }
+
+    @ParameterizedTest(name = "should do nothing when downlink is {0}")
+    @ValueSource(strings = ["0", "", " ", "\n"])
+    fun shouldDoNothingWhenDownlinkIsBlank(downlink: String) {
+        val urcs = listOf("INIT")
+        val message = updateUrcInMessage(urcs, downlink)
+
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf())
+
+        urcService.interpretURCsInMessage(DEVICE_ID, message)
     }
 
     private fun updateUrcInMessage(urcs: List<String>, downlink: String): JsonNode {
