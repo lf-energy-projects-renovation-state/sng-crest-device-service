@@ -24,6 +24,7 @@ import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -68,8 +69,6 @@ class UrcServiceTest {
                 listOf("EXR"),
                 listOf("POR"),
                 listOf("INIT", "BOR", "POR"))
-
-        @JvmStatic private fun noDownlink() = Stream.of("0", "", " ", "\n")
     }
 
     @Test
@@ -183,7 +182,7 @@ class UrcServiceTest {
     }
 
     @ParameterizedTest(name = "should do nothing when downlink is {0}")
-    @MethodSource("noDownlink")
+    @ValueSource(strings = ["0", "", " ", "\n"])
     fun shouldDoNothingWhenDownlinkIsBlank(downlink: String) {
         val urcs = listOf("INIT")
         val message = updateUrcInMessage(urcs, downlink)
