@@ -12,10 +12,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey> {
 
-    fun findFirstByIdentityAndStatusOrderByRevisionDesc(
-        identity: String,
-        status: PreSharedKeyStatus
-    ): PreSharedKey?
+    fun findFirstByIdentityAndStatusOrderByRevisionDesc(identity: String, status: PreSharedKeyStatus): PreSharedKey?
 
     fun findFirstByIdentityOrderByRevisionDesc(identity: String): PreSharedKey?
 

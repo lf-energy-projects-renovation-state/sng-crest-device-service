@@ -23,8 +23,6 @@ class PskDecryptionService(private val pskDecryptionConfiguration: PskDecryption
             pskDecryptionConfiguration.privateKey[keyRef]
                 ?: throw UnknownKeyRefException("Keyref not found in configuration")
 
-        return Cipher.getInstance(pskDecryptionConfiguration.method).apply {
-            init(Cipher.DECRYPT_MODE, privateKey)
-        }
+        return Cipher.getInstance(pskDecryptionConfiguration.method).apply { init(Cipher.DECRYPT_MODE, privateKey) }
     }
 }

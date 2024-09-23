@@ -24,14 +24,11 @@ class MessageController(
     private val locks: MutableMap<String, Any> = mutableMapOf()
 
     /**
-     * This endpoint handles incoming crest device messages. Responses are generated synchronously
-     * to avoid sending the same downlink twice.
+     * This endpoint handles incoming crest device messages. Responses are generated synchronously to avoid sending the
+     * same downlink twice.
      */
     @PostMapping("/{identity}")
-    fun post(
-        @NonNull @PathVariable identity: String,
-        @NonNull @RequestBody body: JsonNode
-    ): ResponseEntity<String> {
+    fun post(@NonNull @PathVariable identity: String, @NonNull @RequestBody body: JsonNode): ResponseEntity<String> {
 
         logger.debug { "Processing message $body" }
         messageProducerService.produceMessage(body)
@@ -52,6 +49,5 @@ class MessageController(
     }
 
     @Synchronized
-    private fun lock(substationIdentification: String) =
-        locks.computeIfAbsent(substationIdentification) { _ -> Any() }
+    private fun lock(substationIdentification: String) = locks.computeIfAbsent(substationIdentification) { _ -> Any() }
 }

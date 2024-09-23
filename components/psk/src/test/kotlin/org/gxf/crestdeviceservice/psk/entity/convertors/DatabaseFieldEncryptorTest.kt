@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test
 
 class DatabaseFieldEncryptorTest {
 
-    private val databaseFieldEncryptor =
-        DatabaseFieldEncryptor().apply { secret = "super-secret-key" }
+    private val databaseFieldEncryptor = DatabaseFieldEncryptor().apply { secret = "super-secret-key" }
 
     @Test
     fun shouldBeAbleTeEncryptAndDecryptData() {

@@ -30,8 +30,7 @@ class PskDecryptionServiceTest {
         val decryptionService =
             PskDecryptionService(
                 PskDecryptionConfiguration(
-                    mapOf(keyRef to keyPair.private as RSAPrivateKey),
-                    "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING"))
+                    mapOf(keyRef to keyPair.private as RSAPrivateKey), "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING"))
 
         // Decrypt the secret
         val decryptedSecret = decryptionService.decryptSecret(encryptedSecret, keyRef)
@@ -52,8 +51,7 @@ class PskDecryptionServiceTest {
         val decryptionService =
             PskDecryptionService(
                 PskDecryptionConfiguration(
-                    mapOf(keyRef to keyPair.private as RSAPrivateKey),
-                    "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING"))
+                    mapOf(keyRef to keyPair.private as RSAPrivateKey), "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING"))
 
         assertThatThrownBy { decryptionService.decryptSecret(encryptedSecret, "2") }
             .isInstanceOf(UnknownKeyRefException::class.java)

@@ -10,15 +10,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CommandRepository : CrudRepository<Command, UUID> {
-    fun findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-        deviceId: String,
-        type: Command.CommandType
-    ): Command?
+    fun findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(deviceId: String, type: Command.CommandType): Command?
 
-    fun findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-        deviceId: String,
-        status: Command.CommandStatus
-    ): Command?
+    fun findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId: String, status: Command.CommandStatus): Command?
 
     fun findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
         deviceId: String,

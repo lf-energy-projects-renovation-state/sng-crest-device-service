@@ -22,16 +22,14 @@ class CommandConsumer(
 ) {
     private val logger = KotlinLogging.logger {}
 
-    @KafkaListener(
-        id = "command", idIsGroup = false, topics = ["\${kafka.consumers.command.topic}"])
+    @KafkaListener(id = "command", idIsGroup = false, topics = ["\${kafka.consumers.command.topic}"])
     fun handleIncomingCommand(externalCommand: ExternalCommand) {
         logger.info {
             "Received command ${externalCommand.command} for device: ${externalCommand.deviceId}, with correlation id: ${externalCommand.correlationId}"
         }
         try {
             val pendingCommand =
-                CommandMapper.externalCommandToCommandEntity(
-                    externalCommand, Command.CommandStatus.PENDING)
+                CommandMapper.externalCommandToCommandEntity(externalCommand, Command.CommandStatus.PENDING)
 
             commandService.validate(pendingCommand)
             commandFeedbackService.sendReceivedFeedback(pendingCommand)

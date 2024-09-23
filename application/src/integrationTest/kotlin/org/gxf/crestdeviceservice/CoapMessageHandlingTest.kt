@@ -51,14 +51,12 @@ class CoapMessageHandlingTest {
 
     @Autowired private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
 
-    @Value("\${kafka.producers.command-feedback.topic}")
-    private lateinit var commandFeedbackTopic: String
+    @Value("\${kafka.producers.command-feedback.topic}") private lateinit var commandFeedbackTopic: String
 
     @BeforeEach
     fun setup() {
         pskRepository.save(
-            PreSharedKey(
-                DEVICE_ID, 0, Instant.MIN, PRE_SHARED_KEY_FIRST, SECRET, PreSharedKeyStatus.ACTIVE))
+            PreSharedKey(DEVICE_ID, 0, Instant.MIN, PRE_SHARED_KEY_FIRST, SECRET, PreSharedKeyStatus.ACTIVE))
     }
 
     @AfterEach
@@ -70,8 +68,7 @@ class CoapMessageHandlingTest {
     @Test
     fun shouldReturnADownLinkContainingPskCommands() {
         pskRepository.save(
-            PreSharedKey(
-                DEVICE_ID, 1, Instant.now(), PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.READY))
+            PreSharedKey(DEVICE_ID, 1, Instant.now(), PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.READY))
         commandRepository.save(
             Command(
                 UUID.randomUUID(),
@@ -103,13 +100,7 @@ class CoapMessageHandlingTest {
     fun shouldChangeActiveKey() {
         // pending psk, waiting for URC in next message from device
         pskRepository.save(
-            PreSharedKey(
-                DEVICE_ID,
-                1,
-                Instant.now(),
-                PRE_SHARED_KEY_NEW,
-                SECRET,
-                PreSharedKeyStatus.PENDING))
+            PreSharedKey(DEVICE_ID, 1, Instant.now(), PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.PENDING))
         commandRepository.save(
             Command(
                 UUID.randomUUID(),
@@ -130,8 +121,7 @@ class CoapMessageHandlingTest {
                 Command.CommandStatus.IN_PROGRESS))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-        val request =
-            HttpEntity<String>(getFileContentAsString("message_psk_set_success.json"), headers)
+        val request = HttpEntity<String>(getFileContentAsString("message_psk_set_success.json"), headers)
 
         val result = restTemplate.postForEntity<String>("/sng/${DEVICE_ID}", request)
 
@@ -147,8 +137,7 @@ class CoapMessageHandlingTest {
     fun shouldSetPendingKeyAsInvalidWhenFailureURCReceived() {
         // pending psk, waiting for URC in next message from device
         pskRepository.save(
-            PreSharedKey(
-                DEVICE_ID, 1, Instant.MIN, PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.PENDING))
+            PreSharedKey(DEVICE_ID, 1, Instant.MIN, PRE_SHARED_KEY_NEW, SECRET, PreSharedKeyStatus.PENDING))
         commandRepository.save(
             Command(
                 UUID.randomUUID(),
@@ -169,8 +158,7 @@ class CoapMessageHandlingTest {
                 Command.CommandStatus.IN_PROGRESS))
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-        val request =
-            HttpEntity<String>(getFileContentAsString("message_psk_set_failure.json"), headers)
+        val request = HttpEntity<String>(getFileContentAsString("message_psk_set_failure.json"), headers)
 
         val result = restTemplate.postForEntity<String>("/sng/${DEVICE_ID}", request)
 
@@ -218,8 +206,7 @@ class CoapMessageHandlingTest {
 
     @Test
     fun shouldSendCommandSuccessFeedbackToMaki() {
-        val consumer =
-            IntegrationTestHelper.createKafkaConsumer(embeddedKafkaBroker, commandFeedbackTopic)
+        val consumer = IntegrationTestHelper.createKafkaConsumer(embeddedKafkaBroker, commandFeedbackTopic)
 
         // command in progress should be in database
         val id = UUID.randomUUID()

@@ -30,26 +30,20 @@ object IntegrationTestHelper {
             DefaultKafkaConsumerFactory(
                 testProperties,
                 StringDeserializer(),
-                AvroDeserializer(
-                    listOf(DeviceMessage.getClassSchema(), CommandFeedback.getClassSchema())))
+                AvroDeserializer(listOf(DeviceMessage.getClassSchema(), CommandFeedback.getClassSchema())))
         val consumer = consumerFactory.createConsumer()
         embeddedKafkaBroker.consumeFromAnEmbeddedTopic(consumer, topic)
         return consumer
     }
 
-    fun createKafkaProducer(
-        embeddedKafkaBroker: EmbeddedKafkaBroker
-    ): Producer<String, SpecificRecordBase> {
-        val producerProps: Map<String, Any> =
-            HashMap(producerProps(embeddedKafkaBroker.brokersAsString))
-        val producerFactory =
-            DefaultKafkaProducerFactory(producerProps, StringSerializer(), AvroSerializer())
+    fun createKafkaProducer(embeddedKafkaBroker: EmbeddedKafkaBroker): Producer<String, SpecificRecordBase> {
+        val producerProps: Map<String, Any> = HashMap(producerProps(embeddedKafkaBroker.brokersAsString))
+        val producerFactory = DefaultKafkaProducerFactory(producerProps, StringSerializer(), AvroSerializer())
         return producerFactory.createProducer()
     }
 
     /**
-     * Copy of the com.alliander.gxf.sngmessageprocessor.kafka test util producer props with
-     * different serializers
+     * Copy of the com.alliander.gxf.sngmessageprocessor.kafka test util producer props with different serializers
      *
      * @see KafkaTestUtils.producerProps
      */

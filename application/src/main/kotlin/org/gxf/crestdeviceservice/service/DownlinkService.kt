@@ -49,16 +49,11 @@ class DownlinkService(
         }
 
     private fun getDownlinkFromCommands(deviceId: String, pendingCommands: List<Command>): String {
-        logger.info {
-            "Device $deviceId has pending commands of types: ${getPrintableCommandTypes(pendingCommands)}."
-        }
+        logger.info { "Device $deviceId has pending commands of types: ${getPrintableCommandTypes(pendingCommands)}." }
 
         val downlink = Downlink(messageProperties.maxBytes)
 
-        val commandsToSend =
-            pendingCommands.filter { command ->
-                downlink.addIfItFits(getDownlinkPerCommand(command))
-            }
+        val commandsToSend = pendingCommands.filter { command -> downlink.addIfItFits(getDownlinkPerCommand(command)) }
 
         logger.info { "Commands that will be sent: ${getPrintableCommandTypes(commandsToSend)}." }
         commandsToSend.forEach { command -> setCommandInProgress(command) }

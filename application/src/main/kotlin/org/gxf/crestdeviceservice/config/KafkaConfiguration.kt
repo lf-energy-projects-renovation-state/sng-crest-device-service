@@ -22,15 +22,10 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
 
 @Configuration
-class KafkaConfiguration(
-    private val kafkaProperties: KafkaProperties,
-    private val sslBundles: SslBundles
-) {
+class KafkaConfiguration(private val kafkaProperties: KafkaProperties, private val sslBundles: SslBundles) {
 
     @Bean
-    fun kafkaListenerContainerFactory(
-        consumerFactory: ConsumerFactory<String, SpecificRecordBase>
-    ) =
+    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<String, SpecificRecordBase>) =
         ConcurrentKafkaListenerContainerFactory<String, SpecificRecordBase>().apply {
             this.consumerFactory = consumerFactory
         }
@@ -43,13 +38,10 @@ class KafkaConfiguration(
             AvroDeserializer(listOf(DeviceCredentials.getClassSchema(), Command.getClassSchema())))
 
     @Bean
-    fun kafkaTemplate(producerFactory: ProducerFactory<String, SpecificRecordBase>) =
-        KafkaTemplate(producerFactory)
+    fun kafkaTemplate(producerFactory: ProducerFactory<String, SpecificRecordBase>) = KafkaTemplate(producerFactory)
 
     @Bean
     fun producerFactory(): ProducerFactory<String, SpecificRecordBase> =
         DefaultKafkaProducerFactory(
-            kafkaProperties.buildProducerProperties(sslBundles),
-            StringSerializer(),
-            AvroSerializer())
+            kafkaProperties.buildProducerProperties(sslBundles), StringSerializer(), AvroSerializer())
 }

@@ -22,21 +22,18 @@ class CommandFeedbackService(
     private val topic = kafkaProducerProperties.commandFeedback.topic
 
     fun sendReceivedFeedback(command: Command) {
-        val commandFeedback =
-            commandEntityToCommandFeedback(command, CommandStatus.Received, "Command received")
+        val commandFeedback = commandEntityToCommandFeedback(command, CommandStatus.Received, "Command received")
         sendFeedback(commandFeedback)
     }
 
     fun sendCancellationFeedback(command: Command, message: String) {
-        val commandFeedback =
-            commandEntityToCommandFeedback(command, CommandStatus.Cancelled, message)
+        val commandFeedback = commandEntityToCommandFeedback(command, CommandStatus.Cancelled, message)
         sendFeedback(commandFeedback)
     }
 
     fun sendRejectionFeedback(reason: String, command: ExternalCommand) {
         val commandFeedback =
-            CommandFeedbackMapper.externalCommandToCommandFeedback(
-                command, CommandStatus.Rejected, reason)
+            CommandFeedbackMapper.externalCommandToCommandFeedback(command, CommandStatus.Rejected, reason)
         sendFeedback(commandFeedback)
     }
 

@@ -19,27 +19,17 @@ class CommandFeedbackMapperTest {
     fun externalCommandToCommandFeedback() {
         val externalCommand = ExternalCommandFactory.externalRebootCommand()
 
-        val result =
-            CommandFeedbackMapper.externalCommandToCommandFeedback(
-                externalCommand, status, MESSAGE_RECEIVED)
+        val result = CommandFeedbackMapper.externalCommandToCommandFeedback(externalCommand, status, MESSAGE_RECEIVED)
 
-        assertThat(result)
-            .usingRecursiveComparison()
-            .ignoringFields("timestampStatus")
-            .isEqualTo(expected)
+        assertThat(result).usingRecursiveComparison().ignoringFields("timestampStatus").isEqualTo(expected)
     }
 
     @Test
     fun commandEntityToCommandFeedback() {
         val commandEntity = CommandFactory.pendingRebootCommand()
 
-        val result =
-            CommandFeedbackMapper.commandEntityToCommandFeedback(
-                commandEntity, status, MESSAGE_RECEIVED)
+        val result = CommandFeedbackMapper.commandEntityToCommandFeedback(commandEntity, status, MESSAGE_RECEIVED)
 
-        assertThat(result)
-            .usingRecursiveComparison()
-            .ignoringFields("timestampStatus")
-            .isEqualTo(expected)
+        assertThat(result).usingRecursiveComparison().ignoringFields("timestampStatus").isEqualTo(expected)
     }
 }
