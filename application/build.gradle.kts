@@ -17,6 +17,7 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
 
     implementation(project(":components:psk"))
+    implementation(project(":components:firmware"))
 
     implementation(kotlin("reflect"))
     implementation(libs.logging)
@@ -65,6 +66,7 @@ testing {
             dependencies {
                 implementation(project())
                 implementation(project(":components:psk"))
+                implementation(project(":components:firmware"))
                 implementation("org.springframework.boot:spring-boot-starter-data-jpa")
                 implementation(libs.kafkaAvro)
                 implementation(libs.avro)
