@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 echo "*********************************************************"
 echo "Running git pre-commit hook. Running Spotless Apply... "
 echo "*********************************************************"
