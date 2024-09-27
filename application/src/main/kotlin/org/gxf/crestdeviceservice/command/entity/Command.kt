@@ -21,6 +21,14 @@ data class Command(
     val commandValue: String?,
     @Enumerated(EnumType.STRING) var status: CommandStatus,
 ) {
+    fun start() = this.apply { this.status = CommandStatus.IN_PROGRESS }
+
+    fun finish() = this.apply { this.status = CommandStatus.SUCCESSFUL }
+
+    fun fail() = this.apply { this.status = CommandStatus.ERROR }
+
+    fun cancel() = this.apply { this.status = CommandStatus.CANCELLED }
+
     enum class CommandType(
         val downlink: String,
         val urcsSuccess: List<String>,

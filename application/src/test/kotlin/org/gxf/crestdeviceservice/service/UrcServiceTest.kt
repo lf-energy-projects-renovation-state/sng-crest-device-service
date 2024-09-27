@@ -26,7 +26,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.refEq
 import org.mockito.kotlin.spy
@@ -84,14 +83,8 @@ class UrcServiceTest {
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(pskCommandsInProgress)
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    pskCommandInProgress, Command.CommandStatus.SUCCESSFUL))
-            .thenReturn(savedPskCommand)
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    pskSetCommandInProgress, Command.CommandStatus.SUCCESSFUL))
-            .thenReturn(savedPskSetCommand)
+        whenever(commandService.save(pskCommandInProgress)).thenReturn(savedPskCommand)
+        whenever(commandService.save(pskSetCommandInProgress)).thenReturn(savedPskSetCommand)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
@@ -108,21 +101,14 @@ class UrcServiceTest {
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(listOf(pskCommandInProgress, pskSetCommandInProgress))
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    pskCommandInProgress, Command.CommandStatus.ERROR))
-            .thenReturn(pskCommandError)
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    pskSetCommandInProgress, Command.CommandStatus.ERROR))
-            .thenReturn(pskSetCommandError)
+        whenever(commandService.save(pskCommandInProgress)).thenReturn(pskCommandError)
+        whenever(commandService.save(pskSetCommandInProgress)).thenReturn(pskSetCommandError)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
         verify(pskService).setPendingKeyAsInvalid(DEVICE_ID)
-        verify(commandService, times(2))
-            .saveCommandWithNewStatus(any<Command>(), eq(Command.CommandStatus.ERROR))
+        verify(commandService, times(2)).save(any<Command>())
         verify(commandFeedbackService, times(2)).sendFeedback(any<CommandFeedback>())
     }
 
@@ -153,15 +139,11 @@ class UrcServiceTest {
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(listOf(commandInProgress))
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    commandInProgress, Command.CommandStatus.SUCCESSFUL))
-            .thenReturn(commandSuccessful)
+        whenever(commandService.save(commandInProgress)).thenReturn(commandSuccessful)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
-        verify(commandService)
-            .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
+        verify(commandService).save(commandInProgress)
         verify(commandFeedbackService).sendFeedback(refEq(commandFeedback, "timestampStatus"))
     }
 
@@ -177,7 +159,7 @@ class UrcServiceTest {
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
-        verify(commandService, times(0)).saveCommandEntities(any<List<Command>>())
+        verify(commandService, times(0)).save(any<List<Command>>())
         verify(commandFeedbackService, times(0)).sendFeedback(any<CommandFeedback>())
     }
 

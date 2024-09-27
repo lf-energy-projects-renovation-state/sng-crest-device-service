@@ -40,16 +40,11 @@ object CommandFactory {
             commandValue = null,
             status = Command.CommandStatus.PENDING)
 
-    fun pendingPskCommands() = listOf(pendingPskCommand(), pendingPskSetCommand())
+    fun rebootCommandInProgress() = pendingRebootCommand().start()
 
-    fun rebootCommandInProgress() =
-        pendingRebootCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
+    fun pskCommandInProgress() = pendingPskCommand().start()
 
-    fun pskCommandInProgress() =
-        pendingPskCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
-
-    fun pskSetCommandInProgress() =
-        pendingPskSetCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
+    fun pskSetCommandInProgress() = pendingPskSetCommand().start()
 
     fun pskCommandsInProgress() = listOf(pskCommandInProgress(), pskSetCommandInProgress())
 }

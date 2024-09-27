@@ -7,7 +7,6 @@ import com.alliander.sng.CommandStatus as ExternalCommandStatus
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
-import org.gxf.crestdeviceservice.command.entity.Command.CommandStatus
 import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
@@ -125,7 +124,7 @@ class UrcService(
             "Command ${command.type} failed for device with id ${command.deviceId}. Error(s): $errorMessages."
         }
 
-        val failedCommand = commandService.saveCommandWithNewStatus(command, CommandStatus.ERROR)
+        val failedCommand = commandService.save(command.fail())
         val commandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
                 failedCommand,
@@ -150,8 +149,7 @@ class UrcService(
             "Command ${command.type} for device ${command.deviceId} handled successfully. Saving command and sending feedback to Maki."
         }
 
-        val successfulCommand =
-            commandService.saveCommandWithNewStatus(command, CommandStatus.SUCCESSFUL)
+        val successfulCommand = commandService.save(command.finish())
         val commandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
                 successfulCommand, ExternalCommandStatus.Successful, "Command handled successfully")
