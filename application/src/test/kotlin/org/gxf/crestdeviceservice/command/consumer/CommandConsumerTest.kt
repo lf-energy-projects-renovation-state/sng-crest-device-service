@@ -22,8 +22,7 @@ class CommandConsumerTest {
     private val commandService = mock<CommandService>()
     private val commandFeedbackService = mock<CommandFeedbackService>()
     private val pskService = mock<PskService>()
-    private val commandConsumer =
-        CommandConsumer(commandService, commandFeedbackService, pskService)
+    private val commandConsumer = CommandConsumer(commandService, commandFeedbackService, pskService)
 
     private val externalCommand = ExternalCommandFactory.externalRebootCommand()
     private val command = CommandFactory.pendingRebootCommand()
@@ -36,8 +35,7 @@ class CommandConsumerTest {
 
         verify(commandService).validate(refEq(command, "id", "timestampIssued"))
         verify(commandFeedbackService).sendReceivedFeedback(refEq(command, "id", "timestampIssued"))
-        verify(commandService)
-            .cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
+        verify(commandService).cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
         verify(commandService).save(refEq(command, "id", "timestampIssued"))
     }
 
@@ -49,8 +47,7 @@ class CommandConsumerTest {
 
         verify(commandService).validate(refEq(command, "id", "timestampIssued"))
         verify(commandFeedbackService).sendReceivedFeedback(refEq(command, "id", "timestampIssued"))
-        verify(commandService)
-            .cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
+        verify(commandService).cancelOlderCommandIfNecessary(refEq(command, "id", "timestampIssued"))
         verify(pskService).generateNewReadyKeyForDevice(command.deviceId)
         verify(commandService).save(refEq(command, "id", "timestampIssued"))
     }

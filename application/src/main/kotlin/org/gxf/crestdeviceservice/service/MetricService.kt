@@ -16,8 +16,7 @@ class MetricService(meterRegistry: MeterRegistry) {
 
     private val identityInvalidCounter =
         Counter.builder("$METRIC_PREFIX.psk.notfound")
-            .description(
-                "Counts the number of times a device tried to connect with a wrong/unknown Identity")
+            .description("Counts the number of times a device tried to connect with a wrong/unknown Identity")
             .register(meterRegistry)
 
     fun incrementIdentityInvalidCounter() = identityInvalidCounter.increment()
