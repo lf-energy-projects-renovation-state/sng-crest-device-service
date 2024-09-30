@@ -10,8 +10,4 @@ import jakarta.persistence.ManyToOne
 
 @Entity
 @IdClass(FirmwarePacketCompositeKey::class)
-class FirmwarePacket(
-    @ManyToOne @Id val firmware: Firmware,
-    @Id val packetNumber: Int,
-    val packet: String
-)
+class FirmwarePacket(@ManyToOne @Id val firmware: Firmware, @Id val packetNumber: Int, val packet: String)
