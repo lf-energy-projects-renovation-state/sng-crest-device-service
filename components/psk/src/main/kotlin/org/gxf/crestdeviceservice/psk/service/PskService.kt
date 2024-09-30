@@ -75,10 +75,12 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
             PreSharedKey(deviceId, newVersion, Instant.now(), newKey, previousPSK.secret, PreSharedKeyStatus.READY))
     }
 
-    private fun generatePsk(): String =
-        secureRandom.ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length).toArray().fold("") { acc, next ->
-            acc + ALLOWED_CHARACTERS[next]
-        }
+    private fun generatePsk() =
+        secureRandom
+            .ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length)
+            .toArray()
+            .map { ALLOWED_CHARACTERS[it] }
+            .joinToString("")
 
     fun setPskToPendingForDevice(deviceId: String): PreSharedKey {
         val psk = getCurrentReadyPsk(deviceId) ?: throw NoExistingPskException("There is no new key ready to be set")
