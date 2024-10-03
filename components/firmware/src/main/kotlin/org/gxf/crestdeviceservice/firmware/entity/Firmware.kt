@@ -17,5 +17,5 @@ class Firmware(
     val name: String,
     val version: String,
     val previousFirmwareId: UUID?,
-    @OneToMany @Cascade(CascadeType.ALL) val packets: List<FirmwarePacket>
+    @OneToMany @Cascade(CascadeType.ALL) val packets: MutableList<FirmwarePacket>
 )
