@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.controller
@@ -27,9 +27,7 @@ class PskControllerTest {
     @Test
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
         val identity = "identity"
-        whenever(pskService.getCurrentActiveKey(identity)).then {
-            throw NoExistingPskException("oops")
-        }
+        whenever(pskService.getCurrentActiveKey(identity)).then { throw NoExistingPskException("oops") }
 
         mvcRequest
             .perform(MockMvcRequestBuilders.get("/psk").header("x-device-identity", identity))

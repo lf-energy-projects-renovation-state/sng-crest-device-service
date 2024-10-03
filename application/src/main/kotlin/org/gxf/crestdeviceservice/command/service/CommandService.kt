@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
@@ -36,34 +36,28 @@ class CommandService(
     }
 
     /**
-     * Check if the device already has a newer command pending of the same type that was issued at a
-     * later date. This check prevents issues if commands arrive out of order or if we reset the
-     * kafka consumer group.
+     * Check if the device already has a newer command pending of the same type that was issued at a later date. This
+     * check prevents issues if commands arrive out of order or if we reset the kafka consumer group.
      */
     private fun deviceHasNewerSameCommand(
         deviceId: String,
         commandType: Command.CommandType,
         timestampNewCommand: Instant
     ): Boolean {
-        val latestCommandInDatabase =
-            getLatestCommandInDatabase(deviceId, commandType) ?: return false
+        val latestCommandInDatabase = getLatestCommandInDatabase(deviceId, commandType) ?: return false
 
         // If the device already has a newer command in the database
         return latestCommandInDatabase.timestampIssued.isAfter(timestampNewCommand)
     }
 
-    private fun deviceHasSameCommandAlreadyInProgress(
-        deviceId: String,
-        commandType: Command.CommandType
-    ) =
+    private fun deviceHasSameCommandAlreadyInProgress(deviceId: String, commandType: Command.CommandType) =
         commandRepository
             .findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
                 deviceId, commandType, Command.CommandStatus.IN_PROGRESS)
             .isNotEmpty()
 
     private fun getLatestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
-        commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-            deviceId, commandType)
+        commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(deviceId, commandType)
 
     fun cancelOlderCommandIfNecessary(pendingCommand: Command) {
         getSameCommandForDeviceAlreadyPending(pendingCommand)?.let {
@@ -75,8 +69,7 @@ class CommandService(
     }
 
     private fun getSameCommandForDeviceAlreadyPending(command: Command): Command? {
-        val latestCommandInDatabase =
-            getLatestCommandInDatabase(command.deviceId, command.type) ?: return null
+        val latestCommandInDatabase = getLatestCommandInDatabase(command.deviceId, command.type) ?: return null
 
         if (latestCommandInDatabase.status == Command.CommandStatus.PENDING) {
             return latestCommandInDatabase
@@ -86,8 +79,7 @@ class CommandService(
     }
 
     private fun cancelCommand(commandToBeCancelled: Command, newCorrelationId: UUID) {
-        val message =
-            "Command cancelled by newer same command with correlation id: $newCorrelationId"
+        val message = "Command cancelled by newer same command with correlation id: $newCorrelationId"
         commandFeedbackService.sendCancellationFeedback(commandToBeCancelled, message)
         save(commandToBeCancelled.cancel())
     }
@@ -100,8 +92,7 @@ class CommandService(
             deviceId, Command.CommandStatus.IN_PROGRESS)
 
     fun getAllPendingCommandsForDevice(deviceId: String) =
-        commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-            deviceId, Command.CommandStatus.PENDING)
+        commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, Command.CommandStatus.PENDING)
 
     fun getAllCommandsInProgressForDevice(deviceId: String) =
         commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
@@ -109,6 +100,5 @@ class CommandService(
 
     fun save(command: Command) = commandRepository.save(command)
 
-    fun save(commands: List<Command>): MutableIterable<Command> =
-        commandRepository.saveAll(commands)
+    fun save(commands: List<Command>): MutableIterable<Command> = commandRepository.saveAll(commands)
 }

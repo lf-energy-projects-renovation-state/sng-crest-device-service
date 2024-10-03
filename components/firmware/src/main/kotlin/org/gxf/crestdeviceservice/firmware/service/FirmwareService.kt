@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
@@ -19,14 +19,12 @@ class FirmwareService(
     fun findByName(name: String): Firmware = firmwareRepository.findByName(name)
 
     /**
-     * Gets a ready-to-go firmware packet for a device. If required, the firmware hashes in the
-     * packet are replaced with device-specific hashes for validation.
+     * Gets a ready-to-go firmware packet for a device. If required, the firmware hashes in the packet are replaced with
+     * device-specific hashes for validation.
      *
      * @param firmware: the firmware from which to get the packet
-     * @param packetNr: the sequence number of the packet. *This is zero-based (following the
-     *   supplier specs)*
-     * @param deviceId: ID of the receiving device, needed to create device-specific hashes if
-     *   required
+     * @param packetNr: the sequence number of the packet. *This is zero-based (following the supplier specs)*
+     * @param deviceId: ID of the receiving device, needed to create device-specific hashes if required
      * @return Downlink command ready to be sent to the device
      */
     fun getPacketForDevice(firmware: Firmware, packetNr: Int, deviceId: String): String {

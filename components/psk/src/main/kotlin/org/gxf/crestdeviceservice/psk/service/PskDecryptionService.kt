@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.psk.service
@@ -23,8 +23,6 @@ class PskDecryptionService(private val pskDecryptionConfiguration: PskDecryption
             pskDecryptionConfiguration.privateKey[keyRef]
                 ?: throw UnknownKeyRefException("Keyref not found in configuration")
 
-        return Cipher.getInstance(pskDecryptionConfiguration.method).apply {
-            init(Cipher.DECRYPT_MODE, privateKey)
-        }
+        return Cipher.getInstance(pskDecryptionConfiguration.method).apply { init(Cipher.DECRYPT_MODE, privateKey) }
     }
 }

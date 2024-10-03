@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.mapper
@@ -9,10 +9,7 @@ import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 
 object CommandMapper {
-    fun externalCommandToCommandEntity(
-        externalCommand: ExternalCommand,
-        status: Command.CommandStatus
-    ): Command {
+    fun externalCommandToCommandEntity(externalCommand: ExternalCommand, status: Command.CommandStatus): Command {
         try {
             return Command(
                 id = UUID.randomUUID(),

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.entity
@@ -33,18 +33,11 @@ class Command(
 
     fun cancel() = this.apply { this.status = CommandStatus.CANCELLED }
 
-    enum class CommandType(
-        val downlink: String,
-        val urcsSuccess: List<String>,
-        val urcsError: List<String>
-    ) {
+    enum class CommandType(val downlink: String, val urcsSuccess: List<String>, val urcsError: List<String>) {
         PSK("PSK", listOf("PSK:TMP"), listOf("PSK:DLER", "PSK:HSER")),
         PSK_SET("PSK:SET", listOf("PSK:SET"), listOf("PSK:DLER", "PSK:HSER", "PSK:EQER")),
         REBOOT("CMD:REBOOT", listOf("INIT", "WDR"), listOf()),
-        FIRMWARE(
-            "OTA",
-            listOf("OTA:SUC"),
-            listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER")),
+        FIRMWARE("OTA", listOf("OTA:SUC"), listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER")),
     }
 
     enum class CommandStatus {

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.entity
@@ -10,11 +10,7 @@ import jakarta.persistence.ManyToOne
 
 @Entity
 @IdClass(FirmwarePacketCompositeKey::class)
-class FirmwarePacket(
-    @ManyToOne @Id val firmware: Firmware,
-    @Id val packetNumber: Int,
-    val packet: String
-) {
+class FirmwarePacket(@ManyToOne @Id val firmware: Firmware, @Id val packetNumber: Int, val packet: String) {
     fun isFirstPacket() = packet.startsWith(OTA_START)
 
     fun isLastPacket() = packet.endsWith(OTA_DONE)

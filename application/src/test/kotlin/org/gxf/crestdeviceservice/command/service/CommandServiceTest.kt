@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
@@ -27,9 +27,7 @@ class CommandServiceTest {
 
     @Test
     fun validateSucceeded() {
-        whenever(
-                commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-                    any(), any()))
+        whenever(commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()))
             .thenReturn(CommandFactory.pendingRebootCommand(Instant.now().minusSeconds(100)))
 
         assertDoesNotThrow { commandService.validate(CommandFactory.pendingRebootCommand()) }
@@ -37,12 +35,9 @@ class CommandServiceTest {
 
     @Test
     fun `Check if command is rejected when latest same command is in the future`() {
-        val exceptionExpected =
-            CommandValidationException("There is a newer command of the same type")
+        val exceptionExpected = CommandValidationException("There is a newer command of the same type")
 
-        whenever(
-                commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-                    any(), any()))
+        whenever(commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()))
             .thenReturn(CommandFactory.pendingRebootCommand(Instant.now().plusSeconds(100)))
 
         assertThatThrownBy { commandService.validate(CommandFactory.pendingRebootCommand()) }
@@ -52,11 +47,8 @@ class CommandServiceTest {
 
     @Test
     fun `Check if command is rejected when same command is in progress`() {
-        val exceptionExpected =
-            CommandValidationException("A command of the same type is already in progress.")
-        whenever(
-                commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
-                    any(), any(), any()))
+        val exceptionExpected = CommandValidationException("A command of the same type is already in progress.")
+        whenever(commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(any(), any(), any()))
             .thenReturn(listOf(CommandFactory.rebootCommandInProgress()))
 
         assertThatThrownBy { commandService.validate(CommandFactory.pendingRebootCommand()) }
@@ -69,19 +61,15 @@ class CommandServiceTest {
         val newCommand = CommandFactory.pendingRebootCommand()
         val existingPendingCommand =
             CommandFactory.pendingRebootCommand(
-                timestampIssued = Instant.now().minusSeconds(100),
-                correlationId = UUID.randomUUID())
+                timestampIssued = Instant.now().minusSeconds(100), correlationId = UUID.randomUUID())
 
-        whenever(
-                commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-                    any(), any()))
+        whenever(commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()))
             .thenReturn(existingPendingCommand)
         whenever(commandRepository.save(any<Command>())).thenReturn(existingPendingCommand)
 
         commandService.cancelOlderCommandIfNecessary(newCommand)
 
-        verify(commandFeedbackService)
-            .sendCancellationFeedback(eq(existingPendingCommand), any<String>())
+        verify(commandFeedbackService).sendCancellationFeedback(eq(existingPendingCommand), any<String>())
         verify(commandRepository).save(existingPendingCommand)
         assertThat(existingPendingCommand.status).isEqualTo(Command.CommandStatus.CANCELLED)
     }
@@ -89,14 +77,10 @@ class CommandServiceTest {
     @Test
     fun `Check if no command is cancelled if no existing same pending command exists`() {
         val newCommand = CommandFactory.pendingRebootCommand()
-        whenever(
-                commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-                    any(), any()))
-            .thenReturn(null)
+        whenever(commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any())).thenReturn(null)
 
         commandService.cancelOlderCommandIfNecessary(newCommand)
 
-        verify(commandFeedbackService, times(0))
-            .sendCancellationFeedback(any<Command>(), any<String>())
+        verify(commandFeedbackService, times(0)).sendCancellationFeedback(any<Command>(), any<String>())
     }
 }

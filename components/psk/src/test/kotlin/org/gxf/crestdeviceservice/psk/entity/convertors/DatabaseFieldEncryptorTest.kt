@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.psk.entity.convertors
@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test
 
 class DatabaseFieldEncryptorTest {
 
-    private val databaseFieldEncryptor =
-        DatabaseFieldEncryptor().apply { secret = "super-secret-key" }
+    private val databaseFieldEncryptor = DatabaseFieldEncryptor().apply { secret = "super-secret-key" }
 
     @Test
     fun shouldBeAbleTeEncryptAndDecryptData() {

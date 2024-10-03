@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
@@ -31,24 +31,18 @@ class DownlinkServiceTest {
     fun setUp() {
         whenever(pskCommandGenerator.getSupportedCommand()).thenReturn(Command.CommandType.PSK)
         whenever(pskCommandGenerator.generateCommandString(any())).thenReturn(pskCommandString)
-        whenever(pskSetCommandGenerator.getSupportedCommand())
-            .thenReturn(Command.CommandType.PSK_SET)
-        whenever(pskSetCommandGenerator.generateCommandString(any()))
-            .thenReturn(pskSetCommandString)
+        whenever(pskSetCommandGenerator.getSupportedCommand()).thenReturn(Command.CommandType.PSK_SET)
+        whenever(pskSetCommandGenerator.generateCommandString(any())).thenReturn(pskSetCommandString)
 
         this.downlinkService =
             DownlinkService(
-                pskService,
-                commandService,
-                messageProperties,
-                listOf(pskCommandGenerator, pskSetCommandGenerator))
+                pskService, commandService, messageProperties, listOf(pskCommandGenerator, pskSetCommandGenerator))
     }
 
     @Test
     fun shouldUseGeneratorWhenAvailableForCommand() {
         val pskCommandPending = CommandFactory.pendingPskCommand()
-        whenever(commandService.getAllPendingCommandsForDevice(deviceId))
-            .thenReturn(listOf(pskCommandPending))
+        whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(listOf(pskCommandPending))
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(true)
 
         val downlink = downlinkService.getDownlinkForDevice(deviceId)
@@ -60,8 +54,7 @@ class DownlinkServiceTest {
     @Test
     fun shouldUseCommandTypeDownlinkWhenGeneratorIsNotAvailable() {
         val rebootCommandPending = CommandFactory.pendingRebootCommand()
-        whenever(commandService.getAllPendingCommandsForDevice(deviceId))
-            .thenReturn(listOf(rebootCommandPending))
+        whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(listOf(rebootCommandPending))
 
         val downlink = downlinkService.getDownlinkForDevice(deviceId)
 
@@ -75,8 +68,7 @@ class DownlinkServiceTest {
         val pskSetCommand = CommandFactory.pendingPskSetCommand()
         val pskCommandsPending = listOf(pskCommand, pskSetCommand)
 
-        whenever(commandService.getAllPendingCommandsForDevice(deviceId))
-            .thenReturn(pskCommandsPending)
+        whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(pskCommandsPending)
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(true)
         whenever(commandService.save(pskCommand)).thenReturn(pskCommand)
         whenever(commandService.save(pskSetCommand)).thenReturn(pskSetCommand)
@@ -93,8 +85,7 @@ class DownlinkServiceTest {
         val rebootCommand = CommandFactory.pendingRebootCommand()
         val pendingCommands = listOf(rebootCommand)
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(false)
-        whenever(commandService.getAllPendingCommandsForDevice(deviceId))
-            .thenReturn(pendingCommands)
+        whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(pendingCommands)
         whenever(commandService.getFirstCommandInProgressForDevice(deviceId)).thenReturn(null)
         whenever(commandService.save(rebootCommand)).thenReturn(rebootCommand)
 

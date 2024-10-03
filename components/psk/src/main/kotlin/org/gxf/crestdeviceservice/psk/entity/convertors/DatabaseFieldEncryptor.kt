@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.psk.entity.convertors
@@ -29,14 +29,11 @@ class DatabaseFieldEncryptor : AttributeConverter<String, String> {
 
     override fun convertToDatabaseColumn(attribute: String): String {
         return Base64.getEncoder()
-            .encodeToString(
-                encrypt(attribute, SecretKeySpec(secret.toByteArray(), ENCRYPTION_ALGORITHM)))
+            .encodeToString(encrypt(attribute, SecretKeySpec(secret.toByteArray(), ENCRYPTION_ALGORITHM)))
     }
 
     override fun convertToEntityAttribute(dbData: String): String {
-        return decrypt(
-            Base64.getDecoder().decode(dbData),
-            SecretKeySpec(secret.toByteArray(), ENCRYPTION_ALGORITHM))
+        return decrypt(Base64.getDecoder().decode(dbData), SecretKeySpec(secret.toByteArray(), ENCRYPTION_ALGORITHM))
     }
 
     private fun encrypt(plaintext: String, secretKey: SecretKey): ByteArray {

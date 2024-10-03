@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
@@ -52,10 +52,7 @@ class UrcServiceTest {
         @JvmStatic
         private fun containingPskErrorUrcs() =
             Stream.of(
-                listOf("PSK:DLER"),
-                listOf("PSK:HSER"),
-                listOf("TS:ERR", "PSK:DLER"),
-                listOf("PSK:DLER", "PSK:EQER"))
+                listOf("PSK:DLER"), listOf("PSK:HSER"), listOf("TS:ERR", "PSK:DLER"), listOf("PSK:DLER", "PSK:EQER"))
 
         @JvmStatic
         private fun notContainingPskUrcs() =
@@ -79,8 +76,7 @@ class UrcServiceTest {
         val pskCommandsInProgress = listOf(pskCommandInProgress, pskSetCommandInProgress)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
-        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(pskCommandsInProgress)
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(pskCommandsInProgress)
         whenever(commandService.save(pskCommandInProgress)).thenReturn(pskCommandInProgress)
         whenever(commandService.save(pskSetCommandInProgress)).thenReturn(pskSetCommandInProgress)
 
@@ -117,8 +113,7 @@ class UrcServiceTest {
     fun shouldNotSetPendingKeyAsInvalidWhenOtherURCReceived(urcs: List<String>) {
         val pskCommands = CommandFactory.pskCommandsInProgress()
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
-        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(pskCommands)
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(pskCommands)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
@@ -133,8 +128,7 @@ class UrcServiceTest {
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
-        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(listOf(commandInProgress))
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf(commandInProgress))
         whenever(commandService.save(commandInProgress)).thenReturn(commandInProgress)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
@@ -144,8 +138,7 @@ class UrcServiceTest {
                 commandInProgress, CommandStatus.Successful, "Command handled successfully")
 
         verify(commandService).save(commandInProgress)
-        verify(commandFeedbackService)
-            .sendFeedback(refEq(expectedCommandFeedback, "timestampStatus"))
+        verify(commandFeedbackService).sendFeedback(refEq(expectedCommandFeedback, "timestampStatus"))
         assertThat(commandInProgress.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
     }
 
@@ -156,8 +149,7 @@ class UrcServiceTest {
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
-        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(listOf(commandInProgress))
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf(commandInProgress))
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
@@ -186,8 +178,7 @@ class UrcServiceTest {
 
     private fun urcFieldValue(urcs: List<String>, downlink: String): ArrayNode? {
         val urcNodes = urcs.map { urc -> TextNode(urc) }
-        val downlinkNode =
-            ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(downlink)))
+        val downlinkNode = ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(downlink)))
         val urcsPlusReceivedDownlink: MutableList<BaseJsonNode> = mutableListOf()
         urcsPlusReceivedDownlink.addAll(urcNodes)
         urcsPlusReceivedDownlink.add(downlinkNode)

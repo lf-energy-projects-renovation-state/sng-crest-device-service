@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.repository
@@ -10,15 +10,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CommandRepository : CrudRepository<Command, UUID> {
-    fun findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(
-        deviceId: String,
-        type: Command.CommandType
-    ): Command?
+    fun findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(deviceId: String, type: Command.CommandType): Command?
 
-    fun findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-        deviceId: String,
-        status: Command.CommandStatus
-    ): Command?
+    fun findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId: String, status: Command.CommandStatus): Command?
 
     fun findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
         deviceId: String,

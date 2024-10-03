@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
@@ -38,9 +38,7 @@ class DeviceCredentialsRetrievalTest {
 
     @BeforeEach
     fun setup() {
-        pskRepository.save(
-            PreSharedKey(
-                IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY, SECRET, PreSharedKeyStatus.ACTIVE))
+        pskRepository.save(PreSharedKey(IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY, SECRET, PreSharedKeyStatus.ACTIVE))
     }
 
     @AfterEach
@@ -52,13 +50,10 @@ class DeviceCredentialsRetrievalTest {
     fun shouldReturnTheLatestPskWhenThereAreMoreFoundForIdentity() {
         // create second PSK for identity this one should be returned
         pskRepository.save(
-            PreSharedKey(
-                IDENTITY, 1, Instant.MIN, "0000111122223333", SECRET, PreSharedKeyStatus.ACTIVE))
+            PreSharedKey(IDENTITY, 1, Instant.MIN, "0000111122223333", SECRET, PreSharedKeyStatus.ACTIVE))
 
         val headers = HttpHeaders().apply { add("x-device-identity", IDENTITY) }
-        val result =
-            restTemplate.exchange(
-                "/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
+        val result = restTemplate.exchange("/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
 
         assertThat(result.body).isEqualTo("0000111122223333")
     }
@@ -66,9 +61,7 @@ class DeviceCredentialsRetrievalTest {
     @Test
     fun shouldReturn404WhenNoKeyIsFound() {
         val headers = HttpHeaders().apply { add("x-device-identity", "12345") }
-        val result =
-            restTemplate.exchange(
-                "/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
+        val result = restTemplate.exchange("/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
 
         assertThat(result.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }

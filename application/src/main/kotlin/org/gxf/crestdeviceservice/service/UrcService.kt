@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
@@ -37,15 +37,11 @@ class UrcService(
             logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
         }
 
-        val downlinks =
-            getDownlinksFromMessage(body).filter { downlink ->
-                downlink != "0" && downlink.isNotBlank()
-            }
+        val downlinks = getDownlinksFromMessage(body).filter { downlink -> downlink != "0" && downlink.isNotBlank() }
         downlinks.forEach { downlink -> handleDownlinkFromMessage(deviceId, downlink, urcs) }
     }
 
-    private fun getUrcsFromMessage(body: JsonNode) =
-        body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
+    private fun getUrcsFromMessage(body: JsonNode) = body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
 
     private fun getDownlinksFromMessage(body: JsonNode) =
         body[URC_FIELD].first { it.isObject }[DL_FIELD].asText().split(";")
@@ -64,18 +60,13 @@ class UrcService(
     private fun getCommandThatDownlinkIsAbout(deviceId: String, downlink: String): Command? {
         val commandsInProgress = commandService.getAllCommandsInProgressForDevice(deviceId)
         return try {
-            commandsInProgress.first { command ->
-                downlinkConcernsCommandType(downlink, command.type)
-            }
+            commandsInProgress.first { command -> downlinkConcernsCommandType(downlink, command.type) }
         } catch (e: NoSuchElementException) {
             null
         }
     }
 
-    private fun downlinkConcernsCommandType(
-        downlink: String,
-        commandType: Command.CommandType
-    ): Boolean {
+    private fun downlinkConcernsCommandType(downlink: String, commandType: Command.CommandType): Boolean {
         return if (commandType == Command.CommandType.PSK) {
             // do not treat PSK_SET downlink as PSK command
             !downlinkMatchesForCommandType(downlink, Command.CommandType.PSK_SET)
@@ -84,10 +75,7 @@ class UrcService(
         }
     }
 
-    private fun downlinkMatchesForCommandType(
-        downlink: String,
-        commandType: Command.CommandType
-    ): Boolean {
+    private fun downlinkMatchesForCommandType(downlink: String, commandType: Command.CommandType): Boolean {
         val parts = commandType.downlink.split(":")
         return parts.all { part -> downlink.contains(part) }
     }
@@ -127,16 +115,13 @@ class UrcService(
         val failedCommand = commandService.save(command.fail())
         val commandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
-                failedCommand,
-                ExternalCommandStatus.Error,
-                "Command failed. Error(s): $errorMessages.")
+                failedCommand, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
         commandFeedbackService.sendFeedback(commandFeedback)
     }
 
     private fun handlePskErrors(deviceId: String) {
         if (!pskService.isPendingPskPresent(deviceId)) {
-            throw NoExistingPskException(
-                "Failure URC received, but no pending key present to set as invalid")
+            throw NoExistingPskException("Failure URC received, but no pending key present to set as invalid")
         }
         pskService.setPendingKeyAsInvalid(deviceId)
     }
@@ -159,8 +144,7 @@ class UrcService(
     private fun handlePskSetSuccess(command: Command) {
         val deviceId = command.deviceId
         if (!pskService.isPendingPskPresent(deviceId)) {
-            throw NoExistingPskException(
-                "Success URC received, but no pending key present to set as active")
+            throw NoExistingPskException("Success URC received, but no pending key present to set as active")
         }
         logger.info { "PSK set successfully, changing active key" }
         pskService.changeActiveKey(deviceId)

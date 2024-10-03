@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.mapper
@@ -20,10 +20,7 @@ class CommandMapperTest {
 
         val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
 
-        assertThat(result)
-            .usingRecursiveComparison()
-            .ignoringFields("id", "timestampIssued")
-            .isEqualTo(expected)
+        assertThat(result).usingRecursiveComparison().ignoringFields("id", "timestampIssued").isEqualTo(expected)
     }
 
     @Test
@@ -31,9 +28,7 @@ class CommandMapperTest {
         val externalCommand = ExternalCommandFactory.externalRebootCommandInvalid()
         val status = Command.CommandStatus.PENDING
 
-        val actual = catchThrowable {
-            CommandMapper.externalCommandToCommandEntity(externalCommand, status)
-        }
+        val actual = catchThrowable { CommandMapper.externalCommandToCommandEntity(externalCommand, status) }
 
         assertThat(actual)
             .isInstanceOf(CommandValidationException::class.java)
