@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
 
+import java.time.Instant
 import java.util.UUID
 import org.gxf.crestdeviceservice.TestConstants.CORRELATION_ID
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
@@ -30,15 +31,19 @@ object CommandFactory {
             commandValue = null,
             status = Command.CommandStatus.PENDING)
 
-    fun pendingRebootCommand() =
+    fun pendingRebootCommand(
+        timestampIssued: Instant = timestamp,
+        correlationId: UUID = CORRELATION_ID,
+        status: Command.CommandStatus = Command.CommandStatus.PENDING
+    ) =
         Command(
             id = UUID.randomUUID(),
             deviceId = DEVICE_ID,
-            correlationId = CORRELATION_ID,
-            timestampIssued = timestamp,
+            correlationId = correlationId,
+            timestampIssued = timestampIssued,
             type = Command.CommandType.REBOOT,
             commandValue = null,
-            status = Command.CommandStatus.PENDING)
+            status = status)
 
     fun rebootCommandInProgress() = pendingRebootCommand().start()
 

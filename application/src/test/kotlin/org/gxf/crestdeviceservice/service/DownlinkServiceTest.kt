@@ -96,8 +96,7 @@ class DownlinkServiceTest {
         whenever(commandService.getAllPendingCommandsForDevice(deviceId))
             .thenReturn(pendingCommands)
         whenever(commandService.getFirstCommandInProgressForDevice(deviceId)).thenReturn(null)
-        whenever(commandService.save(rebootCommand))
-            .thenReturn(rebootCommand.copy(status = Command.CommandStatus.IN_PROGRESS))
+        whenever(commandService.save(rebootCommand)).thenReturn(rebootCommand)
 
         val result = downlinkService.getDownlinkForDevice(deviceId)
 

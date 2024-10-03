@@ -14,4 +14,14 @@ class FirmwarePacket(
     @ManyToOne @Id val firmware: Firmware,
     @Id val packetNumber: Int,
     val packet: String
-)
+) {
+    fun isFirstPacket() = packet.startsWith(OTA_START)
+
+    fun isLastPacket() = packet.endsWith(OTA_DONE)
+
+    companion object {
+        const val OTA_START = "OTA0000"
+        const val OTA_DONE = ":DONE"
+        const val HASH_LENGTH = 40
+    }
+}
