@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
@@ -21,8 +21,7 @@ class FirmwareHashServiceTest {
         val firmware = Firmware(UUID.randomUUID(), "test-firmware", "", null, emptyList())
         val rawPacket = FirmwarePacket(firmware, 0, fileContent[0])
 
-        val actualPacket =
-            firmwareHashService.generateDeviceSpecificPacket(rawPacket, "PONMLKJIHGFEDCBA")
+        val actualPacket = firmwareHashService.generateDeviceSpecificPacket(rawPacket, "PONMLKJIHGFEDCBA")
 
         logger.info { "Resulting packet: $actualPacket" }
     }

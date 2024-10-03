@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
@@ -42,11 +42,9 @@ class FirmwareServiceTest {
         val firmware = FirmwareFactory.getFirmware()
         val packet = FirmwareFactory.getFirmwarePacket(firmware)
 
-        whenever(firmwarePacketRepository.findByFirmwareAndPacketNumber(firmware, packetNumber))
-            .thenReturn(packet)
+        whenever(firmwarePacketRepository.findByFirmwareAndPacketNumber(firmware, packetNumber)).thenReturn(packet)
         whenever(deviceSecretService.getDeviceSecret(deviceId)).thenReturn(deviceSecret)
-        whenever(firmwareHashService.generateDeviceSpecificPacket(packet, deviceSecret))
-            .thenReturn(packet.packet)
+        whenever(firmwareHashService.generateDeviceSpecificPacket(packet, deviceSecret)).thenReturn(packet.packet)
 
         val actualPacket = firmwareService.getPacketForDevice(firmware, packetNumber, deviceId)
 

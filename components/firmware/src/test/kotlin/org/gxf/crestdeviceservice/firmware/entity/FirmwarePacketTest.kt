@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.entity
@@ -17,11 +17,7 @@ class FirmwarePacketTest {
         "OTA1234....:DONE, false, true",
         "OTA3333...OTA0000...:DONE..., false, false",
     )
-    fun shouldReportCorrectForm(
-        firmwarePacket: String,
-        expectedFirstPacket: Boolean,
-        expectedLastPacket: Boolean
-    ) {
+    fun shouldReportCorrectForm(firmwarePacket: String, expectedFirstPacket: Boolean, expectedLastPacket: Boolean) {
         val firmware = Firmware(UUID.randomUUID(), "test", "some-hash")
         val packet = FirmwarePacket(firmware, 0, firmwarePacket)
 

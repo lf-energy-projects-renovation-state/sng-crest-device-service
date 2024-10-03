@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.psk.service
@@ -23,9 +23,7 @@ class DeviceSecretServiceTest {
     fun shouldGetSecret() {
         val deviceId = "test-device"
         val expectedSecret = "this is the secret"
-        val psk =
-            PreSharedKey(
-                deviceId, 0, Instant.now(), "n/a", expectedSecret, PreSharedKeyStatus.ACTIVE)
+        val psk = PreSharedKey(deviceId, 0, Instant.now(), "n/a", expectedSecret, PreSharedKeyStatus.ACTIVE)
         whenever(pskService.getCurrentActivePsk(deviceId)).thenReturn(psk)
 
         val actualSecret = deviceSecretService.getDeviceSecret(deviceId)
