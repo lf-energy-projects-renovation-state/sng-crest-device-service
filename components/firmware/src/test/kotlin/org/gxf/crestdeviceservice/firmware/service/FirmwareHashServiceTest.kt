@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class FirmwareHashServiceTest {
     private val logger = KotlinLogging.logger {}
     private val fileContent = Path("src/test/resources/firmware-oneliner.txt").readLines()
-    private val firmwareHashService = FirmwareHashService()
+    private val firmwareHashService = InternalFirmwareHashService()
 
     @Test
     fun shouldGenerateFirstPacket() {

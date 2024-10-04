@@ -3,7 +3,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
 
     implementation(project(":components:psk"))
-    implementation(files("lib/base85.jar")) // TODO REMOVE
+    implementation(project(":components:base85"))
 
     implementation(libs.commonsCodec)
     implementation(libs.logging)

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class FirmwareCommandGenerator(
     private val firmwareService: FirmwareService,
-    private val deviceSecretService: DeviceSecretService
+    private val deviceSecretService: DeviceSecretService,
 ) : CommandGenerator {
     override fun generateCommandString(command: Command): String {
         requireNotNull(command.commandValue) { "commandValue should have a firmware name" }
