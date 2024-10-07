@@ -12,10 +12,11 @@ import org.springframework.stereotype.Service
 @Service
 class FirmwareService(
     private val firmwareRepository: FirmwareRepository,
-    private val firmwarePacketRepository: FirmwarePacketRepository
+    private val firmwarePacketRepository: FirmwarePacketRepository,
+    private val firmwareMapper: FirmwareMapper
 ) {
     fun processFirmware(firmwareDTO: FirmwareDTO) {
-        val firmware = FirmwareMapper.mapFirmwareDTOToEntity(firmwareDTO)
+        val firmware = firmwareMapper.mapFirmwareDTOToEntity(firmwareDTO)
         firmwareRepository.save(firmware)
         firmware.packets.forEach { packet -> firmwarePacketRepository.save(packet) }
         // todo send to maki
