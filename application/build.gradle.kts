@@ -1,4 +1,3 @@
-import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 // SPDX-FileCopyrightText: Copyright Contributors to the GXF project
@@ -49,6 +48,13 @@ tasks.withType<BootJar> {
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
     imageName.set("ghcr.io/osgp/gxf-sng-crest-device-service:${version}")
+    environment.set(
+        mapOf(
+            "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
+            "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-Djava.security.egd=file:/dev/urandom"
+        )
+    )
+
     if (project.hasProperty("publishImage")) {
         publish.set(true)
         docker {
