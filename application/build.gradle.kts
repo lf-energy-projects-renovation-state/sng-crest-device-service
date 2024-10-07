@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":components:avro"))
     implementation(project(":components:psk"))
     implementation(project(":components:firmware"))
+    implementation(project(":components:web"))
 
     implementation(kotlin("reflect"))
     implementation(libs.logging)
@@ -64,8 +65,10 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
+                implementation(project(":components:avro"))
                 implementation(project(":components:psk"))
                 implementation(project(":components:firmware"))
+                implementation(project(":components:web"))
                 implementation("org.springframework.boot:spring-boot-starter-data-jpa")
                 implementation(libs.kafkaAvro)
                 implementation("org.springframework.kafka:spring-kafka")
