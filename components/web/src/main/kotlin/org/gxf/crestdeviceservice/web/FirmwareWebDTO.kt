@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.web
 
-data class FirmwareDTO(val name: String, val packets: List<String>)
+data class FirmwareWebDTO(val name: String, val packets: List<String>)

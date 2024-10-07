@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
-class FirmwareController(val firmwareService: FirmwareService) {
+class FirmwareWebController(val firmwareWebService: FirmwareWebService) {
     private val redirectUrl = "redirect:/"
 
     @GetMapping("/")
@@ -37,7 +37,7 @@ class FirmwareController(val firmwareService: FirmwareService) {
             return redirectUrl
         }
         try {
-            val processedPackets = firmwareService.processFirmwareFile(file)
+            val processedPackets = firmwareWebService.processFirmwareFile(file)
             redirectAttributes.setMessage(
                 "Successfully processed $processedPackets firmware packets")
         } catch (e: Exception) {

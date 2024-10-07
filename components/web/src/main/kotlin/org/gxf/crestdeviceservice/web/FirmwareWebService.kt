@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 @Service
-class FirmwareService(val httpClient: HttpClient) {
+class FirmwareWebService(val httpClient: HttpClient) {
     private val logger = KotlinLogging.logger {}
 
     fun processFirmwareFile(file: MultipartFile): Int {
@@ -22,13 +22,13 @@ class FirmwareService(val httpClient: HttpClient) {
         return firmwareFileDTO.packets.size
     }
 
-    fun mapFirmwareFileToDTO(file: MultipartFile): FirmwareDTO {
+    fun mapFirmwareFileToDTO(file: MultipartFile): FirmwareWebDTO {
         val fileContent = String(file.inputStream.readBytes())
 
         logger.debug { "Contents of firmware file:\n${fileContent}" }
 
         val packets = fileContent.lines()
 
-        return FirmwareDTO(file.originalFilename!!, packets)
+        return FirmwareWebDTO(file.originalFilename!!, packets)
     }
 }

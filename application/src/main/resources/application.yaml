@@ -5,7 +5,7 @@
 # The crest device service should always require mutual tls
 server:
   ssl:
-    enabled: false
+    enabled: true
     client-auth: none
     bundle: "crest-device-service"
 
