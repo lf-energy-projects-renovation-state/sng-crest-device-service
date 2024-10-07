@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface FirmwareRepository : CrudRepository<Firmware, Int> {
-    fun findByName(name: String): Firmware
+    fun findByName(name: String): Firmware?
 
-    fun findByVersion(version: String): Firmware
+    fun findByVersion(version: String): Firmware?
 }
