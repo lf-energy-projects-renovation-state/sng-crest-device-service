@@ -7,6 +7,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.firmware.dto.FirmwareDTO
 import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
+import org.gxf.crestdeviceservice.service.FirmwareProducerService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.lang.NonNull
@@ -18,7 +19,10 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/firmware")
-class FirmwareController(val firmwareService: FirmwareService) {
+class FirmwareController(
+    val firmwareService: FirmwareService,
+    val firmwareProducerService: FirmwareProducerService
+) {
     private val logger = KotlinLogging.logger {}
 
     @PostMapping("/{name}")
@@ -27,11 +31,14 @@ class FirmwareController(val firmwareService: FirmwareService) {
         @NonNull @RequestBody firmware: FirmwareDTO
     ): ResponseEntity<String> {
         try {
-            logger.debug { "Processing firmware with name $name" }
-            firmwareService.processFirmware(firmware)
-            logger.debug { "Processed firmware" }
+            logger.debug { "Processing firmware file with name $name" }
+            val firmwares = firmwareService.processFirmware(firmware)
+            logger.debug { "Processed firmware file" }
+            firmwareProducerService.send(firmwares)
+            logger.info { "Sent updated list of firmwares to Maki" }
             return ResponseEntity.ok("Firmware successfully processed")
         } catch (e: FirmwareException) {
+            logger.error(e) { "Failed to process firmware file" }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
