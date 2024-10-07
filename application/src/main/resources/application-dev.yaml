@@ -22,6 +22,11 @@ mutual-tls:
 server:
   port: 9000
 
+config:
+  http:
+    url: "http://localhost:9000"
+    connection-timeout: "5000ms"
+
 kafka:
   consumers:
     pre-shared-key:
@@ -52,3 +57,10 @@ psk:
         -----END PRIVATE KEY-----
 message:
   max-bytes: 1024
+
+logging:
+  level:
+    org:
+      gxf:
+        crestdeviceservice:
+          debug

@@ -4,7 +4,7 @@
 package org.gxf.crestdeviceservice.http
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.gxf.crestdeviceservice.web.FirmwareDTO
+import org.gxf.crestdeviceservice.web.FirmwareWebDTO
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
@@ -21,7 +21,7 @@ class HttpClient(private val webClient: RestClient) {
     private val logger = KotlinLogging.logger {}
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    fun postFirmware(firmware: FirmwareDTO): ResponseEntity<String> {
+    fun postFirmware(firmware: FirmwareWebDTO): ResponseEntity<String> {
         logger.debug {
             "Posting firmware with name ${firmware.name} and ${firmware.packets.size} packets"
         }
@@ -39,7 +39,7 @@ class HttpClient(private val webClient: RestClient) {
     }
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    private fun executeRequest(firmware: FirmwareDTO): ResponseEntity<String> =
+    private fun executeRequest(firmware: FirmwareWebDTO): ResponseEntity<String> =
         webClient
             .post()
             .uri("$MESSAGE_PATH/${firmware.name}")
