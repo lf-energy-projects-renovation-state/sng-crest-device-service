@@ -7,6 +7,7 @@ import java.util.UUID
 import org.gxf.crestdeviceservice.firmware.dto.FirmwareDTO
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
+import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.springframework.stereotype.Service
 
@@ -32,12 +33,16 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
         name.substringAfter("#TO#").substringBefore(".txt")
 
     private fun getPreviousFirmwareIdFromName(name: String): UUID? {
-        return if (name.contains("#FROM#")) {
-            val previousFirmwareVersion = name.substringAfter("#FROM#").substringBefore("#TO#")
-            val previousFirmware = firmwareRepository.findByVersion(previousFirmwareVersion)
-            previousFirmware.id // todo exceptie als nog niet bestaat
+        if (!name.contains("#FROM#")) {
+            return null
+        }
+        val previousFirmwareVersion = name.substringAfter("#FROM#").substringBefore("#TO#")
+        val previousFirmware = firmwareRepository.findByVersion(previousFirmwareVersion)
+        if (previousFirmware != null) {
+            return previousFirmware.id
         } else {
-            null
+            throw FirmwareException(
+                "Previous firmware with version $previousFirmwareVersion does not exist")
         }
     }
 
