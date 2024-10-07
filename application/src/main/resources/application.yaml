@@ -5,8 +5,8 @@
 # The crest device service should always require mutual tls
 server:
   ssl:
-    enabled: true
-    client-auth: need
+    enabled: false
+    client-auth: none
     bundle: "crest-device-service"
 
 # Run the actuator under a different not tls port

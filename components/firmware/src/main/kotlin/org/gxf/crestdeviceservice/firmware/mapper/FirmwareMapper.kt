@@ -18,7 +18,7 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
                 UUID.randomUUID(),
                 firmwareDTO.name,
                 getFirmwareVersionFromName(firmwareDTO.name),
-                getPreviousFirmwareFromName(firmwareDTO.name),
+                getPreviousFirmwareIdFromName(firmwareDTO.name),
                 mutableListOf())
 
         val packets = mapLinesToPackets(firmwareDTO.packets, firmware)
@@ -31,10 +31,14 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
     private fun getFirmwareVersionFromName(name: String) =
         name.substringAfter("#TO#").substringBefore(".txt")
 
-    private fun getPreviousFirmwareFromName(name: String): UUID {
-        val previousFirmwareVersion = name.substringAfter("#FROM#").substringBefore("#TO#")
-        val previousFirmware = firmwareRepository.findByVersion(previousFirmwareVersion)
-        return previousFirmware.id
+    private fun getPreviousFirmwareIdFromName(name: String): UUID? {
+        return if (name.contains("#FROM#")) {
+            val previousFirmwareVersion = name.substringAfter("#FROM#").substringBefore("#TO#")
+            val previousFirmware = firmwareRepository.findByVersion(previousFirmwareVersion)
+            previousFirmware.id // todo exceptie als nog niet bestaat
+        } else {
+            null
+        }
     }
 
     private fun mapLinesToPackets(dtoPackets: List<String>, firmware: Firmware) =
