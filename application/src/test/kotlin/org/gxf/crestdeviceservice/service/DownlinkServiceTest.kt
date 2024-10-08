@@ -9,6 +9,7 @@ import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.config.MessageProperties
+import org.gxf.crestdeviceservice.model.Downlink
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.gxf.crestdeviceservice.service.command.CommandGenerator
 import org.junit.jupiter.api.BeforeEach
@@ -45,7 +46,7 @@ class DownlinkServiceTest {
         whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(listOf(pskCommandPending))
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(true)
 
-        val downlink = downlinkService.getDownlinkForDevice(deviceId)
+        val downlink = downlinkService.getDownlinkForDevice(deviceId, Downlink())
 
         verify(pskCommandGenerator).generateCommandString(pskCommandPending)
         assertThat(downlink).isEqualTo("!$pskCommandString")
@@ -56,7 +57,7 @@ class DownlinkServiceTest {
         val rebootCommandPending = CommandFactory.pendingRebootCommand()
         whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(listOf(rebootCommandPending))
 
-        val downlink = downlinkService.getDownlinkForDevice(deviceId)
+        val downlink = downlinkService.getDownlinkForDevice(deviceId, Downlink())
 
         verify(pskCommandGenerator, never()).generateCommandString(rebootCommandPending)
         assertThat(downlink).isEqualTo("!${Command.CommandType.REBOOT.downlink}")
@@ -73,7 +74,7 @@ class DownlinkServiceTest {
         whenever(commandService.save(pskCommand)).thenReturn(pskCommand)
         whenever(commandService.save(pskSetCommand)).thenReturn(pskSetCommand)
 
-        val result = downlinkService.getDownlinkForDevice(deviceId)
+        val result = downlinkService.getDownlinkForDevice(deviceId, Downlink())
 
         assertThat(result).isEqualTo("!$pskCommandString;$pskSetCommandString")
         assertThat(pskCommand.status).isEqualTo(Command.CommandStatus.IN_PROGRESS)
@@ -89,7 +90,7 @@ class DownlinkServiceTest {
         whenever(commandService.getFirstCommandInProgressForDevice(deviceId)).thenReturn(null)
         whenever(commandService.save(rebootCommand)).thenReturn(rebootCommand)
 
-        val result = downlinkService.getDownlinkForDevice(deviceId)
+        val result = downlinkService.getDownlinkForDevice(deviceId, Downlink())
 
         val expectedDownlink = "!CMD:REBOOT"
         assertThat(result).isEqualTo(expectedDownlink)
@@ -102,7 +103,7 @@ class DownlinkServiceTest {
         whenever(commandService.getFirstCommandInProgressForDevice(deviceId))
             .thenReturn(CommandFactory.rebootCommandInProgress())
 
-        val result = downlinkService.getDownlinkForDevice(deviceId)
+        val result = downlinkService.getDownlinkForDevice(deviceId, Downlink())
 
         assertThat(result).isEqualTo("0")
     }
@@ -111,7 +112,7 @@ class DownlinkServiceTest {
     fun shouldReturnNoActionDownlinkWhenThereIsNoNewPskOrPendingCommand() {
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(false)
 
-        val result = downlinkService.getDownlinkForDevice(deviceId)
+        val result = downlinkService.getDownlinkForDevice(deviceId, Downlink())
 
         assertThat(result).isEqualTo("0")
     }

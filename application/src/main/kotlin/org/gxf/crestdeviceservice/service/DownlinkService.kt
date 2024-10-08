@@ -22,24 +22,23 @@ class DownlinkService(
     private val messageProperties: MessageProperties,
     commandGeneratorsList: List<CommandGenerator>
 ) {
-    companion object {
-        private const val RESPONSE_SUCCESS = "0"
-    }
 
     private val logger = KotlinLogging.logger {}
 
     private val commandGenerators = commandGeneratorsList.associateBy { it.getSupportedCommand() }
 
+    fun createDownlink() = Downlink(messageProperties.maxBytes)
+
     @Transactional
     @Throws(NoExistingPskException::class)
-    fun getDownlinkForDevice(deviceId: String): String {
+    fun getDownlinkForDevice(deviceId: String, downlink: Downlink): String {
         logger.info { "Gathering pending commands for device $deviceId" }
         val pendingCommands = commandService.getAllPendingCommandsForDevice(deviceId)
         val commandsToSend = getCommandsToSend(pendingCommands)
         if (commandsToSend.isNotEmpty()) {
-            return getDownlinkFromCommands(commandsToSend)
+            fillDownlinkFromCommands(commandsToSend, downlink)
         }
-        return RESPONSE_SUCCESS
+        return downlink.getDownlink()
     }
 
     private fun getCommandsToSend(pendingCommands: List<Command>) =
@@ -51,19 +50,15 @@ class DownlinkService(
             else -> true
         }
 
-    private fun getDownlinkFromCommands(pendingCommands: List<Command>): String {
+    private fun fillDownlinkFromCommands(pendingCommands: List<Command>, downlink: Downlink) {
         logger.info { "Device has pending commands of types: ${getPrintableCommandTypes(pendingCommands)}." }
 
-        val downlink = Downlink(messageProperties.maxBytes)
-
         val commandsToSend = pendingCommands.filter { command -> downlink.addIfItFits(getDownlinkPerCommand(command)) }
-
         logger.info { "Commands that will be sent: ${getPrintableCommandTypes(commandsToSend)}." }
+
         commandsToSend.forEach { command -> setCommandInProgress(command) }
 
-        val completeDownlink = downlink.downlink
-        logger.debug { "Downlink that will be sent: $completeDownlink" }
-        return completeDownlink
+        logger.debug { "Downlink that will be sent: ${downlink.getDownlink()}" }
     }
 
     private fun getPrintableCommandTypes(commands: List<Command>) =

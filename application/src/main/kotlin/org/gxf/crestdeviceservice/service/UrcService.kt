@@ -11,6 +11,7 @@ import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
+import org.gxf.crestdeviceservice.model.Downlink
 import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.getMessageFromCode
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -37,8 +38,9 @@ class UrcService(
             logger.debug { "Received message with urcs ${urcs.joinToString(", ")}" }
         }
 
-        val downlinks = getDownlinksFromMessage(body).filter { downlink -> downlink != "0" && downlink.isNotBlank() }
-        downlinks.forEach { downlink -> handleDownlinkFromMessage(deviceId, downlink, urcs) }
+        getDownlinksFromMessage(body)
+            .filter { downlink -> downlink != Downlink.RESPONSE_SUCCESS && downlink.isNotBlank() }
+            .forEach { downlink -> handleDownlinkFromMessage(deviceId, downlink, urcs) }
     }
 
     private fun getUrcsFromMessage(body: JsonNode) = body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
@@ -59,11 +61,7 @@ class UrcService(
 
     private fun getCommandThatDownlinkIsAbout(deviceId: String, downlink: String): Command? {
         val commandsInProgress = commandService.getAllCommandsInProgressForDevice(deviceId)
-        return try {
-            commandsInProgress.first { command -> downlinkConcernsCommandType(downlink, command.type) }
-        } catch (e: NoSuchElementException) {
-            null
-        }
+        return commandsInProgress.firstOrNull { command -> downlinkConcernsCommandType(downlink, command.type) }
     }
 
     private fun downlinkConcernsCommandType(downlink: String, commandType: Command.CommandType): Boolean {

@@ -19,8 +19,7 @@ class FirmwareCommandGenerator(
         val firmwareName = command.commandValue
 
         val firmware = firmwareService.findByName(firmwareName)
-        val secret = deviceSecretService.getDeviceSecret(deviceId)
-        return firmwareService.getPacketForDevice(firmware, 0, secret)
+        return firmwareService.getPacketForDevice(firmware, 0, deviceId)
     }
 
     override fun getSupportedCommand() = Command.CommandType.FIRMWARE

@@ -52,4 +52,14 @@ object CommandFactory {
     fun pskSetCommandInProgress() = pendingPskSetCommand().start()
 
     fun pskCommandsInProgress() = listOf(pskCommandInProgress(), pskSetCommandInProgress())
+
+    fun firmwareCommandInProgress() =
+        Command(
+            id = UUID.randomUUID(),
+            deviceId = DEVICE_ID,
+            correlationId = CORRELATION_ID,
+            timestampIssued = timestamp,
+            type = Command.CommandType.FIRMWARE,
+            commandValue = "the-firmware-to-install",
+            status = Command.CommandStatus.IN_PROGRESS)
 }

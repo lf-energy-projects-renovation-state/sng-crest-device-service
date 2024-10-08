@@ -21,6 +21,12 @@ class Command(
     val commandValue: String?,
     status: CommandStatus,
 ) {
+    init {
+        if (type.needsCommandValue) {
+            checkNotNull(commandValue)
+        }
+    }
+
     @Enumerated(EnumType.STRING)
     var status: CommandStatus = status
         private set
@@ -33,11 +39,16 @@ class Command(
 
     fun cancel() = this.apply { this.status = CommandStatus.CANCELLED }
 
-    enum class CommandType(val downlink: String, val urcsSuccess: List<String>, val urcsError: List<String>) {
-        PSK("PSK", listOf("PSK:TMP"), listOf("PSK:DLER", "PSK:HSER")),
-        PSK_SET("PSK:SET", listOf("PSK:SET"), listOf("PSK:DLER", "PSK:HSER", "PSK:EQER")),
-        REBOOT("CMD:REBOOT", listOf("INIT", "WDR"), listOf()),
-        FIRMWARE("OTA", listOf("OTA:SUC"), listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER")),
+    enum class CommandType(
+        val downlink: String,
+        val urcsSuccess: List<String>,
+        val urcsError: List<String>,
+        val needsCommandValue: Boolean
+    ) {
+        PSK("PSK", listOf("PSK:TMP"), listOf("PSK:DLER", "PSK:HSER"), false),
+        PSK_SET("PSK:SET", listOf("PSK:SET"), listOf("PSK:DLER", "PSK:HSER", "PSK:EQER"), false),
+        REBOOT("CMD:REBOOT", listOf("INIT", "WDR"), listOf(), false),
+        FIRMWARE("OTA", listOf("OTA:SUC"), listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER"), true),
     }
 
     enum class CommandStatus {
