@@ -23,5 +23,5 @@ class PreSharedKey(
     @Convert(converter = DatabaseFieldEncryptor::class) val secret: String,
     @Enumerated(EnumType.STRING) var status: PreSharedKeyStatus
 ) {
-    fun commandHash() = DigestUtils.sha256Hex("$secret$preSharedKey")
+    fun commandHash(): String = DigestUtils.sha256Hex("$secret$preSharedKey")
 }
