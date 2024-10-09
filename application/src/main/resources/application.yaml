@@ -6,7 +6,7 @@
 server:
   ssl:
     enabled: true
-    client-auth: none
+    client-auth: need
     bundle: "crest-device-service"
 
 # Run the actuator under a different not tls port
