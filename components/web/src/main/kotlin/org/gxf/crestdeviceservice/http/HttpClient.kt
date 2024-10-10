@@ -15,7 +15,7 @@ import org.springframework.web.client.toEntity
 @Component
 class HttpClient(private val webClient: RestClient) {
     companion object {
-        const val MESSAGE_PATH = "/firmware"
+        const val FIRMWARE_API = "/web/api/firmware"
     }
 
     private val logger = KotlinLogging.logger {}
@@ -27,7 +27,7 @@ class HttpClient(private val webClient: RestClient) {
         }
 
         try {
-            val response = executeRequest(firmware)
+            val response = executeFirmwareRequest(firmware)
             logger.debug {
                 "Posted message with name ${firmware.name}, resulting response: $response"
             }
@@ -39,10 +39,10 @@ class HttpClient(private val webClient: RestClient) {
     }
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    private fun executeRequest(firmware: FirmwareWebDTO): ResponseEntity<String> =
+    private fun executeFirmwareRequest(firmware: FirmwareWebDTO): ResponseEntity<String> =
         webClient
             .post()
-            .uri("$MESSAGE_PATH/${firmware.name}")
+            .uri("$FIRMWARE_API/${firmware.name}")
             .body(firmware)
             .retrieve()
             .toEntity<String>()

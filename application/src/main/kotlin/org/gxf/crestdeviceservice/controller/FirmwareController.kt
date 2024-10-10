@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/firmware")
+@RequestMapping("/web/api/firmware")
 class FirmwareController(
     val firmwareService: FirmwareService,
     val firmwareProducerService: FirmwareProducerService
