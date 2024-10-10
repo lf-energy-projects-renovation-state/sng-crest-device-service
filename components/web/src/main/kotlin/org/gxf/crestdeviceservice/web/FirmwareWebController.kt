@@ -13,14 +13,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
 class FirmwareWebController(val firmwareWebService: FirmwareWebService) {
-    private val redirectUrl = "redirect:/"
+    private val redirectUrl = "redirect:/web/firmware"
 
-    @GetMapping("/")
+    @GetMapping("/web/firmware")
     fun showUploadForm(model: Model): String {
         return "uploadForm"
     }
 
-    @PostMapping("/")
+    @PostMapping("/web/firmware")
     fun handleFileUpload(
         @RequestPart("file") file: MultipartFile,
         redirectAttributes: RedirectAttributes

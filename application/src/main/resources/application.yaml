@@ -2,11 +2,11 @@
 #
 #SPDX-License-Identifier: Apache-2.0
 
-# The crest device service should always require mutual tls
+# Port for proxy should always require mutual tls
 server:
   ssl:
-    enabled: false
-    client-auth: none
+    enabled: true
+    client-auth: need
     bundle: "crest-device-service"
 
 # Run the actuator under a different not tls port
