@@ -27,6 +27,9 @@ config:
   http:
     url: "http://localhost:9001"
     connection-timeout: "5000ms"
+  # port for web client
+  web-server:
+    port: 9001
 
 kafka:
   consumers:

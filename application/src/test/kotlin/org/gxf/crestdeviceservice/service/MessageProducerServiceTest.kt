@@ -26,7 +26,8 @@ class MessageProducerServiceTest {
     private val kafkaProducerProperties =
         KafkaProducerProperties(
             KafkaProducerTopicProperties(deviceMessageTopic),
-            KafkaProducerTopicProperties("command-feedback"))
+            KafkaProducerTopicProperties("command-feedback"),
+            KafkaProducerTopicProperties("firmware"))
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {

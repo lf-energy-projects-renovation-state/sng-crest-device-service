@@ -10,11 +10,12 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class WebServerConfiguration : WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
+class WebServerConfiguration(private val webServerProperties: WebServerProperties) :
+    WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
     override fun customize(factory: TomcatServletWebServerFactory) {
         val connector = Connector(Http11NioProtocol::class.java.name)
         connector.scheme = "http"
-        connector.port = 9001
+        connector.port = webServerProperties.port
         factory.addAdditionalTomcatConnectors(connector)
     }
 }

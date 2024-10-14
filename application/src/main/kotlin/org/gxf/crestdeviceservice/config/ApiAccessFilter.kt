@@ -7,19 +7,19 @@ import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
-import org.apache.catalina.connector.RequestFacade
-import org.apache.catalina.connector.ResponseFacade
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Component
 
 @Component
 class ApiAccessFilter : Filter {
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        val requestUri = (request as RequestFacade).requestURI
+        val requestUri = (request as HttpServletRequest).requestURI
         val isProxyService = !requestUri.startsWith("/web")
         val correctPortForProxyService = request.serverPort == 9000
 
         if (isProxyService && !correctPortForProxyService) {
-            (response as ResponseFacade).sendError(404)
+            (response as HttpServletResponse).sendError(404)
             return
         }
 
