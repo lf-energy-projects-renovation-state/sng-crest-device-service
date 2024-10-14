@@ -22,6 +22,18 @@ spring:
       auto-offset-reset: earliest
       group-id: "gxf-sng-crest-device-service"
 
+# port for proxy, using mutual TLS
+server:
+  port: 9000
+
+config:
+  http:
+    url: "http://localhost:9001"
+    connection-timeout: "5000ms"
+  # port for web client
+  web-server:
+    port: 9001
+
 kafka:
   consumers:
     pre-shared-key:
@@ -33,6 +45,8 @@ kafka:
       topic: "crest-message"
     command-feedback:
       topic: "command-feedback"
+    firmware:
+      topic: "firmware"
 
 database:
   encryption-key: "super-secret-key"
