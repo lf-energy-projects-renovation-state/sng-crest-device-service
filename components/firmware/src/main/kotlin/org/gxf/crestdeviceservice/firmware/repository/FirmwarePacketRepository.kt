@@ -9,4 +9,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface FirmwarePacketRepository : CrudRepository<FirmwarePacket, FirmwarePacketCompositeKey>
+interface FirmwarePacketRepository : CrudRepository<FirmwarePacket, FirmwarePacketCompositeKey> {
+    override fun findAll(): List<FirmwarePacket>
+}
