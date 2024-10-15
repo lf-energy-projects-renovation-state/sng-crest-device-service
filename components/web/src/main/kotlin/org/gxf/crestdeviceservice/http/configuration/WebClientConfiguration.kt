@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.http.configuration
@@ -32,6 +32,5 @@ class WebClientConfiguration(private val httpProps: HttpProperties) {
             }
             .build()
 
-    private fun requestFactory() =
-        JdkClientHttpRequestFactory().apply { setReadTimeout(httpProps.connectionTimeout) }
+    private fun requestFactory() = JdkClientHttpRequestFactory().apply { setReadTimeout(httpProps.connectionTimeout) }
 }

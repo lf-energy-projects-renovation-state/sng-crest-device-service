@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.mapper
@@ -28,8 +28,7 @@ class FirmwareMapperTest {
     @Test
     fun mapFirmwareDTOToEntity() {
         val firmwareDTO = testFirmwareDTO()
-        val previousFirmware =
-            Firmware(previousUUID, name, previousVersion, UUID.randomUUID(), mutableListOf())
+        val previousFirmware = Firmware(previousUUID, name, previousVersion, UUID.randomUUID(), mutableListOf())
         whenever(firmwareRepository.findByVersion(previousVersion)).thenReturn(previousFirmware)
 
         val result = firmwareMapper.mapFirmwareDTOToEntity(firmwareDTO)

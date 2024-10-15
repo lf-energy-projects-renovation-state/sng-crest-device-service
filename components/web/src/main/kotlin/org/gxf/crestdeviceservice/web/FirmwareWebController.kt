@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.web
@@ -21,10 +21,7 @@ class FirmwareWebController(val firmwareWebService: FirmwareWebService) {
     }
 
     @PostMapping("/web/firmware")
-    fun handleFileUpload(
-        @RequestPart("file") file: MultipartFile,
-        redirectAttributes: RedirectAttributes
-    ): String {
+    fun handleFileUpload(@RequestPart("file") file: MultipartFile, redirectAttributes: RedirectAttributes): String {
         if (file.originalFilename.isNullOrEmpty()) {
             redirectAttributes.setMessage("No file provided")
             return redirectUrl
@@ -38,8 +35,7 @@ class FirmwareWebController(val firmwareWebService: FirmwareWebService) {
         }
         try {
             val processedPackets = firmwareWebService.processFirmwareFile(file)
-            redirectAttributes.setMessage(
-                "Successfully processed $processedPackets firmware packets")
+            redirectAttributes.setMessage("Successfully processed $processedPackets firmware packets")
         } catch (e: Exception) {
             redirectAttributes.setMessage("Failed to process file: ${e.message}")
         }

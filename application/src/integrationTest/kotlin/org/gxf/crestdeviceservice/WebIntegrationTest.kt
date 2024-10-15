@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
@@ -45,8 +45,7 @@ class WebIntegrationTest {
     fun firmwareFileUploadTest() {
         // arrange
         val testFile = ClassPathResource(name).file
-        val consumer =
-            createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.firmware.topic)
+        val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.firmware.topic)
 
         // act
         val response = uploadFile(testFile)
@@ -61,8 +60,7 @@ class WebIntegrationTest {
     }
 
     fun uploadFile(file: File): ResponseEntity<String> {
-        val headers: HttpHeaders =
-            HttpHeaders().apply { contentType = MediaType.MULTIPART_FORM_DATA }
+        val headers: HttpHeaders = HttpHeaders().apply { contentType = MediaType.MULTIPART_FORM_DATA }
 
         val body: LinkedMultiValueMap<String, Any> =
             LinkedMultiValueMap<String, Any>().apply { add("file", FileSystemResource(file)) }

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.controller
@@ -19,17 +19,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/web/api/firmware")
-class FirmwareController(
-    val firmwareService: FirmwareService,
-    val firmwareProducerService: FirmwareProducerService
-) {
+class FirmwareController(val firmwareService: FirmwareService, val firmwareProducerService: FirmwareProducerService) {
     private val logger = KotlinLogging.logger {}
 
     @PostMapping("/{name}")
-    fun post(
-        @NonNull @PathVariable name: String,
-        @NonNull @RequestBody firmware: FirmwareDTO
-    ): ResponseEntity<String> {
+    fun post(@NonNull @PathVariable name: String, @NonNull @RequestBody firmware: FirmwareDTO): ResponseEntity<String> {
         try {
             logger.debug { "Processing firmware file with name $name" }
             val firmwares = firmwareService.processFirmware(firmware)
