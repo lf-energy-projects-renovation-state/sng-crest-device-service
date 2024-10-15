@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.http
@@ -22,15 +22,11 @@ class HttpClient(private val webClient: RestClient) {
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
     fun postFirmware(firmware: FirmwareWebDTO): ResponseEntity<String> {
-        logger.debug {
-            "Posting firmware with name ${firmware.name} and ${firmware.packets.size} packets"
-        }
+        logger.debug { "Posting firmware with name ${firmware.name} and ${firmware.packets.size} packets" }
 
         try {
             val response = executeFirmwareRequest(firmware)
-            logger.debug {
-                "Posted message with name ${firmware.name}, resulting response: $response"
-            }
+            logger.debug { "Posted message with name ${firmware.name}, resulting response: $response" }
             return response
         } catch (e: Exception) {
             logger.warn(e) { "Error received while posting message with name ${firmware.name}" }
@@ -40,10 +36,5 @@ class HttpClient(private val webClient: RestClient) {
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
     private fun executeFirmwareRequest(firmware: FirmwareWebDTO): ResponseEntity<String> =
-        webClient
-            .post()
-            .uri("$FIRMWARE_API/${firmware.name}")
-            .body(firmware)
-            .retrieve()
-            .toEntity<String>()
+        webClient.post().uri("$FIRMWARE_API/${firmware.name}").body(firmware).retrieve().toEntity<String>()
 }
