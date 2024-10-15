@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
@@ -31,12 +31,9 @@ class MessageProducerServiceTest {
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
-        val messageProducerService =
-            MessageProducerService(mockedKafkaTemplate, kafkaProducerProperties)
+        val messageProducerService = MessageProducerService(mockedKafkaTemplate, kafkaProducerProperties)
 
-        val jsonNode =
-            ObjectMapper()
-                .readTree("""
+        val jsonNode = ObjectMapper().readTree("""
             {
                 "ID":12345
             }

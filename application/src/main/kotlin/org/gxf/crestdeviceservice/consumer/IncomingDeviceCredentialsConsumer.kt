@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.consumer
@@ -24,10 +24,7 @@ class IncomingDeviceCredentialsConsumer(
 
     private val logger = KotlinLogging.logger {}
 
-    @KafkaListener(
-        id = "pre-shared-key",
-        idIsGroup = false,
-        topics = ["\${kafka.consumers.pre-shared-key.topic}"])
+    @KafkaListener(id = "pre-shared-key", idIsGroup = false, topics = ["\${kafka.consumers.pre-shared-key.topic}"])
     fun handleIncomingDeviceCredentials(deviceCredentials: DeviceCredentials) {
         logger.info { "Received key for ${deviceCredentials.imei}" }
 
@@ -46,18 +43,14 @@ class IncomingDeviceCredentialsConsumer(
     }
 
     private fun setInitialKey(deviceCredentials: DeviceCredentials, deviceId: String) {
-        val decryptedPsk =
-            pskDecryptionService.decryptSecret(deviceCredentials.psk, deviceCredentials.keyRef)
-        val decryptedSecret =
-            pskDecryptionService.decryptSecret(deviceCredentials.secret, deviceCredentials.keyRef)
+        val decryptedPsk = pskDecryptionService.decryptSecret(deviceCredentials.psk, deviceCredentials.keyRef)
+        val decryptedSecret = pskDecryptionService.decryptSecret(deviceCredentials.secret, deviceCredentials.keyRef)
 
         pskService.setInitialKeyForDevice(deviceId, decryptedPsk, decryptedSecret)
     }
 
     private fun preparePskCommands(deviceId: String) {
-        logger.info {
-            "Prepare pending PSK and PSK_SET commands for PSK change for device $deviceId."
-        }
+        logger.info { "Prepare pending PSK and PSK_SET commands for PSK change for device $deviceId." }
         val pskCommand =
             Command(
                 id = UUID.randomUUID(),

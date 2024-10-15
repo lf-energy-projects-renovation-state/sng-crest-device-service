@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
@@ -24,8 +24,7 @@ import org.springframework.kafka.test.utils.KafkaTestUtils
 import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@EmbeddedKafka(
-    topics = ["\${kafka.consumers.command.topic}", "\${kafka.producers.command-feedback.topic}"])
+@EmbeddedKafka(topics = ["\${kafka.consumers.command.topic}", "\${kafka.producers.command-feedback.topic}"])
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class MakiCommandHandlingTest {
     companion object {
@@ -38,8 +37,7 @@ class MakiCommandHandlingTest {
 
     @Value("\${kafka.consumers.command.topic}") private lateinit var commandTopic: String
 
-    @Value("\${kafka.producers.command-feedback.topic}")
-    private lateinit var commandFeedbackTopic: String
+    @Value("\${kafka.producers.command-feedback.topic}") private lateinit var commandFeedbackTopic: String
 
     @AfterEach
     fun cleanup() {
@@ -59,8 +57,7 @@ class MakiCommandHandlingTest {
                 .setCommand("reboot")
                 .setValue("")
                 .build()
-        val consumer =
-            IntegrationTestHelper.createKafkaConsumer(embeddedKafkaBroker, commandFeedbackTopic)
+        val consumer = IntegrationTestHelper.createKafkaConsumer(embeddedKafkaBroker, commandFeedbackTopic)
 
         producer.send(ProducerRecord(commandTopic, commandFromMaki))
 
@@ -85,8 +82,7 @@ class MakiCommandHandlingTest {
         Awaitility.await().atMost(Duration.ofSeconds(3)).untilAsserted {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-                    DEVICE_ID,
-                    org.gxf.crestdeviceservice.command.entity.Command.CommandStatus.PENDING)
+                    DEVICE_ID, org.gxf.crestdeviceservice.command.entity.Command.CommandStatus.PENDING)
 
             assertThat(savedCommand).isNotNull
         }

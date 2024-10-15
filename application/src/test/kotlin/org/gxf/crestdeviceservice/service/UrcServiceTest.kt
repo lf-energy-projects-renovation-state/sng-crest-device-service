@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
@@ -52,10 +52,7 @@ class UrcServiceTest {
         @JvmStatic
         private fun containingPskErrorUrcs() =
             Stream.of(
-                listOf("PSK:DLER"),
-                listOf("PSK:HSER"),
-                listOf("TS:ERR", "PSK:DLER"),
-                listOf("PSK:DLER", "PSK:EQER"))
+                listOf("PSK:DLER"), listOf("PSK:HSER"), listOf("TS:ERR", "PSK:DLER"), listOf("PSK:DLER", "PSK:EQER"))
 
         @JvmStatic
         private fun notContainingPskUrcs() =
@@ -77,20 +74,14 @@ class UrcServiceTest {
         val pskCommandInProgress = CommandFactory.pskCommandInProgress()
         val savedPskCommand = pskCommandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
         val pskSetCommandInProgress = CommandFactory.pskSetCommandInProgress()
-        val savedPskSetCommand =
-            pskSetCommandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
+        val savedPskSetCommand = pskSetCommandInProgress.copy(status = Command.CommandStatus.SUCCESSFUL)
         val pskCommandsInProgress = listOf(pskCommandInProgress, pskSetCommandInProgress)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
-        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(pskCommandsInProgress)
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    pskCommandInProgress, Command.CommandStatus.SUCCESSFUL))
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(pskCommandsInProgress)
+        whenever(commandService.saveCommandWithNewStatus(pskCommandInProgress, Command.CommandStatus.SUCCESSFUL))
             .thenReturn(savedPskCommand)
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    pskSetCommandInProgress, Command.CommandStatus.SUCCESSFUL))
+        whenever(commandService.saveCommandWithNewStatus(pskSetCommandInProgress, Command.CommandStatus.SUCCESSFUL))
             .thenReturn(savedPskSetCommand)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
@@ -108,21 +99,16 @@ class UrcServiceTest {
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(listOf(pskCommandInProgress, pskSetCommandInProgress))
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    pskCommandInProgress, Command.CommandStatus.ERROR))
+        whenever(commandService.saveCommandWithNewStatus(pskCommandInProgress, Command.CommandStatus.ERROR))
             .thenReturn(pskCommandError)
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    pskSetCommandInProgress, Command.CommandStatus.ERROR))
+        whenever(commandService.saveCommandWithNewStatus(pskSetCommandInProgress, Command.CommandStatus.ERROR))
             .thenReturn(pskSetCommandError)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
         verify(pskService).setPendingKeyAsInvalid(DEVICE_ID)
-        verify(commandService, times(2))
-            .saveCommandWithNewStatus(any<Command>(), eq(Command.CommandStatus.ERROR))
+        verify(commandService, times(2)).saveCommandWithNewStatus(any<Command>(), eq(Command.CommandStatus.ERROR))
         verify(commandFeedbackService, times(2)).sendFeedback(any<CommandFeedback>())
     }
 
@@ -131,8 +117,7 @@ class UrcServiceTest {
     fun shouldNotSetPendingKeyAsInvalidWhenOtherURCReceived(urcs: List<String>) {
         val pskCommands = CommandFactory.pskCommandsInProgress()
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
-        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(pskCommands)
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(pskCommands)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
@@ -151,17 +136,13 @@ class UrcServiceTest {
                 commandSuccessful, CommandStatus.Successful, "Command handled successfully")
 
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
-        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(listOf(commandInProgress))
-        whenever(
-                commandService.saveCommandWithNewStatus(
-                    commandInProgress, Command.CommandStatus.SUCCESSFUL))
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf(commandInProgress))
+        whenever(commandService.saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL))
             .thenReturn(commandSuccessful)
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
-        verify(commandService)
-            .saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
+        verify(commandService).saveCommandWithNewStatus(commandInProgress, Command.CommandStatus.SUCCESSFUL)
         verify(commandFeedbackService).sendFeedback(refEq(commandFeedback, "timestampStatus"))
     }
 
@@ -172,8 +153,7 @@ class UrcServiceTest {
         val message = updateUrcInMessage(urcs, REBOOT_DOWNLINK)
 
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
-        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
-            .thenReturn(listOf(commandInProgress))
+        whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf(commandInProgress))
 
         urcService.interpretURCsInMessage(DEVICE_ID, message)
 
@@ -202,8 +182,7 @@ class UrcServiceTest {
 
     private fun urcFieldValue(urcs: List<String>, downlink: String): ArrayNode? {
         val urcNodes = urcs.map { urc -> TextNode(urc) }
-        val downlinkNode =
-            ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(downlink)))
+        val downlinkNode = ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(downlink)))
         val urcsPlusReceivedDownlink: MutableList<BaseJsonNode> = mutableListOf()
         urcsPlusReceivedDownlink.addAll(urcNodes)
         urcsPlusReceivedDownlink.add(downlinkNode)

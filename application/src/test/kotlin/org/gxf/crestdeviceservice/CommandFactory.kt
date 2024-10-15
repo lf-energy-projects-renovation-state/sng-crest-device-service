@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
@@ -42,14 +42,11 @@ object CommandFactory {
 
     fun pendingPskCommands() = listOf(pendingPskCommand(), pendingPskSetCommand())
 
-    fun rebootCommandInProgress() =
-        pendingRebootCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
+    fun rebootCommandInProgress() = pendingRebootCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
 
-    fun pskCommandInProgress() =
-        pendingPskCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
+    fun pskCommandInProgress() = pendingPskCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
 
-    fun pskSetCommandInProgress() =
-        pendingPskSetCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
+    fun pskSetCommandInProgress() = pendingPskSetCommand().copy(status = Command.CommandStatus.IN_PROGRESS)
 
     fun pskCommandsInProgress() = listOf(pskCommandInProgress(), pskSetCommandInProgress())
 }

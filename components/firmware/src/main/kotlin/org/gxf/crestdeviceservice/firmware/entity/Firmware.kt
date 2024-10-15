@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.entity
@@ -17,7 +17,5 @@ class Firmware(
     val name: String,
     val version: String,
     val previousFirmwareId: UUID?,
-    @OneToMany(mappedBy = "firmware")
-    @Cascade(CascadeType.ALL)
-    val packets: MutableList<FirmwarePacket>
+    @OneToMany(mappedBy = "firmware") @Cascade(CascadeType.ALL) val packets: MutableList<FirmwarePacket>
 )

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the GXF project
+// SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.psk.repository
@@ -12,10 +12,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PskRepository : CrudRepository<PreSharedKey, PreSharedKeyCompositeKey> {
 
-    fun findFirstByIdentityAndStatusOrderByRevisionDesc(
-        identity: String,
-        status: PreSharedKeyStatus
-    ): PreSharedKey?
+    fun findFirstByIdentityAndStatusOrderByRevisionDesc(identity: String, status: PreSharedKeyStatus): PreSharedKey?
 
     fun findFirstByIdentityOrderByRevisionDesc(identity: String): PreSharedKey?
 
