@@ -12,7 +12,7 @@ import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_VERSION
 import org.gxf.crestdeviceservice.TestConstants.NUMBER_OF_PACKETS
 
 object FirmwaresFactory {
-    fun firmwares() = Firmwares.newBuilder().setFirmwares(listOf(firmware())).build()
+    fun getFirmwares() = Firmwares.newBuilder().setFirmwares(listOf(firmware())).build()
 
     private fun firmware() =
         Firmware.newBuilder()
