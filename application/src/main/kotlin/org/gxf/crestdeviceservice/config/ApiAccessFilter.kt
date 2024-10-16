@@ -15,14 +15,13 @@ import org.springframework.stereotype.Component
 class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         val requestUri = (request as HttpServletRequest).requestURI
-        val isProxyService = !requestUri.startsWith("/web")
+        val isProxyService = !requestUri.startsWith("/web") && !requestUri.startsWith("/test")
         val correctPortForProxyService = request.serverPort == serverProperties.port
 
         if (isProxyService && !correctPortForProxyService) {
             (response as HttpServletResponse).sendError(404)
-            return
+        } else {
+            chain.doFilter(request, response)
         }
-
-        chain.doFilter(request, response)
     }
 }
