@@ -27,7 +27,7 @@ class FirmwareController(val firmwareService: FirmwareService, val firmwareProdu
         try {
             logger.debug { "Processing firmware file with name $name" }
             val firmwares = firmwareService.processFirmware(firmware)
-            logger.debug { "Processed firmware file" }
+            logger.info { "Processed firmware file" }
             firmwareProducerService.send(firmwares)
             logger.info { "Sent updated list of firmwares to Maki" }
             return ResponseEntity.ok("Firmware successfully processed")

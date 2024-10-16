@@ -3,47 +3,42 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.alliander.sng.Firmwares
 import org.apache.avro.specific.SpecificRecordBase
 import org.assertj.core.api.Assertions.assertThat
+import org.gxf.crestdeviceservice.FirmwaresFactory
 import org.gxf.crestdeviceservice.TestConstants.COMMAND_FEEDBACK_TOPIC
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_MESSAGE_TOPIC
 import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_TOPIC
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
 import org.gxf.crestdeviceservice.config.KafkaProducerTopicProperties
-import org.gxf.sng.avro.DeviceMessage
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.check
 import org.springframework.kafka.core.KafkaTemplate
 
 @ExtendWith(MockitoExtension::class)
-class MessageProducerServiceTest {
-
+class FirmwareProducerServiceTest {
     @Mock private lateinit var mockedKafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
 
     private val kafkaProducerProperties =
         KafkaProducerProperties(
             KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
             KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
-            KafkaProducerTopicProperties(FIRMWARE_TOPIC))
+            KafkaProducerTopicProperties(FIRMWARE_TOPIC),
+        )
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
-        val messageProducerService = MessageProducerService(mockedKafkaTemplate, kafkaProducerProperties)
+        val firmwareProducerService = FirmwareProducerService(mockedKafkaTemplate, kafkaProducerProperties)
+        val firmwares = FirmwaresFactory.firmwares()
 
-        val jsonNode = ObjectMapper().readTree("""
-            {
-                "ID":12345
-            }
-        """)
-        messageProducerService.produceMessage(jsonNode)
+        firmwareProducerService.send(firmwares)
         verify(mockedKafkaTemplate)
             .send(
-                check { assertThat(it).isEqualTo(DEVICE_MESSAGE_TOPIC) },
-                check { assertThat((it as DeviceMessage).payload).isEqualTo(jsonNode.toString()) })
+                org.mockito.kotlin.check { assertThat(it).isEqualTo(FIRMWARE_TOPIC) },
+                org.mockito.kotlin.check { assertThat(it as Firmwares).isEqualTo(firmwares) })
     }
 }
