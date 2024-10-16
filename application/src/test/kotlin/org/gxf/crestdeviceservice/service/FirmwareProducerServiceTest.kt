@@ -33,7 +33,7 @@ class FirmwareProducerServiceTest {
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
         val firmwareProducerService = FirmwareProducerService(mockedKafkaTemplate, kafkaProducerProperties)
-        val firmwares = FirmwaresFactory.firmwares()
+        val firmwares = FirmwaresFactory.getFirmwares()
 
         firmwareProducerService.send(firmwares)
         verify(mockedKafkaTemplate)
