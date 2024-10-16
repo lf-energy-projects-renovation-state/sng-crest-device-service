@@ -27,11 +27,11 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.util.LinkedMultiValueMap
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(topics = ["\${kafka.producers.firmware.topic}"])
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EnableConfigurationProperties(KafkaProducerProperties::class)
-class WebIntegrationTest {
+class FirmwareFileUploadTest {
     @Autowired private lateinit var restTemplate: TestRestTemplate
     @Autowired private lateinit var firmwareRepository: FirmwareRepository
     @Autowired private lateinit var firmwarePacketRepository: FirmwarePacketRepository
@@ -44,11 +44,11 @@ class WebIntegrationTest {
     @Test
     fun firmwareFileUploadTest() {
         // arrange
-        val testFile = ClassPathResource(name).file
+        val firmwareFile = ClassPathResource(name).file
         val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.firmware.topic)
 
         // act
-        val response = uploadFile(testFile)
+        val response = uploadFile(firmwareFile)
 
         // assert
         assertThat(response.statusCode.value()).isEqualTo(302)

@@ -12,11 +12,11 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Component
 
 @Component
-class ApiAccessFilter : Filter {
+class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         val requestUri = (request as HttpServletRequest).requestURI
         val isProxyService = !requestUri.startsWith("/web")
-        val correctPortForProxyService = request.serverPort == 9000
+        val correctPortForProxyService = request.serverPort == serverProperties.port
 
         if (isProxyService && !correctPortForProxyService) {
             (response as HttpServletResponse).sendError(404)
