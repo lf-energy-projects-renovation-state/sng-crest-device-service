@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.web
 
-import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.http.HttpClient
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.springframework.core.io.ClassPathResource
 import org.springframework.mock.web.MockMultipartFile
 
 class FirmwareWebServiceTest {
@@ -17,7 +17,8 @@ class FirmwareWebServiceTest {
 
     @Test
     fun processFirmwareFile() {
-        val firmwareFile = File("src/test/resources/RTU#FULL#TO#23.10.txt")
+        val fileName = "RTU#FULL#TO#23.10.txt"
+        val firmwareFile = ClassPathResource(fileName).file
         val multipartFile = MockMultipartFile(firmwareFile.name, firmwareFile.name, null, firmwareFile.readBytes())
         val expectedSize = 13
         val firmwareFileDto = FirmwareWebMapper.mapFirmwareFileToDTO(multipartFile)
