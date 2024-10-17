@@ -14,21 +14,11 @@ class FirmwareWebService(val httpClient: HttpClient) {
 
     fun processFirmwareFile(file: MultipartFile): Int {
         logger.info { "Processing file: ${file.originalFilename}" }
-        val firmwareFileDTO = mapFirmwareFileToDTO(file)
+        val firmwareFileDTO = FirmwareWebMapper.mapFirmwareFileToDTO(file)
         logger.info { "Processing ${firmwareFileDTO.packets.size} packets from firmware file" }
 
         httpClient.postFirmware(firmwareFileDTO)
 
         return firmwareFileDTO.packets.size
-    }
-
-    fun mapFirmwareFileToDTO(file: MultipartFile): FirmwareWebDTO {
-        val fileContent = String(file.inputStream.readBytes())
-
-        logger.debug { "Contents of firmware file:\n${fileContent}" }
-
-        val packets = fileContent.lines()
-
-        return FirmwareWebDTO(file.originalFilename!!, packets)
     }
 }
