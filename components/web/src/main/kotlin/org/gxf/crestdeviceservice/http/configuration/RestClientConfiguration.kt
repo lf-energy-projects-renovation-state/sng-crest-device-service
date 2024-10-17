@@ -13,24 +13,19 @@ import org.springframework.http.client.JdkClientHttpRequestFactory
 import org.springframework.web.client.RestClient
 
 @Configuration
-class WebClientConfiguration(private val httpProps: HttpProperties) {
+class RestClientConfiguration(private val httpProperties: HttpProperties) {
 
     @Bean
-    fun webClient(
-        webClientBuilder: RestClient.Builder,
-        webClientSsl: RestClientSsl,
-    ): RestClient =
-        webClientBuilder
+    fun restClientBuilder(
+        builder: RestClient.Builder,
+        restClientSsl: RestClientSsl,
+    ): RestClient.Builder =
+        builder
             .requestFactory(requestFactory())
-            .baseUrl(httpProps.url)
+            .baseUrl(httpProperties.url)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .apply {
-                if (httpProps.sslBundle != null) {
-                    it.apply(webClientSsl.fromBundle(httpProps.sslBundle))
-                }
-            }
-            .build()
 
-    private fun requestFactory() = JdkClientHttpRequestFactory().apply { setReadTimeout(httpProps.connectionTimeout) }
+    private fun requestFactory() =
+        JdkClientHttpRequestFactory().apply { setReadTimeout(httpProperties.connectionTimeout) }
 }

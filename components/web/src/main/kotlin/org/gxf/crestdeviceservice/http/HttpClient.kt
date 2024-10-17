@@ -13,7 +13,7 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.toEntity
 
 @Component
-class HttpClient(private val webClient: RestClient) {
+class HttpClient(private val restClientBuilder: RestClient.Builder) {
     companion object {
         const val FIRMWARE_API = "/web/api/firmware"
     }
@@ -35,6 +35,8 @@ class HttpClient(private val webClient: RestClient) {
     }
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    private fun executeFirmwareRequest(firmware: FirmwareWebDTO): ResponseEntity<String> =
-        webClient.post().uri("$FIRMWARE_API/${firmware.name}").body(firmware).retrieve().toEntity<String>()
+    private fun executeFirmwareRequest(firmware: FirmwareWebDTO): ResponseEntity<String> {
+        val restClient = restClientBuilder.build()
+        return restClient.post().uri("$FIRMWARE_API/${firmware.name}").body(firmware).retrieve().toEntity<String>()
+    }
 }
