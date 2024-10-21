@@ -15,9 +15,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Base85 {
     // Constants used in encoding and decoding
-    private static final long Power4 = 52200625; // 85^4
-    private static final long Power3 = 614125;  // 85^3
-    private static final long Power2 = 7225;   // 85^2
+    private static final long POWER_4 = 52200625; // 85^4
+    private static final long POWER_3 = 614125;  // 85^3
+    private static final long POWER_2 = 7225;   // 85^2
 
     /**
      * This is a base class for encoding data using the Base85 encoding scheme,
@@ -176,13 +176,13 @@ public class Base85 {
 
         protected int _encodeDangling(final byte[] encodeMap, final byte[] out, final int wi, final ByteBuffer buffer, int leftover) {
             long sum = buffer.getInt(0) & 0x00000000ffffffffL;
-            out[wi] = encodeMap[(int) (sum / Power4)];
-            sum %= Power4;
-            out[wi + 1] = encodeMap[(int) (sum / Power3)];
-            sum %= Power3;
+            out[wi] = encodeMap[(int) (sum / POWER_4)];
+            sum %= POWER_4;
+            out[wi + 1] = encodeMap[(int) (sum / POWER_3)];
+            sum %= POWER_3;
             if (leftover >= 2) {
-                out[wi + 2] = encodeMap[(int) (sum / Power2)];
-                sum %= Power2;
+                out[wi + 2] = encodeMap[(int) (sum / POWER_2)];
+                sum %= POWER_2;
                 if (leftover >= 3)
                     out[wi + 3] = encodeMap[(int) (sum / 85)];
             }
@@ -205,12 +205,12 @@ public class Base85 {
         }
 
         protected int _writeData(long sum, byte[] map, byte[] out, int wi) {
-            out[wi] = map[(int) (sum / Power4)];
-            sum %= Power4;
-            out[wi + 1] = map[(int) (sum / Power3)];
-            sum %= Power3;
-            out[wi + 2] = map[(int) (sum / Power2)];
-            sum %= Power2;
+            out[wi] = map[(int) (sum / POWER_4)];
+            sum %= POWER_4;
+            out[wi + 1] = map[(int) (sum / POWER_3)];
+            sum %= POWER_3;
+            out[wi + 2] = map[(int) (sum / POWER_2)];
+            sum %= POWER_2;
             out[wi + 3] = map[(int) (sum / 85)];
             out[wi + 4] = map[(int) (sum % 85)];
             return wi + 5;
@@ -448,16 +448,16 @@ public class Base85 {
 
         protected int _decodeDangling(final byte[] decodeMap, final byte[] in, final int ri, final ByteBuffer buffer, int leftover) {
             if (leftover == 1) throwMalformed(null);
-            long sum = decodeMap[in[ri]] * Power4 +
-                    decodeMap[in[ri + 1]] * Power3 + 85;
+            long sum = decodeMap[in[ri]] * POWER_4 +
+                    decodeMap[in[ri + 1]] * POWER_3 + 85;
             if (leftover >= 3) {
-                sum += decodeMap[in[ri + 2]] * Power2;
+                sum += decodeMap[in[ri + 2]] * POWER_2;
                 if (leftover >= 4)
                     sum += decodeMap[in[ri + 3]] * 85;
                 else
-                    sum += Power2;
+                    sum += POWER_2;
             } else
-                sum += Power3 + Power2;
+                sum += POWER_3 + POWER_2;
             buffer.putInt(0, (int) sum);
             return leftover - 1;
         }
@@ -478,9 +478,9 @@ public class Base85 {
         }
 
         protected void _putData(ByteBuffer buffer, byte[] map, byte[] in, int ri) {
-            buffer.putInt(0, (int) (map[in[ri]] * Power4 +
-                    map[in[ri + 1]] * Power3 +
-                    map[in[ri + 2]] * Power2 +
+            buffer.putInt(0, (int) (map[in[ri]] * POWER_4 +
+                    map[in[ri + 1]] * POWER_3 +
+                    map[in[ri + 2]] * POWER_2 +
                     map[in[ri + 3]] * 85 +
                     map[in[ri + 4]]));
         }
@@ -525,5 +525,8 @@ public class Base85 {
     public static Decoder getRfc1924Decoder() {
         if (RFC1924DECODER == null) RFC1924DECODER = new Rfc1924Decoder();
         return RFC1924DECODER;
+    }
+
+    private Base85() {
     }
 }
