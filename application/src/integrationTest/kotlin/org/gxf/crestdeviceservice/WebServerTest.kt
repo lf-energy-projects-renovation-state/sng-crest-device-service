@@ -5,11 +5,17 @@ package org.gxf.crestdeviceservice
 
 import java.io.File
 import java.time.Duration
+import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.IntegrationTestHelper.createKafkaConsumer
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
 import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
+import org.gxf.crestdeviceservice.psk.repository.PskRepository
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -20,6 +26,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.kafka.test.EmbeddedKafkaBroker
@@ -31,20 +38,36 @@ import org.springframework.util.LinkedMultiValueMap
 @EmbeddedKafka(topics = ["\${kafka.producers.firmware.topic}"])
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EnableConfigurationProperties(KafkaProducerProperties::class)
-class FirmwareFileUploadTest {
+class WebServerTest {
     @Autowired private lateinit var restTemplate: TestRestTemplate
     @Autowired private lateinit var firmwareRepository: FirmwareRepository
     @Autowired private lateinit var firmwarePacketRepository: FirmwarePacketRepository
     @Autowired private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
     @Autowired private lateinit var kafkaProducerProperties: KafkaProducerProperties
+    @Autowired private lateinit var pskRepository: PskRepository
 
-    private val name = "RTU#FULL#TO#23.10.txt"
-    private val numberOfPackets = 13
+    companion object {
+        private const val NAME = "RTU#FULL#TO#23.10.txt"
+        private const val NUMBER_OF_PACKETS = 13
+        private const val IDENTITY = "1234"
+        private const val PRE_SHARED_KEY = "1234567890123456"
+        private const val SECRET = "123456789"
+    }
+
+    @BeforeEach
+    fun setup() {
+        pskRepository.save(PreSharedKey(IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY, SECRET, PreSharedKeyStatus.ACTIVE))
+    }
+
+    @AfterEach
+    fun cleanup() {
+        pskRepository.deleteAll()
+    }
 
     @Test
     fun firmwareFileUploadTest() {
         // arrange
-        val firmwareFile = ClassPathResource(name).file
+        val firmwareFile = ClassPathResource(NAME).file
         val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.firmware.topic)
 
         // act
@@ -52,8 +75,8 @@ class FirmwareFileUploadTest {
 
         // assert
         assertThat(response.statusCode.value()).isEqualTo(302)
-        assertThat(firmwareRepository.findByName(name)).isNotNull
-        assertThat(firmwarePacketRepository.findAll().size).isEqualTo(numberOfPackets)
+        assertThat(firmwareRepository.findByName(NAME)).isNotNull
+        assertThat(firmwarePacketRepository.findAll().size).isEqualTo(NUMBER_OF_PACKETS)
 
         val records = consumer.poll(Duration.ofSeconds(1))
         assertThat(records.records(kafkaProducerProperties.firmware.topic)).hasSize(1)
@@ -67,5 +90,17 @@ class FirmwareFileUploadTest {
         val requestEntity = HttpEntity(body, headers)
 
         return this.restTemplate.postForEntity<String>("/web/firmware", requestEntity)
+    }
+
+    @Test
+    fun pskRequestOnWebPortShouldReturn404() {
+        // create second PSK for identity this one should be returned
+        pskRepository.save(
+            PreSharedKey(IDENTITY, 1, Instant.MIN, "0000111122223333", SECRET, PreSharedKeyStatus.ACTIVE))
+
+        val headers = HttpHeaders().apply { add("x-device-identity", IDENTITY) }
+        val result = restTemplate.exchange("/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
+
+        assertThat(result.statusCode.is4xxClientError).isTrue()
     }
 }
