@@ -16,12 +16,13 @@ class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         val requestUri = (request as HttpServletRequest).requestURI
         val isProxyService = !requestUri.startsWith("/web") && !requestUri.startsWith("/test")
-        val correctPortForProxyService = request.serverPort == serverProperties.port
 
-        if (isProxyService && !correctPortForProxyService) {
+        if (isProxyService && !correctPortForProxyService(request)) {
             (response as HttpServletResponse).sendError(404)
         } else {
             chain.doFilter(request, response)
         }
     }
+
+    private fun correctPortForProxyService(request: ServletRequest) = request.serverPort == serverProperties.port
 }
