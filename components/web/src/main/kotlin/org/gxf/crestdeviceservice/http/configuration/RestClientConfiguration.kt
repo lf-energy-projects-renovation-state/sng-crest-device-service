@@ -17,10 +17,9 @@ class RestClientConfiguration(private val httpProperties: HttpProperties) {
 
     @Bean
     fun restClientBuilder(
-        builder: RestClient.Builder,
         restClientSsl: RestClientSsl,
-    ): RestClient.Builder =
-        builder
+    ) =
+        RestClient.builder()
             .requestFactory(requestFactory())
             .baseUrl(httpProperties.url)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
