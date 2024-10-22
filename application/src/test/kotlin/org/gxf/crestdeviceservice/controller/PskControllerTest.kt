@@ -8,7 +8,6 @@ import org.gxf.crestdeviceservice.service.MetricService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
@@ -16,10 +15,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @WebMvcTest(PskController::class)
-@ConfigurationPropertiesScan("org.gxf.crestdeviceservice")
 class PskControllerTest {
 
-    @Autowired private lateinit var mvcRequest: MockMvc
+    @Autowired private lateinit var mockMvc: MockMvc
 
     @MockBean private lateinit var pskService: PskService
 
@@ -32,7 +30,7 @@ class PskControllerTest {
         val identity = "identity"
         whenever(pskService.getCurrentActiveKey(identity)).thenReturn(null)
 
-        mvcRequest
+        mockMvc
             .perform(MockMvcRequestBuilders.get(url).header("x-device-identity", identity))
             .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
@@ -42,7 +40,7 @@ class PskControllerTest {
         val identity = "identity"
         whenever(pskService.getCurrentActiveKey(identity)).thenReturn("key")
 
-        mvcRequest
+        mockMvc
             .perform(MockMvcRequestBuilders.get(url).header("x-device-identity", identity))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().string("key"))
