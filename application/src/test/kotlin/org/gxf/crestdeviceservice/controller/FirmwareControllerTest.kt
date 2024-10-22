@@ -40,7 +40,7 @@ class FirmwareControllerTest {
 
         mockMvc
             .perform(
-                post("https://localhost:9001/web/api/firmware/$FIRMWARE_NAME")
+                post("https://localhost:9001/web/firmware/api/$FIRMWARE_NAME")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(payload))
             .andExpect(status().isOk)
