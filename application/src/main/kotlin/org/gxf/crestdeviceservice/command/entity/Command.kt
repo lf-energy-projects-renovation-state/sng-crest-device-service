@@ -48,6 +48,8 @@ class Command(
         PSK("PSK", listOf("PSK:TMP"), listOf("PSK:DLER", "PSK:HSER"), false),
         PSK_SET("PSK:SET", listOf("PSK:SET"), listOf("PSK:DLER", "PSK:HSER", "PSK:EQER"), false),
         REBOOT("CMD:REBOOT", listOf("INIT", "WDR"), listOf(), false),
+        RSP("CMD:RSP", listOf("CMD:RSP"), listOf("DLER"), false),
+        RSP2("CMD:RSP2", listOf("CMD:RSP2"), listOf("DLER"), false),
         FIRMWARE("OTA", listOf("OTA:SUC"), listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER"), true),
     }
 
