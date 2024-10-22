@@ -64,7 +64,4 @@ message:
 
 logging:
   level:
-    org:
-      gxf:
-        crestdeviceservice:
-          debug
+    org.gxf.crestdeviceservice: debug

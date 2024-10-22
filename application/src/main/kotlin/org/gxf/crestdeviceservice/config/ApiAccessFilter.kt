@@ -15,15 +15,26 @@ import org.springframework.stereotype.Component
 @Component
 class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        val requestUri = (request as HttpServletRequest).requestURI
-        val isProxyService = requestUri.startsWith("/sng") || requestUri.startsWith("/psk")
-
-        if (isProxyService && !correctPortForProxyService(request)) {
-            (response as HttpServletResponse).sendError(404)
-        } else {
+        if (isAllowedCombination(request)) {
             chain.doFilter(request, response)
+        } else {
+            (response as HttpServletResponse).sendError(404)
         }
     }
 
-    private fun correctPortForProxyService(request: ServletRequest) = request.serverPort == serverProperties.port
+    private fun isAllowedCombination(request: ServletRequest): Boolean {
+        val requestUri = (request as HttpServletRequest).requestURI
+
+        return isErrorEndpoint(requestUri) ||
+            (isWebEndpoint(requestUri) && !isProxyPort(request)) ||
+            (isProxyEndpoint(requestUri) && isProxyPort(request))
+    }
+
+    private fun isErrorEndpoint(requestUri: String) = requestUri.startsWith("/error")
+
+    private fun isProxyEndpoint(requestUri: String) = requestUri.startsWith("/sng") || requestUri.startsWith("/psk")
+
+    private fun isWebEndpoint(requestUri: String) = requestUri.startsWith("/web") || requestUri.startsWith("/test")
+
+    private fun isProxyPort(request: ServletRequest) = request.serverPort == serverProperties.port
 }

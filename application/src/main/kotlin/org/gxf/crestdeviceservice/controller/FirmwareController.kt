@@ -18,11 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/web/api/firmware")
-class FirmwareController(val firmwareService: FirmwareService, val firmwareProducerService: FirmwareProducerService) {
+@RequestMapping("/web/firmware")
+class FirmwareController(
+    val firmwareService: FirmwareService,
+    val firmwareProducerService: FirmwareProducerService,
+) {
     private val logger = KotlinLogging.logger {}
 
-    @PostMapping("/{name}")
+    @PostMapping("/api/{name}")
     fun post(@NonNull @PathVariable name: String, @NonNull @RequestBody firmware: FirmwareDTO): ResponseEntity<String> {
         try {
             logger.debug { "Processing firmware file with name $name" }

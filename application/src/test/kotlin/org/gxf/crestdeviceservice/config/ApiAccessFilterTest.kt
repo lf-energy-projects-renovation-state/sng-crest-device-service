@@ -29,13 +29,17 @@ class ApiAccessFilterTest {
         "9000, /psk, 200",
         "9000, /sng, 200",
         "9000, /error, 200",
-        "9000, /web/firmware, 200",
-        "9000, /web/api/firmware, 200",
+        "9000, /web/firmware, 404",
+        "9000, /web/api/firmware, 404",
+        "9000, /wbe/api/firmware, 404",
         "9001, /psk, 404",
         "9001, /sng, 404",
         "9001, /error, 200",
         "9001, /web/firmware, 200",
-        "9001, /web/api/firmware, 200")
+        "9001, /web/api/firmware, 200",
+        "9001, /wbe/api/firmware, 404",
+        "8080, /psk, 404",
+    )
     fun shouldReturn404ForProxyRequestsOnWebPort(port: Int, uri: String, expectedHttpCode: Int) {
         val chain = MockFilterChain()
         val request = MockHttpServletRequest()
