@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.web
 
-import org.gxf.crestdeviceservice.config.ServerProperties
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,9 +16,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(FirmwareWebController::class)
 class FirmwareWebControllerTest {
-    @MockBean private lateinit var firmwareWebService: FirmwareWebService
-    @MockBean private lateinit var serverProperties: ServerProperties
     @Autowired private lateinit var mockMvc: MockMvc
+
+    @MockBean private lateinit var firmwareWebService: FirmwareWebService
 
     @Test
     fun handleFileUpload() {
@@ -27,7 +26,9 @@ class FirmwareWebControllerTest {
         val firmwareFile = ClassPathResource(fileName).file
         val multipartFile = MockMultipartFile("file", firmwareFile.name, "text/plain", firmwareFile.readBytes())
 
-        mockMvc.perform(multipart("/web/firmware").file(multipartFile)).andExpect(status().isFound)
+        mockMvc
+            .perform(multipart("https://localhost:9001/web/firmware").file(multipartFile))
+            .andExpect(status().isFound)
 
         verify(firmwareWebService).processFirmwareFile(multipartFile)
     }

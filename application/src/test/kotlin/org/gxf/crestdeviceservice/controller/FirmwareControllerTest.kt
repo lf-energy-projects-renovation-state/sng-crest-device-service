@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.gxf.crestdeviceservice.FirmwareDTOFactory.getFirmwareDTO
 import org.gxf.crestdeviceservice.FirmwaresFactory.getFirmwares
 import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_NAME
-import org.gxf.crestdeviceservice.config.ServerProperties
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
 import org.gxf.crestdeviceservice.service.FirmwareProducerService
 import org.junit.jupiter.api.Test
@@ -30,8 +29,6 @@ class FirmwareControllerTest {
 
     @MockBean private lateinit var firmwareProducerService: FirmwareProducerService
 
-    @MockBean private lateinit var serverProperties: ServerProperties
-
     private val objectMapper = ObjectMapper()
 
     @Test
@@ -42,7 +39,10 @@ class FirmwareControllerTest {
         whenever(firmwareService.processFirmware(eq(firmwareDTO))).thenReturn(firmwares)
 
         mockMvc
-            .perform(post("/web/api/firmware/$FIRMWARE_NAME").contentType(MediaType.APPLICATION_JSON).content(payload))
+            .perform(
+                post("https://localhost:9001/web/api/firmware/$FIRMWARE_NAME")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(payload))
             .andExpect(status().isOk)
 
         verify(firmwareService).processFirmware(eq(firmwareDTO))
