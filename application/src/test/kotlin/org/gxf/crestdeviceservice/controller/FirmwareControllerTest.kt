@@ -24,10 +24,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(FirmwareController::class)
 class FirmwareControllerTest {
-    @MockBean private lateinit var firmwareService: FirmwareService
-    @MockBean private lateinit var firmwareProducerService: FirmwareProducerService
-    @MockBean private lateinit var serverProperties: ServerProperties
     @Autowired private lateinit var mockMvc: MockMvc
+
+    @MockBean private lateinit var firmwareService: FirmwareService
+
+    @MockBean private lateinit var firmwareProducerService: FirmwareProducerService
+
+    @MockBean private lateinit var serverProperties: ServerProperties
+
     private val objectMapper = ObjectMapper()
 
     @Test
