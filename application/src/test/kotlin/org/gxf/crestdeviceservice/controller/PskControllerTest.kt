@@ -8,6 +8,7 @@ import org.gxf.crestdeviceservice.service.MetricService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
@@ -15,7 +16,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @WebMvcTest(PskController::class)
-class DeviceCredentialsControllerTest {
+@ConfigurationPropertiesScan("org.gxf.crestdeviceservice")
+class PskControllerTest {
 
     @Autowired private lateinit var mvcRequest: MockMvc
 

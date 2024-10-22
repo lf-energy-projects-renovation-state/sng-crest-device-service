@@ -4,17 +4,25 @@
 package org.gxf.crestdeviceservice.config
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.mock.web.MockFilterChain
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 
 class ApiAccessFilterTest {
-    private val portProxy = 9000
-
-    private val serverProperties = ServerProperties(portProxy)
+    private val serverProperties = mock<ServerProperties>()
     private val filter = ApiAccessFilter(serverProperties)
+    private val proxyPort = 9000
+
+    @BeforeEach
+    fun setup() {
+        whenever(serverProperties.port).thenReturn(proxyPort)
+    }
 
     @ParameterizedTest
     @CsvSource(
