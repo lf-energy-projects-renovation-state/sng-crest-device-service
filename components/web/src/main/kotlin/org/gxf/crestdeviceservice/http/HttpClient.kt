@@ -15,7 +15,7 @@ import org.springframework.web.client.toEntity
 @Component
 class HttpClient(private val restClientBuilder: RestClient.Builder) {
     companion object {
-        const val FIRMWARE_API = "/web/api/firmware"
+        const val FIRMWARE_API = "/web/firmware/api"
     }
 
     private val logger = KotlinLogging.logger {}

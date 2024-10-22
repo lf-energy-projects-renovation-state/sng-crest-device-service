@@ -9,7 +9,6 @@ import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwareEntity
 import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwares
 import org.gxf.crestdeviceservice.FirmwareFactory.getPreviousFirmwareEntity
 import org.gxf.crestdeviceservice.firmware.mapper.FirmwareMapper
-import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,9 +20,8 @@ import org.mockito.kotlin.whenever
 @ExtendWith(MockitoExtension::class)
 class FirmwareServiceTest {
     private val firmwareRepository = mock<FirmwareRepository>()
-    private val firmwarePacketRepository = mock<FirmwarePacketRepository>()
     private val firmwareMapper = mock<FirmwareMapper>()
-    private val firmwareService = FirmwareService(firmwareRepository, firmwarePacketRepository, firmwareMapper)
+    private val firmwareService = FirmwareService(firmwareRepository, firmwareMapper)
 
     @Test
     fun processFirmware() {
