@@ -5,8 +5,8 @@ package org.gxf.crestdeviceservice.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.util.*
-import org.assertj.core.api.Assertions.*
+import java.util.UUID
+import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.service.CommandService

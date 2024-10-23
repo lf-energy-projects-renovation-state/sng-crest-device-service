@@ -4,7 +4,7 @@
 package org.gxf.crestdeviceservice.psk.service
 
 import java.time.Instant
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.junit.jupiter.api.Test

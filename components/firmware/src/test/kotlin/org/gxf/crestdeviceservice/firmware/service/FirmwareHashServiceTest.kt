@@ -4,7 +4,7 @@
 package org.gxf.crestdeviceservice.firmware.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.util.*
+import java.util.UUID
 import kotlin.io.path.Path
 import kotlin.io.path.readLines
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
