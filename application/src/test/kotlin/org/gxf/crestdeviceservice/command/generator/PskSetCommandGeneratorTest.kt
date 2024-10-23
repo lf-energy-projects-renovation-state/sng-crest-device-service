@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.service.command
+package org.gxf.crestdeviceservice.command.generator
 
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
@@ -14,9 +14,9 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class PskCommandGeneratorTest {
+class PskSetCommandGeneratorTest {
     private val pskService = mock<PskService>()
-    private val generator = PskCommandGenerator(pskService)
+    private val generator = PskSetCommandGenerator(pskService)
 
     @ParameterizedTest
     @CsvSource(
@@ -32,6 +32,6 @@ class PskCommandGeneratorTest {
         val result = generator.generateCommandString(pskCommandPending)
 
         // PSK:[Key]:[Hash]:SET
-        assertThat(result).isEqualTo("PSK:${key}:${expectedHash}")
+        assertThat(result).isEqualTo("PSK:${key}:${expectedHash}:SET")
     }
 }

@@ -4,7 +4,7 @@
 package org.gxf.crestdeviceservice.command.entity
 
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.params.ParameterizedTest

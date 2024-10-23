@@ -1,14 +1,14 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.service.command
+package org.gxf.crestdeviceservice.command.generator
 
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
-@Service
+@Component
 class PskSetCommandGenerator(private val pskService: PskService) : CommandGenerator {
     override fun generateCommandString(command: Command): String {
         val readyKey =

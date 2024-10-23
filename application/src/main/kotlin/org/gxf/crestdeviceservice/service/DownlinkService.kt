@@ -6,12 +6,12 @@ package org.gxf.crestdeviceservice.service
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.generator.CommandGenerator
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.config.MessageProperties
 import org.gxf.crestdeviceservice.model.Downlink
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
-import org.gxf.crestdeviceservice.service.command.CommandGenerator
 import org.springframework.stereotype.Service
 
 /** Creates downlinks to be sent to a device after it makes contact. */
@@ -20,12 +20,12 @@ class DownlinkService(
     private val pskService: PskService,
     private val commandService: CommandService,
     private val messageProperties: MessageProperties,
-    commandGeneratorsList: List<CommandGenerator>
+    commandGenerators: List<CommandGenerator>
 ) {
 
     private val logger = KotlinLogging.logger {}
 
-    private val commandGenerators = commandGeneratorsList.associateBy { it.getSupportedCommand() }
+    private val commandGenerators = commandGenerators.associateBy { it.getSupportedCommand() }
 
     fun createDownlink() = Downlink(messageProperties.maxBytes)
 
@@ -36,7 +36,7 @@ class DownlinkService(
         val pendingCommands = commandService.getAllPendingCommandsForDevice(deviceId)
         val commandsToSend = getCommandsToSend(pendingCommands)
         if (commandsToSend.isNotEmpty()) {
-            fillDownlinkFromCommands(commandsToSend, downlink)
+            downlink.fillFromCommands(commandsToSend)
         }
         return downlink.getDownlink()
     }
@@ -50,16 +50,15 @@ class DownlinkService(
             else -> true
         }
 
-    private fun fillDownlinkFromCommands(pendingCommands: List<Command>, downlink: Downlink) {
+    private fun Downlink.fillFromCommands(pendingCommands: List<Command>) {
         logger.info { "Device has pending commands of types: ${getPrintableCommandTypes(pendingCommands)}." }
 
-        val commandsToSend =
-            pendingCommands.filter { command -> downlink.addIfPossible(getDownlinkPerCommand(command)) }
+        val commandsToSend = pendingCommands.filter { command -> addIfPossible(getDownlinkPerCommand(command)) }
         logger.info { "Commands that will be sent: ${getPrintableCommandTypes(commandsToSend)}." }
 
         commandsToSend.forEach { command -> setCommandInProgress(command) }
 
-        logger.debug { "Downlink that will be sent: ${downlink.getDownlink()}" }
+        logger.debug { "Downlink that will be sent: ${getDownlink()}" }
     }
 
     private fun getPrintableCommandTypes(commands: List<Command>) =
@@ -71,7 +70,7 @@ class DownlinkService(
             logger.info { "Device $deviceId needs key change" }
             pskService.setPskToPendingForDevice(deviceId)
         }
-        commandService.save(command.start())
+        commandService.saveCommand(command.start())
     }
 
     private fun getDownlinkPerCommand(command: Command) =

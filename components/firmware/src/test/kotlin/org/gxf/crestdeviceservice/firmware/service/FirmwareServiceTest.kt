@@ -29,7 +29,7 @@ class FirmwareServiceTest {
         val expectedFirmware = FirmwareFactory.getFirmware()
         whenever(firmwareRepository.findByName(firmwareName)).thenReturn(expectedFirmware)
 
-        val actualFirmware = firmwareService.findByName(firmwareName)
+        val actualFirmware = firmwareService.findFirmwareByName(firmwareName)
 
         assertThat(actualFirmware).isSameAs(expectedFirmware)
     }

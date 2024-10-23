@@ -27,30 +27,36 @@ class Command(
         }
     }
 
+    fun getRequiredCommandValue() = checkNotNull(commandValue)
+
     @Enumerated(EnumType.STRING)
     var status: CommandStatus = status
         private set
 
-    fun start() = this.apply { this.status = CommandStatus.IN_PROGRESS }
+    fun start() = apply { status = CommandStatus.IN_PROGRESS }
 
-    fun finish() = this.apply { this.status = CommandStatus.SUCCESSFUL }
+    fun finish() = apply { status = CommandStatus.SUCCESSFUL }
 
-    fun fail() = this.apply { this.status = CommandStatus.ERROR }
+    fun fail() = apply { status = CommandStatus.ERROR }
 
-    fun cancel() = this.apply { this.status = CommandStatus.CANCELLED }
+    fun cancel() = apply { status = CommandStatus.CANCELLED }
 
     enum class CommandType(
         val downlink: String,
         val urcsSuccess: List<String>,
         val urcsError: List<String>,
-        val needsCommandValue: Boolean
+        val needsCommandValue: Boolean = false
     ) {
-        PSK("PSK", listOf("PSK:TMP"), listOf("PSK:DLER", "PSK:HSER"), false),
-        PSK_SET("PSK:SET", listOf("PSK:SET"), listOf("PSK:DLER", "PSK:HSER", "PSK:EQER"), false),
-        REBOOT("CMD:REBOOT", listOf("INIT", "WDR"), listOf(), false),
-        RSP("CMD:RSP", listOf("CMD:RSP"), listOf("DLER"), false),
-        RSP2("CMD:RSP2", listOf("CMD:RSP2"), listOf("DLER"), false),
-        FIRMWARE("OTA", listOf("OTA:SUC"), listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER"), true),
+        PSK("PSK", listOf("PSK:TMP"), listOf("PSK:DLER", "PSK:HSER")),
+        PSK_SET("PSK:SET", listOf("PSK:SET"), listOf("PSK:DLER", "PSK:HSER", "PSK:EQER")),
+        REBOOT("CMD:REBOOT", listOf("INIT", "WDR"), listOf()),
+        RSP("CMD:RSP", listOf("CMD:RSP"), listOf("DLER")),
+        RSP2("CMD:RSP2", listOf("CMD:RSP2"), listOf("DLER")),
+        FIRMWARE(
+            "OTA",
+            listOf("OTA:SUC"),
+            listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER"),
+            needsCommandValue = true),
     }
 
     enum class CommandStatus {

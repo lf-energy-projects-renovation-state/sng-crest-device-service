@@ -30,7 +30,7 @@ class UrcService(
 
     private val logger = KotlinLogging.logger {}
 
-    fun interpretURCsInMessage(deviceId: String, body: JsonNode) {
+    fun interpretUrcsInMessage(deviceId: String, body: JsonNode) {
         val urcs = getUrcsFromMessage(body)
         if (urcs.isEmpty()) {
             logger.debug { "Received message without urcs" }
@@ -107,7 +107,7 @@ class UrcService(
             "Command ${command.type} failed for device with id ${command.deviceId}. Error(s): $errorMessages."
         }
 
-        val failedCommand = commandService.save(command.fail())
+        val failedCommand = commandService.saveCommand(command.fail())
         val commandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
                 failedCommand, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
@@ -129,7 +129,7 @@ class UrcService(
             "Command ${command.type} for device ${command.deviceId} handled successfully. Saving command and sending feedback to Maki."
         }
 
-        val successfulCommand = commandService.save(command.finish())
+        val successfulCommand = commandService.saveCommand(command.finish())
         val commandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
                 successfulCommand, ExternalCommandStatus.Successful, "Command handled successfully")

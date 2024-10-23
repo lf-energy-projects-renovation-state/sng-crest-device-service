@@ -81,7 +81,7 @@ class CommandService(
     private fun cancelCommand(commandToBeCancelled: Command, newCorrelationId: UUID) {
         val message = "Command cancelled by newer same command with correlation id: $newCorrelationId"
         commandFeedbackService.sendCancellationFeedback(commandToBeCancelled, message)
-        save(commandToBeCancelled.cancel())
+        saveCommand(commandToBeCancelled.cancel())
     }
 
     fun isPskCommand(command: Command) =
@@ -98,7 +98,7 @@ class CommandService(
         commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
             deviceId, Command.CommandStatus.IN_PROGRESS)
 
-    fun save(command: Command) = commandRepository.save(command)
+    fun saveCommand(command: Command) = commandRepository.save(command)
 
-    fun save(commands: List<Command>): MutableIterable<Command> = commandRepository.saveAll(commands)
+    fun saveCommands(vararg commands: Command) = commandRepository.saveAll(commands.asList())
 }

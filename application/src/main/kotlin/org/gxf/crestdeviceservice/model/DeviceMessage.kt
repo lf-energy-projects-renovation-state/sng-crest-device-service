@@ -5,7 +5,7 @@ package org.gxf.crestdeviceservice.model
 
 import com.fasterxml.jackson.databind.JsonNode
 
-class DeviceMessageWrapper(val message: JsonNode) {
+class DeviceMessage(val message: JsonNode) {
     fun getFotaMessageCounter() = message[FMC_FIELD].intValue()
 
     companion object {

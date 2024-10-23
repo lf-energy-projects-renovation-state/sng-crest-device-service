@@ -8,7 +8,7 @@ import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
-import org.gxf.crestdeviceservice.model.DeviceMessageWrapper
+import org.gxf.crestdeviceservice.model.DeviceMessage
 import org.gxf.crestdeviceservice.model.Downlink
 import org.springframework.stereotype.Service
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 class PayloadService(
     private val urcService: UrcService,
     private val firmwareService: FirmwareService,
-    private val commandService: CommandService
+    private val commandService: CommandService,
 ) {
     /**
      * Process the payload. This includes
@@ -28,16 +28,12 @@ class PayloadService(
      * @param downlink The downlink to be returned to the device, fill it here if needed
      */
     fun processPayload(identity: String, body: JsonNode, downlink: Downlink) {
-        urcService.interpretURCsInMessage(identity, body)
+        urcService.interpretUrcsInMessage(identity, body)
 
-        addFirmwareCommandIfRequested(DeviceMessageWrapper(body), identity, downlink)
+        addFirmwareCommandIfRequested(DeviceMessage(body), identity, downlink)
     }
 
-    private fun addFirmwareCommandIfRequested(
-        deviceMessage: DeviceMessageWrapper,
-        identity: String,
-        downlink: Downlink
-    ) {
+    private fun addFirmwareCommandIfRequested(deviceMessage: DeviceMessage, identity: String, downlink: Downlink) {
         val fotaMessageCounter = deviceMessage.getFotaMessageCounter()
         if (fotaMessageCounter > 0) {
             val firmwareCommand =
@@ -46,7 +42,7 @@ class PayloadService(
                 }
 
             if (firmwareCommand != null) {
-                val firmware = firmwareService.findByName(firmwareCommand.commandValue!!)
+                val firmware = firmwareService.findFirmwareByName(firmwareCommand.getRequiredCommandValue())
                 val otaCommand = firmwareService.getPacketForDevice(firmware, fotaMessageCounter, identity)
                 downlink.addIfPossible(otaCommand)
             } else {

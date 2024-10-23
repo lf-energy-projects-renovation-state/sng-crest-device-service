@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface FirmwarePacketRepository : CrudRepository<FirmwarePacket, FirmwarePacketCompositeKey> {
-    fun findByFirmwareAndPacketNumber(firmware: Firmware, i: Int): FirmwarePacket
+    fun findByFirmwareAndPacketNumber(firmware: Firmware, packetNumber: Int): FirmwarePacket
 }

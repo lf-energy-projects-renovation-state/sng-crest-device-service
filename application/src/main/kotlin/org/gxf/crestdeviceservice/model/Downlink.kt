@@ -9,28 +9,27 @@ class Downlink(private val maxSize: Int = 1024) {
     private var downlink = ""
 
     /**
-     * Returns the downlink. This is either "0" when no commands were added or a ';' separated string of the added
-     * commands preceeded by '!'
+     * Returns the downlink. This is either "0" when no commands were added or a '!', followed by a ';' separated string
+     * of the added commands
      *
      * @return the downlink
      */
-    fun getDownlink() = downlink.ifBlank { RESPONSE_SUCCESS }
+    fun getDownlink() = downlink.ifEmpty { RESPONSE_SUCCESS }
 
     private val logger = KotlinLogging.logger {}
-    private val otaRegex = ".*OTA[0-9A-F]{4}:.*".toRegex()
 
     /**
      * Try to add the command to the downlink. Reasons for not adding the command:
      * - new size exceeds `maxSize`
      * - downlink contains an OTA command (no other commands allowed)
-     * - OTA command can't be added to other commands in he same downlink
+     * - OTA command can't be added to other commands in the same downlink
      *
      * @param commandToAdd The command you want to add to the downlink
      * @return true if the command was added, false otherwise
      */
     fun addIfPossible(commandToAdd: String): Boolean =
         when {
-            isFirmwareUpdate(commandToAdd) && downlink.isNotBlank() -> {
+            isFirmwareUpdate(commandToAdd) && downlink.isNotEmpty() -> {
                 logger.debug { "Not adding OTA, because other commands are already present" }
                 false
             }
@@ -48,7 +47,7 @@ class Downlink(private val maxSize: Int = 1024) {
             if (downlink.isEmpty()) {
                 FORCE_RESPONSE + commandToAdd
             } else {
-                downlink.plus(";$commandToAdd")
+                downlink + COMMAND_SEPARATOR + commandToAdd
             }
         val newSize = newCumulative.length
         logger.debug {
@@ -65,7 +64,9 @@ class Downlink(private val maxSize: Int = 1024) {
     private fun isFirmwareUpdate(command: String) = command.matches(otaRegex)
 
     companion object {
-        const val FORCE_RESPONSE = "!"
         const val RESPONSE_SUCCESS = "0"
+        private const val FORCE_RESPONSE = "!"
+        private const val COMMAND_SEPARATOR = ";"
+        private val otaRegex = ".*OTA[0-9A-F]{4}:.*".toRegex()
     }
 }

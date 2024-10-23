@@ -7,11 +7,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.generator.CommandGenerator
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.config.MessageProperties
 import org.gxf.crestdeviceservice.model.Downlink
 import org.gxf.crestdeviceservice.psk.service.PskService
-import org.gxf.crestdeviceservice.service.command.CommandGenerator
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
@@ -71,8 +71,8 @@ class DownlinkServiceTest {
 
         whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(pskCommandsPending)
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(true)
-        whenever(commandService.save(pskCommand)).thenReturn(pskCommand)
-        whenever(commandService.save(pskSetCommand)).thenReturn(pskSetCommand)
+        whenever(commandService.saveCommand(pskCommand)).thenReturn(pskCommand)
+        whenever(commandService.saveCommand(pskSetCommand)).thenReturn(pskSetCommand)
 
         val result = downlinkService.getDownlinkForDevice(deviceId, Downlink())
 
@@ -88,7 +88,7 @@ class DownlinkServiceTest {
         whenever(pskService.readyForPskSetCommand(deviceId)).thenReturn(false)
         whenever(commandService.getAllPendingCommandsForDevice(deviceId)).thenReturn(pendingCommands)
         whenever(commandService.getFirstCommandInProgressForDevice(deviceId)).thenReturn(null)
-        whenever(commandService.save(rebootCommand)).thenReturn(rebootCommand)
+        whenever(commandService.saveCommand(rebootCommand)).thenReturn(rebootCommand)
 
         val result = downlinkService.getDownlinkForDevice(deviceId, Downlink())
 

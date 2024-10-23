@@ -12,7 +12,7 @@ import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
-import org.gxf.crestdeviceservice.model.DeviceMessageWrapper
+import org.gxf.crestdeviceservice.model.DeviceMessage
 import org.gxf.crestdeviceservice.model.Downlink
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -34,21 +34,21 @@ class PayloadServiceTest {
     private val mapper = ObjectMapper()
 
     @Test
-    fun shouldProcessURCs() {
+    fun shouldProcessUrcs() {
         val message = TestHelper.messageTemplate()
         val downlink = Downlink()
         val deviceId = "device-id"
 
         payloadService.processPayload(deviceId, message, downlink)
 
-        verify(urcService, times(1)).interpretURCsInMessage(deviceId, message)
+        verify(urcService, times(1)).interpretUrcsInMessage(deviceId, message)
     }
 
     @Test
-    fun shouldSupplyOtaCommandForFMC() {
+    fun shouldSupplyOtaCommandForFmc() {
         val packetNumber = 3
         val message = TestHelper.messageTemplate()
-        message.set<JsonNode>(DeviceMessageWrapper.FMC_FIELD, mapper.readTree(packetNumber.toString()))
+        message.set<JsonNode>(DeviceMessage.FMC_FIELD, mapper.readTree(packetNumber.toString()))
         val downlink = Downlink()
         val deviceId = "device-id"
         val firmwareCommand = CommandFactory.firmwareCommandInProgress()
@@ -57,12 +57,12 @@ class PayloadServiceTest {
         val otaCommand = "OTA0003ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
         whenever(commandService.getAllCommandsInProgressForDevice(deviceId)).thenReturn(listOf(firmwareCommand))
-        whenever(firmwareService.findByName(firmwareName)).thenReturn(firmware)
+        whenever(firmwareService.findFirmwareByName(firmwareName)).thenReturn(firmware)
         whenever(firmwareService.getPacketForDevice(firmware, packetNumber, deviceId)).thenReturn(otaCommand)
 
         payloadService.processPayload(deviceId, message, downlink)
 
-        verify(urcService, times(1)).interpretURCsInMessage(deviceId, message)
+        verify(urcService, times(1)).interpretUrcsInMessage(deviceId, message)
         assertThat(downlink.getDownlink()).contains(otaCommand)
     }
 }

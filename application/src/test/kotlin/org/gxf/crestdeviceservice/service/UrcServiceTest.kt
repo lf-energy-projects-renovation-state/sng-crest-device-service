@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.refEq
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
@@ -77,10 +78,10 @@ class UrcServiceTest {
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(pskCommandsInProgress)
-        whenever(commandService.save(pskCommandInProgress)).thenReturn(pskCommandInProgress)
-        whenever(commandService.save(pskSetCommandInProgress)).thenReturn(pskSetCommandInProgress)
+        whenever(commandService.saveCommand(pskCommandInProgress)).thenReturn(pskCommandInProgress)
+        whenever(commandService.saveCommand(pskSetCommandInProgress)).thenReturn(pskSetCommandInProgress)
 
-        urcService.interpretURCsInMessage(DEVICE_ID, message)
+        urcService.interpretUrcsInMessage(DEVICE_ID, message)
 
         verify(pskService).changeActiveKey(DEVICE_ID)
         assertThat(pskCommandInProgress.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
@@ -95,14 +96,14 @@ class UrcServiceTest {
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(true)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID))
             .thenReturn(listOf(pskCommandInProgress, pskSetCommandInProgress))
-        whenever(commandService.save(pskCommandInProgress)).thenReturn(pskCommandInProgress)
-        whenever(commandService.save(pskSetCommandInProgress)).thenReturn(pskSetCommandInProgress)
+        whenever(commandService.saveCommand(pskCommandInProgress)).thenReturn(pskCommandInProgress)
+        whenever(commandService.saveCommand(pskSetCommandInProgress)).thenReturn(pskSetCommandInProgress)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
-        urcService.interpretURCsInMessage(DEVICE_ID, message)
+        urcService.interpretUrcsInMessage(DEVICE_ID, message)
 
         verify(pskService).setPendingKeyAsInvalid(DEVICE_ID)
-        verify(commandService, times(2)).save(any<Command>())
+        verify(commandService, times(2)).saveCommand(any<Command>())
         verify(commandFeedbackService, times(2)).sendFeedback(any<CommandFeedback>())
         assertThat(pskCommandInProgress.status).isEqualTo(Command.CommandStatus.ERROR)
         assertThat(pskSetCommandInProgress.status).isEqualTo(Command.CommandStatus.ERROR)
@@ -116,9 +117,9 @@ class UrcServiceTest {
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(pskCommands)
         val message = updateUrcInMessage(urcs, PSK_DOWNLINK)
 
-        urcService.interpretURCsInMessage(DEVICE_ID, message)
+        urcService.interpretUrcsInMessage(DEVICE_ID, message)
 
-        verify(pskService, times(0)).setPendingKeyAsInvalid(DEVICE_ID)
+        verify(pskService, never()).setPendingKeyAsInvalid(DEVICE_ID)
     }
 
     @Test
@@ -129,15 +130,15 @@ class UrcServiceTest {
 
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf(commandInProgress))
-        whenever(commandService.save(commandInProgress)).thenReturn(commandInProgress)
+        whenever(commandService.saveCommand(commandInProgress)).thenReturn(commandInProgress)
 
-        urcService.interpretURCsInMessage(DEVICE_ID, message)
+        urcService.interpretUrcsInMessage(DEVICE_ID, message)
 
         val expectedCommandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
                 commandInProgress, CommandStatus.Successful, "Command handled successfully")
 
-        verify(commandService).save(commandInProgress)
+        verify(commandService).saveCommand(commandInProgress)
         verify(commandFeedbackService).sendFeedback(refEq(expectedCommandFeedback, "timestampStatus"))
         assertThat(commandInProgress.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
     }
@@ -151,10 +152,10 @@ class UrcServiceTest {
         whenever(pskService.isPendingPskPresent(DEVICE_ID)).thenReturn(false)
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf(commandInProgress))
 
-        urcService.interpretURCsInMessage(DEVICE_ID, message)
+        urcService.interpretUrcsInMessage(DEVICE_ID, message)
 
-        verify(commandService, times(0)).save(any<List<Command>>())
-        verify(commandFeedbackService, times(0)).sendFeedback(any<CommandFeedback>())
+        verify(commandService, never()).saveCommands(any<Command>(), any<Command>())
+        verify(commandFeedbackService, never()).sendFeedback(any<CommandFeedback>())
     }
 
     @ParameterizedTest(name = "should do nothing when downlink is {0}")
@@ -165,7 +166,7 @@ class UrcServiceTest {
 
         whenever(commandService.getAllCommandsInProgressForDevice(DEVICE_ID)).thenReturn(listOf())
 
-        urcService.interpretURCsInMessage(DEVICE_ID, message)
+        urcService.interpretUrcsInMessage(DEVICE_ID, message)
     }
 
     private fun updateUrcInMessage(urcs: List<String>, downlink: String): JsonNode {

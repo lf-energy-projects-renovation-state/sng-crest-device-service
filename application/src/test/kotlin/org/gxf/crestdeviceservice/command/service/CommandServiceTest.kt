@@ -16,7 +16,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -81,6 +81,6 @@ class CommandServiceTest {
 
         commandService.cancelOlderCommandIfNecessary(newCommand)
 
-        verify(commandFeedbackService, times(0)).sendCancellationFeedback(any<Command>(), any<String>())
+        verify(commandFeedbackService, never()).sendCancellationFeedback(any<Command>(), any<String>())
     }
 }

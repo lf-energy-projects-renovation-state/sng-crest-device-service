@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.service.command
+package org.gxf.crestdeviceservice.command.generator
 
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
-@Service
+@Component
 class FirmwareCommandGenerator(
     private val firmwareService: FirmwareService,
 ) : CommandGenerator {
@@ -16,7 +16,7 @@ class FirmwareCommandGenerator(
         val deviceId = command.deviceId
         val firmwareName = command.commandValue
 
-        val firmware = firmwareService.findByName(firmwareName)
+        val firmware = firmwareService.findFirmwareByName(firmwareName)
         return firmwareService.getPacketForDevice(firmware, 0, deviceId)
     }
 

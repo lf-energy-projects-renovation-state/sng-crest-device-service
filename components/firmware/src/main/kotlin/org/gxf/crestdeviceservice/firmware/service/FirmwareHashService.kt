@@ -13,7 +13,7 @@ import org.gxf.utilities.Base85
 import org.springframework.stereotype.Service
 
 @Service
-class InternalFirmwareHashService {
+class FirmwareHashService {
     private val logger = KotlinLogging.logger {}
 
     /**
