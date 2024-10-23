@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.entity
 
-import java.util.*
+import java.util.UUID
 
 object FirmwareFactory {
     fun getFirmware() = Firmware(id = UUID.randomUUID(), name = "A Firmware", hash = "some-hash")

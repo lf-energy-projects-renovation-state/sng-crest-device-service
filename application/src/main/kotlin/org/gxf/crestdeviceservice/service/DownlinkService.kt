@@ -14,7 +14,7 @@ import org.gxf.crestdeviceservice.psk.service.PskService
 import org.gxf.crestdeviceservice.service.command.CommandGenerator
 import org.springframework.stereotype.Service
 
-/** Creates downlinks to be returned to a device after it makes contact. */
+/** Creates downlinks to be sent to a device after it makes contact. */
 @Service
 class DownlinkService(
     private val pskService: PskService,

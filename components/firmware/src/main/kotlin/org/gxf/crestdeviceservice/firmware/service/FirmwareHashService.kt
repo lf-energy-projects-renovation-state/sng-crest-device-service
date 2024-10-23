@@ -12,20 +12,8 @@ import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.OTA_S
 import org.gxf.utilities.Base85
 import org.springframework.stereotype.Service
 
-interface FirmwareHashService {
-    /**
-     * Generates a device specific packet. This means that the firmware hashes at the start and end of the firmware are
-     * replaced with a new hash over the device's secret and the original hash. See Crest specs for details.
-     *
-     * @param firmwarePacket the original packet (as an entity)
-     * @param deviceSecret the secret with which to hash the firmware hash(es)
-     * @return the downlink command ready to be sent to the device
-     */
-    fun generateDeviceSpecificPacket(firmwarePacket: FirmwarePacket, deviceSecret: String): String
-}
-
 @Service
-internal class InternalFirmwareHashService : FirmwareHashService {
+class InternalFirmwareHashService {
     private val logger = KotlinLogging.logger {}
 
     /**
@@ -36,7 +24,7 @@ internal class InternalFirmwareHashService : FirmwareHashService {
      * @param deviceSecret the secret with which to hash the firmware hash(es)
      * @return the downlink command ready to be sent to the device
      */
-    override fun generateDeviceSpecificPacket(firmwarePacket: FirmwarePacket, deviceSecret: String): String {
+    fun generateDeviceSpecificPacket(firmwarePacket: FirmwarePacket, deviceSecret: String): String {
         var result = firmwarePacket.packet
         if (firmwarePacket.isFirstPacket()) {
             result = replaceCurrentFirmwareHash(result, deviceSecret)
@@ -48,7 +36,7 @@ internal class InternalFirmwareHashService : FirmwareHashService {
     }
 
     private fun replaceCurrentFirmwareHash(packet: String, deviceSecret: String): String {
-        val command = packet.substring(0, OTA_START.length)
+        val command = OTA_START
         val currentFirmwareHash = packet.substring(OTA_START.length, OTA_START.length + HASH_LENGTH)
         val theRest = packet.substring(OTA_START.length + HASH_LENGTH, packet.length)
 
