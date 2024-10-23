@@ -48,7 +48,7 @@ class PayloadService(
             if (firmwareCommand != null) {
                 val firmware = firmwareService.findByName(firmwareCommand.commandValue!!)
                 val otaCommand = firmwareService.getPacketForDevice(firmware, fotaMessageCounter, identity)
-                downlink.addIfItFits(otaCommand)
+                downlink.addIfPossible(otaCommand)
             } else {
                 throw NoMatchingCommandException(
                     "Device $identity requests FOTA packet $fotaMessageCounter (FMC), but no running FIRMWARE command was found")

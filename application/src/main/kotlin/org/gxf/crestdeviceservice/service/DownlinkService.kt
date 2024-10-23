@@ -53,7 +53,8 @@ class DownlinkService(
     private fun fillDownlinkFromCommands(pendingCommands: List<Command>, downlink: Downlink) {
         logger.info { "Device has pending commands of types: ${getPrintableCommandTypes(pendingCommands)}." }
 
-        val commandsToSend = pendingCommands.filter { command -> downlink.addIfItFits(getDownlinkPerCommand(command)) }
+        val commandsToSend =
+            pendingCommands.filter { command -> downlink.addIfPossible(getDownlinkPerCommand(command)) }
         logger.info { "Commands that will be sent: ${getPrintableCommandTypes(commandsToSend)}." }
 
         commandsToSend.forEach { command -> setCommandInProgress(command) }

@@ -8,22 +8,51 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 class Downlink(private val maxSize: Int = 1024) {
     private var downlink = ""
 
+    /**
+     * Returns the downlink. This is either "0" when no commands were added or a ';' separated string of the added
+     * commands preceeded by '!'
+     *
+     * @return the downlink
+     */
     fun getDownlink() = downlink.ifBlank { RESPONSE_SUCCESS }
 
     private val logger = KotlinLogging.logger {}
+    private val otaRegex = ".*OTA[0-9A-F]{4}:.*".toRegex()
 
-    fun addIfItFits(downlinkToAdd: String): Boolean {
-        val currentSize = downlink.length
+    /**
+     * Try to add the command to the downlink. Reasons for not adding the command:
+     * - new size exceeds `maxSize`
+     * - downlink contains an OTA command (no other commands allowed)
+     * - OTA command can't be added to other commands in he same downlink
+     *
+     * @param commandToAdd The command you want to add to the downlink
+     * @return true if the command was added, false otherwise
+     */
+    fun addIfPossible(commandToAdd: String): Boolean =
+        when {
+            isFirmwareUpdate(commandToAdd) && downlink.isNotBlank() -> {
+                logger.debug { "Not adding OTA, because other commands are already present" }
+                false
+            }
+            isFirmwareUpdate(downlink) -> {
+                logger.debug { "Not adding $downlink because the current downlink contains an OTA" }
+                false
+            }
+            else -> {
+                addIfItFits(commandToAdd, downlink.length)
+            }
+        }
 
+    private fun addIfItFits(commandToAdd: String, currentSize: Int): Boolean {
         val newCumulative =
             if (downlink.isEmpty()) {
-                "!$downlinkToAdd"
+                FORCE_RESPONSE + commandToAdd
             } else {
-                downlink.plus(";$downlinkToAdd")
+                downlink.plus(";$commandToAdd")
             }
         val newSize = newCumulative.length
         logger.debug {
-            "Trying to add a downlink '$downlinkToAdd' to existing downlink '$downlink'. " +
+            "Trying to add a downlink '$commandToAdd' to existing downlink '$downlink'. " +
                 "Current downlink size: $currentSize. Downlink size after after adding: $newSize."
         }
         if (newSize <= maxSize) {
@@ -33,7 +62,10 @@ class Downlink(private val maxSize: Int = 1024) {
         return false
     }
 
+    private fun isFirmwareUpdate(command: String) = command.matches(otaRegex)
+
     companion object {
+        const val FORCE_RESPONSE = "!"
         const val RESPONSE_SUCCESS = "0"
     }
 }

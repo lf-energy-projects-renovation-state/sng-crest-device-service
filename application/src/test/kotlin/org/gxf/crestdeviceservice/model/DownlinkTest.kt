@@ -7,14 +7,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class DownlinkTest {
-    private val maxSize = 1024
-
     @Test
     fun firstCommandFitsMaxMessageSize() {
-        val downlink = Downlink(maxSize)
+        val downlink = Downlink()
         val downlinkToAdd = "CMD:REBOOT"
 
-        val result = downlink.addIfItFits(downlinkToAdd)
+        val result = downlink.addIfPossible(downlinkToAdd)
 
         assertThat(result).isTrue()
         assertThat(downlink.getDownlink()).isEqualTo("!$downlinkToAdd")
@@ -22,12 +20,12 @@ class DownlinkTest {
 
     @Test
     fun multipleCommandsFitMaxMessageSize() {
-        val downlink = Downlink(maxSize)
+        val downlink = Downlink()
         val downlinkExisting = "CMD:REBOOT;CMD:REBOOT"
         val downlinkToAdd = "CMD:REBOOT"
 
-        val existingFits = downlink.addIfItFits(downlinkExisting)
-        val result = downlink.addIfItFits(downlinkToAdd)
+        val existingFits = downlink.addIfPossible(downlinkExisting)
+        val result = downlink.addIfPossible(downlinkToAdd)
 
         assertThat(existingFits).isTrue()
         assertThat(result).isTrue()
@@ -35,8 +33,32 @@ class DownlinkTest {
     }
 
     @Test
+    fun shouldBlockWhenFirmwareIsPresent() {
+        val downlink = Downlink()
+        val expectedDownlink = "OTA0000:small-enough-to-have-room-for-other-commands"
+        downlink.addIfPossible(expectedDownlink)
+
+        assertThat(downlink.getDownlink()).isEqualTo("!$expectedDownlink")
+        assertThat(downlink.addIfPossible("CMD:REBOOT")).isFalse()
+        assertThat(downlink.getDownlink()).isEqualTo("!$expectedDownlink")
+    }
+
+    @Test
+    fun shouldBlockFirmwareIfOtherCommandIsPresent() {
+        val downlink = Downlink()
+        val rebootCommand = "CMD:REBOOT"
+        val rspCommand = "CMD:RSP"
+
+        assertThat(downlink.addIfPossible(rebootCommand)).isTrue()
+        assertThat(downlink.addIfPossible("OTA0000:please-don't-combine-with-other-commands")).isFalse()
+        assertThat(downlink.addIfPossible(rspCommand)).isTrue()
+
+        assertThat(downlink.getDownlink()).isEqualTo("!$rebootCommand;$rspCommand")
+    }
+
+    @Test
     fun doesNotFitMaxMessageSize() {
-        val downlink = Downlink(maxSize)
+        val downlink = Downlink()
         val downlinkExisting =
             "PSK:1234567890123456:ce2eca02d7ce354830eae7dd3b140755334f9c00582a53044655adde22126071;" +
                 "PSK:1234567890123456:ce2eca02d7ce354830eae7dd3b140755334f9c00582a53044655adde22126071:SET;" +
@@ -49,8 +71,8 @@ class DownlinkTest {
                 "CMD:REBOOT"
         val downlinkToAdd = "CMD:REBOOT"
 
-        val existingFits = downlink.addIfItFits(downlinkExisting)
-        val added = downlink.addIfItFits(downlinkToAdd)
+        val existingFits = downlink.addIfPossible(downlinkExisting)
+        val added = downlink.addIfPossible(downlinkToAdd)
 
         assertThat(existingFits).isTrue()
         assertThat(added).isFalse()
@@ -59,6 +81,6 @@ class DownlinkTest {
 
     @Test
     fun shouldReturnDefaultDownlinkWhenNoCommandGiven() {
-        assertThat(Downlink(maxSize).getDownlink()).isEqualTo(Downlink.RESPONSE_SUCCESS)
+        assertThat(Downlink().getDownlink()).isEqualTo(Downlink.RESPONSE_SUCCESS)
     }
 }
