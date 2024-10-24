@@ -5,11 +5,11 @@ package org.gxf.crestdeviceservice.firmware.service
 
 import com.alliander.sng.Firmwares
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.gxf.crestdeviceservice.firmware.dto.FirmwareDTO
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.mapper.FirmwareMapper
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class FirmwareService(
@@ -18,8 +18,8 @@ class FirmwareService(
 ) {
     private val logger = KotlinLogging.logger {}
 
-    fun processFirmware(firmwareDTO: FirmwareDTO): Firmwares {
-        val firmware = firmwareMapper.mapFirmwareDTOToEntity(firmwareDTO)
+    fun processFirmware(file: MultipartFile): Firmwares {
+        val firmware = firmwareMapper.mapFirmwareFileToEntity(file)
         save(firmware)
         val firmwareEntities: List<Firmware> = firmwareRepository.findAll()
         return firmwareMapper.mapEntitiesToFirmwares(firmwareEntities)

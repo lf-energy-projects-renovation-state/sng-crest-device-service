@@ -6,26 +6,35 @@ package org.gxf.crestdeviceservice.firmware.mapper
 import com.alliander.sng.Firmware as ExternalFirmware
 import com.alliander.sng.FirmwareType
 import com.alliander.sng.Firmwares
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.util.UUID
-import org.gxf.crestdeviceservice.firmware.dto.FirmwareDTO
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
-    fun mapFirmwareDTOToEntity(firmwareDTO: FirmwareDTO): Firmware {
+    private val logger = KotlinLogging.logger {}
+
+    fun mapFirmwareFileToEntity(file: MultipartFile): Firmware {
+        val fileContent = String(file.inputStream.readBytes())
+
+        logger.debug { "Contents of firmware file:\n${fileContent}" }
+
+        val name = file.originalFilename!!
+
         val firmware =
             Firmware(
                 UUID.randomUUID(),
-                firmwareDTO.name,
-                getFirmwareVersionFromName(firmwareDTO.name),
-                getPreviousFirmwareIdFromName(firmwareDTO.name),
+                name,
+                getFirmwareVersionFromName(name),
+                getPreviousFirmwareIdFromName(name),
                 mutableListOf())
 
-        val packets = mapLinesToPackets(firmwareDTO.packets, firmware)
+        val packets = mapLinesToPackets(fileContent.lines(), firmware)
 
         firmware.packets.addAll(packets)
 

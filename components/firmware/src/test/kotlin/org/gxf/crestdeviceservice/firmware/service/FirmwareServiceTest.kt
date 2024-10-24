@@ -4,7 +4,7 @@
 package org.gxf.crestdeviceservice.firmware.service
 
 import org.assertj.core.api.Assertions.assertThat
-import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwareDTO
+import org.gxf.crestdeviceservice.FirmwareFactory
 import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwareEntity
 import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwares
 import org.gxf.crestdeviceservice.FirmwareFactory.getPreviousFirmwareEntity
@@ -25,16 +25,16 @@ class FirmwareServiceTest {
 
     @Test
     fun processFirmware() {
-        val firmwareDTO = getFirmwareDTO()
-        val firmwareEntity = getFirmwareEntity(firmwareDTO.name)
+        val firmwareFile = FirmwareFactory.getFirmwareFile()
+        val firmwareEntity = getFirmwareEntity(firmwareFile.name)
         val previousFirmware = getPreviousFirmwareEntity()
         val allFirmwareEntities = listOf(previousFirmware, firmwareEntity)
         val firmwares = getFirmwares()
-        whenever(firmwareMapper.mapFirmwareDTOToEntity(firmwareDTO)).thenReturn(firmwareEntity)
+        whenever(firmwareMapper.mapFirmwareFileToEntity(firmwareFile)).thenReturn(firmwareEntity)
         whenever(firmwareRepository.findAll()).thenReturn(allFirmwareEntities)
         whenever(firmwareMapper.mapEntitiesToFirmwares(listOf(previousFirmware, firmwareEntity))).thenReturn(firmwares)
 
-        val result = firmwareService.processFirmware(firmwareDTO)
+        val result = firmwareService.processFirmware(firmwareFile)
 
         verify(firmwareRepository).save(firmwareEntity)
         assertThat(result).isEqualTo(firmwares)
