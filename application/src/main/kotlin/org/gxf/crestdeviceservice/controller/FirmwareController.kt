@@ -51,9 +51,9 @@ class FirmwareController(
 
             logger.info { "Sent updated list of firmwares to Maki" }
             redirectAttributes.setMessage("Successfully processed ${firmwares.firmwares.size} firmware packets")
-        } catch (e: FirmwareException) {
-            logger.error(e) { "Failed to process firmware file" }
-            redirectAttributes.setMessage("Failed to process file: ${e.message}")
+        } catch (exception: FirmwareException) {
+            logger.error(exception) { "Failed to process firmware file" }
+            redirectAttributes.setMessage("Failed to process file: ${exception.message}")
         }
         return redirectUrl
     }

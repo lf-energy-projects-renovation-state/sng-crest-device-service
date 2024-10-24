@@ -62,7 +62,7 @@ class UrcService(
         val commandsInProgress = commandService.getAllCommandsInProgressForDevice(deviceId)
         return try {
             commandsInProgress.first { command -> downlinkConcernsCommandType(downlink, command.type) }
-        } catch (e: NoSuchElementException) {
+        } catch (exception: NoSuchElementException) {
             null
         }
     }

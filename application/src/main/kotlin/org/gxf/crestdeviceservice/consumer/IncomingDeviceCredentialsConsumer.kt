@@ -37,8 +37,8 @@ class IncomingDeviceCredentialsConsumer(
                 pskService.generateNewReadyKeyForDevice(deviceId)
                 preparePskCommands(deviceId)
             }
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to set device credentials for $deviceId" }
+        } catch (exception: Exception) {
+            logger.error(exception) { "Failed to set device credentials for $deviceId" }
         }
     }
 

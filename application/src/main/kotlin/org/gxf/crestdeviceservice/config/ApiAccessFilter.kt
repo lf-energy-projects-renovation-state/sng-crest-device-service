@@ -26,8 +26,11 @@ class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
         val requestUri = (request as HttpServletRequest).requestURI
 
         return isErrorEndpoint(requestUri) ||
-            (isWebEndpoint(requestUri) && !isProxyPort(request)) ||
-            (isProxyEndpoint(requestUri) && isProxyPort(request))
+            if (isProxyPort(request)) {
+                isProxyEndpoint(requestUri)
+            } else {
+                isWebEndpoint(requestUri)
+            }
     }
 
     private fun isErrorEndpoint(requestUri: String) = requestUri.startsWith("/error")

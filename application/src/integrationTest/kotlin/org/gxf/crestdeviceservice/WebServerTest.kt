@@ -76,7 +76,7 @@ class WebServerTest {
         // assert
         assertThat(response.statusCode.is2xxSuccessful).isTrue()
         assertThat(firmwareRepository.findByName(NAME)).isNotNull
-        assertThat(firmwarePacketRepository.findAll().size).isEqualTo(NUMBER_OF_PACKETS)
+        assertThat(firmwarePacketRepository.findAll()).hasSize(NUMBER_OF_PACKETS)
 
         val records = consumer.poll(Duration.ofSeconds(1))
         assertThat(records.records(kafkaProducerProperties.firmware.topic)).hasSize(1)
@@ -85,8 +85,7 @@ class WebServerTest {
     fun uploadFile(file: File): ResponseEntity<String> {
         val headers: HttpHeaders = HttpHeaders().apply { contentType = MediaType.MULTIPART_FORM_DATA }
 
-        val body: LinkedMultiValueMap<String, Any> =
-            LinkedMultiValueMap<String, Any>().apply { add("file", FileSystemResource(file)) }
+        val body = LinkedMultiValueMap<String, Any>().apply { add("file", FileSystemResource(file)) }
         val requestEntity = HttpEntity(body, headers)
 
         return this.restTemplate.postForEntity<String>("/web/firmware", requestEntity)

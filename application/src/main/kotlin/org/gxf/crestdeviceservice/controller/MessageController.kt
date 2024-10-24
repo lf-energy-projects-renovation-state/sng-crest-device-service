@@ -39,8 +39,8 @@ class MessageController(
                 urcService.interpretURCsInMessage(identity, body)
                 val downlink = downlinkService.getDownlinkForDevice(identity, body)
                 return ResponseEntity.ok(downlink)
-            } catch (e: Exception) {
-                logger.error(e) {
+            } catch (exception: Exception) {
+                logger.error(exception) {
                     "Exception occurred while interpreting message from or creating downlink for device $identity"
                 }
                 return ResponseEntity.internalServerError().build()
