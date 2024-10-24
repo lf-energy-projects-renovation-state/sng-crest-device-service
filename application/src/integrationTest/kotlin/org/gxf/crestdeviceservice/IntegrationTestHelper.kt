@@ -33,9 +33,7 @@ object IntegrationTestHelper {
                 StringDeserializer(),
                 AvroDeserializer(
                     listOf(
-                        DeviceMessage.getClassSchema(),
-                        CommandFeedback.getClassSchema(),
-                        Firmwares.getClassSchema())))
+                        DeviceMessage.getClassSchema(), CommandFeedback.getClassSchema(), Firmwares.getClassSchema())))
         val consumer = consumerFactory.createConsumer()
         embeddedKafkaBroker.consumeFromAnEmbeddedTopic(consumer, topic)
         return consumer

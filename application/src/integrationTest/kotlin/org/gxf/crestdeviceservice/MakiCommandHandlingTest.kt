@@ -24,8 +24,7 @@ import org.springframework.kafka.test.utils.KafkaTestUtils
 import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@EmbeddedKafka(
-    topics = ["\${kafka.consumers.command.topic}", "\${kafka.producers.command-feedback.topic}"])
+@EmbeddedKafka(topics = ["\${kafka.consumers.command.topic}", "\${kafka.producers.command-feedback.topic}"])
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class MakiCommandHandlingTest {
     companion object {
