@@ -22,8 +22,6 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
     fun mapFirmwareFileToEntity(file: MultipartFile): Firmware {
         val fileContent = String(file.inputStream.readBytes())
 
-        logger.debug { "Contents of firmware file:\n${fileContent}" }
-
         val name = checkNotNull(file.originalFilename) { "File name should not be null" }
 
         val firmware =

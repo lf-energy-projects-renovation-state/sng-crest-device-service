@@ -49,7 +49,7 @@ class FirmwareController(
             val firmwares = firmwareService.processFirmware(file)
             firmwareProducerService.send(firmwares)
 
-            logger.info { "Sent updated list of firmwares to Maki" }
+            logger.info { "Firmware file successfully processed" }
             redirectAttributes.setMessage("Successfully processed ${firmwares.firmwares.size} firmware packets")
         } catch (exception: FirmwareException) {
             logger.error(exception) { "Failed to process firmware file" }
