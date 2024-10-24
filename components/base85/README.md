@@ -2,7 +2,7 @@
 
 High speed, standalone, thread-safe [Base85](https://en.wikipedia.org/wiki/Ascii85) encoder/decoder implemented in Java and JavaScript.
 
-Supports [RFC 1924](https://tools.ietf.org/html/rfc1924), [Z85](https://rfc.zeromq.org/spec:32/Z85/), and [Ascii85](https://en.wikipedia.org/wiki/Ascii85) (with optional null and space compression).
+Supports [RFC 1924](https://tools.ietf.org/html/rfc1924) ~~, [Z85](https://rfc.zeromq.org/spec:32/Z85/), and [Ascii85](https://en.wikipedia.org/wiki/Ascii85) (with optional null and space compression)~~ (We removed the other implementations, see the NOTICE file).
 Supports writing to a provided output buffer (`byte[]` for Java and any `TypedArray` for JavaScript).
 
 Java implementation requires Java 8 or above.
