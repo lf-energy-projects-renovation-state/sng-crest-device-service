@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
 
+import com.alliander.sng.Firmware as ExternalFirmware
 import com.alliander.sng.FirmwareType
 import com.alliander.sng.Firmwares
 import java.util.UUID
@@ -34,12 +35,12 @@ object FirmwareFactory {
     fun getPreviousFirmwareEntity(): Firmware =
         Firmware(PREVIOUS_FIRMWARE_UUID, FIRMWARE_NAME, FIRMWARE_FROM_VERSION, UUID.randomUUID(), mutableListOf())
 
-    fun getFirmwarePacket(firmware: Firmware) = FirmwarePacket(firmware, 0, FIRMWARE_PACKET_0)
+    private fun getFirmwarePacket(firmware: Firmware) = FirmwarePacket(firmware, 0, FIRMWARE_PACKET_0)
 
     fun getFirmwares() = Firmwares.newBuilder().setFirmwares(listOf(firmware(), previousFirmware())).build()
 
     private fun firmware() =
-        com.alliander.sng.Firmware.newBuilder()
+        ExternalFirmware.newBuilder()
             .setName(FIRMWARE_NAME)
             .setType(FirmwareType.device)
             .setVersion(FIRMWARE_VERSION)
@@ -48,7 +49,7 @@ object FirmwareFactory {
             .build()
 
     private fun previousFirmware() =
-        com.alliander.sng.Firmware.newBuilder()
+        ExternalFirmware.newBuilder()
             .setName(FIRMWARE_NAME)
             .setType(FirmwareType.device)
             .setVersion(FIRMWARE_FROM_VERSION)

@@ -17,9 +17,8 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.kafka:spring-kafka")
 
-    implementation(project(":components:device"))
     implementation(project(":components:avro"))
-    implementation(project(":components:psk"))
+    implementation(project(":components:device"))
     implementation(project(":components:firmware"))
     implementation(project(":components:psk"))
 

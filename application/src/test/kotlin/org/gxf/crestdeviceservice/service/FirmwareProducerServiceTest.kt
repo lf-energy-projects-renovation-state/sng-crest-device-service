@@ -7,8 +7,10 @@ import org.apache.avro.specific.SpecificRecordBase
 import org.gxf.crestdeviceservice.FirmwaresFactory
 import org.gxf.crestdeviceservice.TestConstants.COMMAND_FEEDBACK_TOPIC
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_MESSAGE_TOPIC
+import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_KEY
 import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_TOPIC
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
+import org.gxf.crestdeviceservice.config.KafkaProducerTopicKeyProperties
 import org.gxf.crestdeviceservice.config.KafkaProducerTopicProperties
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -25,8 +27,7 @@ class FirmwareProducerServiceTest {
         KafkaProducerProperties(
             KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
             KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
-            KafkaProducerTopicProperties(FIRMWARE_TOPIC),
-        )
+            KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY))
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
@@ -34,6 +35,6 @@ class FirmwareProducerServiceTest {
         val firmwares = FirmwaresFactory.getFirmwares()
 
         firmwareProducerService.send(firmwares)
-        verify(mockedKafkaTemplate).send(FIRMWARE_TOPIC, firmwares)
+        verify(mockedKafkaTemplate).send(FIRMWARE_TOPIC, FIRMWARE_KEY, firmwares)
     }
 }

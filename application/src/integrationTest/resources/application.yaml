@@ -46,6 +46,7 @@ kafka:
       topic: "command-feedback"
     firmware:
       topic: "firmware"
+      key: "firmware"
 
 database:
   encryption-key: "super-secret-key"

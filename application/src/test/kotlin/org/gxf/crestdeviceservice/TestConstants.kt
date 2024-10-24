@@ -14,6 +14,7 @@ object TestConstants {
     const val DEVICE_MESSAGE_TOPIC = "device-message"
     const val COMMAND_FEEDBACK_TOPIC = "command-feedback"
     const val FIRMWARE_TOPIC = "firmware-topic"
+    const val FIRMWARE_KEY = "firmware-key"
 
     const val MESSAGE_RECEIVED = "Command received"
 

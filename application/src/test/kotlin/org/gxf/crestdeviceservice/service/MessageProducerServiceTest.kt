@@ -8,8 +8,10 @@ import org.apache.avro.specific.SpecificRecordBase
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestConstants.COMMAND_FEEDBACK_TOPIC
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_MESSAGE_TOPIC
+import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_KEY
 import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_TOPIC
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
+import org.gxf.crestdeviceservice.config.KafkaProducerTopicKeyProperties
 import org.gxf.crestdeviceservice.config.KafkaProducerTopicProperties
 import org.gxf.sng.avro.DeviceMessage
 import org.junit.jupiter.api.Test
@@ -29,7 +31,7 @@ class MessageProducerServiceTest {
         KafkaProducerProperties(
             KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
             KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
-            KafkaProducerTopicProperties(FIRMWARE_TOPIC))
+            KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY))
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
