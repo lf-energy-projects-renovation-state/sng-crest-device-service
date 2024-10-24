@@ -44,6 +44,7 @@ kafka:
       topic: "command-feedback"
     firmware:
       topic: "firmware"
+      key: "firmware"
 
 database:
   # This key was used to encrypt the data in db/migration/test-data/V3__test_data.sql

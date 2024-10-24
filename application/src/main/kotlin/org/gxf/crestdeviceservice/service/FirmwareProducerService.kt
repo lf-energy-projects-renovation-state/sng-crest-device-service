@@ -19,6 +19,6 @@ class FirmwareProducerService(
 
     fun send(firmwares: Firmwares) {
         logger.info { "Sending firmwares to Maki" }
-        kafkaTemplate.send(kafkaProducerProperties.firmware.topic, firmwares)
+        kafkaTemplate.send(kafkaProducerProperties.firmware.topic, kafkaProducerProperties.firmware.key, firmwares)
     }
 }
