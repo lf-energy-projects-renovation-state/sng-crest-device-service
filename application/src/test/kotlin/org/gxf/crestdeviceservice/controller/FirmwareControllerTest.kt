@@ -32,7 +32,7 @@ class FirmwareControllerTest {
 
         whenever(firmwareService.processFirmware(firmwareFile)).thenReturn(firmwares)
 
-        mockMvc.perform(multipart("https://localhost:9001/web/firmware").file(firmwareFile)).andExpect(status().isOk)
+        mockMvc.perform(multipart("https://localhost:9001/web/firmware").file(firmwareFile)).andExpect(status().isFound)
 
         verify(firmwareService).processFirmware(firmwareFile)
         verify(firmwareProducerService).send(firmwares)
