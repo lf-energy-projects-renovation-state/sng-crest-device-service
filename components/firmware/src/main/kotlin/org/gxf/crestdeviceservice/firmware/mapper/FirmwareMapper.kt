@@ -12,10 +12,10 @@ import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 
-@Service
+@Component
 class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
     private val logger = KotlinLogging.logger {}
 
