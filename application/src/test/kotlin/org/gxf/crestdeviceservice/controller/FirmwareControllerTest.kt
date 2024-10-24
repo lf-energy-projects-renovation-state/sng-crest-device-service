@@ -4,21 +4,18 @@
 package org.gxf.crestdeviceservice.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.gxf.crestdeviceservice.FirmwareDTOFactory.getFirmwareDTO
+import org.gxf.crestdeviceservice.FirmwareFileFactory
 import org.gxf.crestdeviceservice.FirmwaresFactory.getFirmwares
-import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_NAME
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
 import org.gxf.crestdeviceservice.service.FirmwareProducerService
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(FirmwareController::class)
@@ -33,19 +30,14 @@ class FirmwareControllerTest {
 
     @Test
     fun shouldProcessFirmwareAndSendAllFirmwares() {
-        val firmwareDTO = getFirmwareDTO()
-        val payload = objectMapper.writeValueAsString(firmwareDTO)
+        val firmwareFile = FirmwareFileFactory.getFirmwareFile()
         val firmwares = getFirmwares()
-        whenever(firmwareService.processFirmware(eq(firmwareDTO))).thenReturn(firmwares)
 
-        mockMvc
-            .perform(
-                post("https://localhost:9001/web/firmware/api/$FIRMWARE_NAME")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload))
-            .andExpect(status().isOk)
+        whenever(firmwareService.processFirmware(firmwareFile)).thenReturn(firmwares)
 
-        verify(firmwareService).processFirmware(eq(firmwareDTO))
+        mockMvc.perform(multipart("https://localhost:9001/web/firmware").file(firmwareFile)).andExpect(status().isOk)
+
+        verify(firmwareService).processFirmware(firmwareFile)
         verify(firmwareProducerService).send(firmwares)
     }
 }

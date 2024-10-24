@@ -8,7 +8,6 @@ include("application")
 include("components:avro")
 include("components:psk")
 include("components:firmware")
-include("components:web")
 
 dependencyResolutionManagement {
     versionCatalogs {

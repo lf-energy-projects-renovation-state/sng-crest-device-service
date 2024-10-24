@@ -4,39 +4,61 @@
 package org.gxf.crestdeviceservice.controller
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.gxf.crestdeviceservice.firmware.dto.FirmwareDTO
 import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
 import org.gxf.crestdeviceservice.service.FirmwareProducerService
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.lang.NonNull
-import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
-@RestController
+@Controller
 @RequestMapping("/web/firmware")
 class FirmwareController(
     val firmwareService: FirmwareService,
     val firmwareProducerService: FirmwareProducerService,
 ) {
     private val logger = KotlinLogging.logger {}
+    private val redirectUrl = "redirect:/web/firmware"
 
-    @PostMapping("/api/{name}")
-    fun post(@NonNull @PathVariable name: String, @NonNull @RequestBody firmware: FirmwareDTO): ResponseEntity<String> {
+    @GetMapping
+    fun showUploadForm(model: Model): String {
+        return "uploadForm"
+    }
+
+    @PostMapping
+    fun handleFileUpload(@RequestPart("file") file: MultipartFile, redirectAttributes: RedirectAttributes): String {
+        if (file.originalFilename.isNullOrEmpty()) {
+            redirectAttributes.setMessage("No file provided")
+            return redirectUrl
+        }
+
+        redirectAttributes.addFlashAttribute("filename", file.originalFilename)
+
+        if (file.isEmpty) {
+            redirectAttributes.setMessage("An empty file was provided")
+            return redirectUrl
+        }
         try {
-            logger.debug { "Processing firmware file with name $name" }
-            val firmwares = firmwareService.processFirmware(firmware)
-            logger.info { "Processed firmware file" }
+            logger.info { "Processing firmware file with name: ${file.originalFilename}" }
+
+            val firmwares = firmwareService.processFirmware(file)
             firmwareProducerService.send(firmwares)
+
             logger.info { "Sent updated list of firmwares to Maki" }
-            return ResponseEntity.ok("Firmware successfully processed")
+            redirectAttributes.setMessage("Successfully processed ${firmwares.firmwares.size} firmware packets")
         } catch (e: FirmwareException) {
             logger.error(e) { "Failed to process firmware file" }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
+            redirectAttributes.setMessage("Failed to process file: ${e.message}")
         }
+        return redirectUrl
+    }
+
+    private fun RedirectAttributes.setMessage(message: String) {
+        this.addFlashAttribute("message", message)
     }
 }
