@@ -51,12 +51,11 @@ class WebServerTest {
         private const val NUMBER_OF_PACKETS = 13
         private const val IDENTITY = "1234"
         private const val PRE_SHARED_KEY = "1234567890123456"
-        private const val SECRET = "123456789"
     }
 
     @BeforeEach
     fun setup() {
-        pskRepository.save(PreSharedKey(IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY, SECRET, PreSharedKeyStatus.ACTIVE))
+        pskRepository.save(PreSharedKey(IDENTITY, 0, Instant.MIN, PRE_SHARED_KEY, PreSharedKeyStatus.ACTIVE))
     }
 
     @AfterEach
@@ -94,8 +93,7 @@ class WebServerTest {
     @Test
     fun pskRequestOnWebPortShouldReturn404() {
         // create second PSK for identity this one should be returned
-        pskRepository.save(
-            PreSharedKey(IDENTITY, 1, Instant.MIN, "0000111122223333", SECRET, PreSharedKeyStatus.ACTIVE))
+        pskRepository.save(PreSharedKey(IDENTITY, 1, Instant.MIN, "0000111122223333", PreSharedKeyStatus.ACTIVE))
 
         val headers = HttpHeaders().apply { add("x-device-identity", IDENTITY) }
         val result = restTemplate.exchange("/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)

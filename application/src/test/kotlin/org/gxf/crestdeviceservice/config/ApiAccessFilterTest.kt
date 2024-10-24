@@ -40,7 +40,7 @@ class ApiAccessFilterTest {
         "9001, /wbe/firmware/api, 404",
         "8080, /psk, 404",
     )
-    fun shouldReturn404ForProxyRequestsOnWebPort(port: Int, uri: String, expectedHttpCode: Int) {
+    fun shouldReturnTheRightStatusCodeForRequestOnPort(port: Int, uri: String, expectedHttpCode: Int) {
         val chain = MockFilterChain()
         val request = MockHttpServletRequest()
         request.serverPort = port

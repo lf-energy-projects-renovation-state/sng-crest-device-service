@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
 
-import com.alliander.sng.Firmwares
 import org.apache.avro.specific.SpecificRecordBase
-import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.FirmwaresFactory
 import org.gxf.crestdeviceservice.TestConstants.COMMAND_FEEDBACK_TOPIC
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_MESSAGE_TOPIC
@@ -36,9 +34,6 @@ class FirmwareProducerServiceTest {
         val firmwares = FirmwaresFactory.getFirmwares()
 
         firmwareProducerService.send(firmwares)
-        verify(mockedKafkaTemplate)
-            .send(
-                org.mockito.kotlin.check { assertThat(it).isEqualTo(FIRMWARE_TOPIC) },
-                org.mockito.kotlin.check { assertThat(it as Firmwares).isEqualTo(firmwares) })
+        verify(mockedKafkaTemplate).send(FIRMWARE_TOPIC, firmwares)
     }
 }

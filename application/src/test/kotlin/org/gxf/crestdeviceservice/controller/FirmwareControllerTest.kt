@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.gxf.crestdeviceservice.FirmwareFileFactory
 import org.gxf.crestdeviceservice.FirmwaresFactory.getFirmwares
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
@@ -25,8 +24,6 @@ class FirmwareControllerTest {
     @MockBean private lateinit var firmwareService: FirmwareService
 
     @MockBean private lateinit var firmwareProducerService: FirmwareProducerService
-
-    private val objectMapper = ObjectMapper()
 
     @Test
     fun shouldProcessFirmwareAndSendAllFirmwares() {

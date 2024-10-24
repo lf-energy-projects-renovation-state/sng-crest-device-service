@@ -24,7 +24,7 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
 
         logger.debug { "Contents of firmware file:\n${fileContent}" }
 
-        val name = file.originalFilename!!
+        val name = checkNotNull(file.originalFilename) { "File name should not be null" }
 
         val firmware =
             Firmware(
@@ -44,15 +44,12 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
     private fun getFirmwareVersionFromName(name: String) = name.substringAfter("#TO#").substringBefore(".txt")
 
     private fun getPreviousFirmwareIdFromName(name: String): UUID? {
-        if (!name.contains("#FROM#")) {
-            return null
-        }
-        val previousFirmwareVersion = name.substringAfter("#FROM#").substringBefore("#TO#")
-        val previousFirmware = firmwareRepository.findByVersion(previousFirmwareVersion)
-        if (previousFirmware != null) {
-            return previousFirmware.id
-        } else {
-            throw FirmwareException("Previous firmware with version $previousFirmwareVersion does not exist")
+        val previousVersionRegex = """(?<=#FROM#)(.*)(?=#TO#)""".toRegex()
+        return previousVersionRegex.find(name)?.let {
+            val previousFirmwareVersion = it.value
+            val previousFirmware = firmwareRepository.findByVersion(previousFirmwareVersion)
+            previousFirmware?.id
+                ?: throw FirmwareException("Previous firmware with version $previousFirmwareVersion does not exist")
         }
     }
 
@@ -90,9 +87,7 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
         }
 
     private fun getFromVersion(firmware: Firmware): String? {
-        return if (firmware.previousFirmwareId == null) {
-            null
-        } else {
+        return firmware.previousFirmwareId?.let {
             val previousFirmware = firmwareRepository.findById(firmware.previousFirmwareId)
             previousFirmware.get().version
         }

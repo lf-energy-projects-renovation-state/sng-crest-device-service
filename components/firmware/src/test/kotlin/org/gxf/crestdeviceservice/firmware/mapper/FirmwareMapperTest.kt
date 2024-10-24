@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice.firmware.mapper
 import com.alliander.sng.FirmwareType
 import java.util.Optional
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwareEntity
 import org.gxf.crestdeviceservice.FirmwareFactory.getPreviousFirmwareEntity
 import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_FROM_VERSION
@@ -16,7 +17,6 @@ import org.gxf.crestdeviceservice.TestConstants.PREVIOUS_FIRMWARE_UUID
 import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -44,6 +44,7 @@ class FirmwareMapperTest {
     fun mapEntitiesToFirmwaresThrowsException() {
         val firmwareEntities = listOf(getFirmwareEntity(FIRMWARE_WRONG_NAME))
 
-        assertThrows<FirmwareException> { firmwareMapper.mapEntitiesToFirmwares(firmwareEntities) }
+        assertThatThrownBy { firmwareMapper.mapEntitiesToFirmwares(firmwareEntities) }
+            .isInstanceOf(FirmwareException::class.java)
     }
 }
