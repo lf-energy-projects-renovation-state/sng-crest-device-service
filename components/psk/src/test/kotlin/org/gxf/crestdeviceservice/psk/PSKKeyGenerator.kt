@@ -16,7 +16,6 @@ import kotlin.io.path.createTempDirectory
 import org.junit.jupiter.api.Test
 
 class PSKKeyGenerator {
-
     private val logger = KotlinLogging.logger {}
     private val algorithm = "RSA"
 
@@ -53,12 +52,18 @@ class PSKKeyGenerator {
             .encodeToString(privateKey.encoded)
             .chunked(Int.MAX_VALUE)
             .joinToString(
-                separator = "\n", prefix = "-----BEGIN PRIVATE KEY-----\n", postfix = "\n-----END PRIVATE KEY-----")
+                separator = "\n",
+                prefix = "-----BEGIN PRIVATE KEY-----\n",
+                postfix = "\n-----END PRIVATE KEY-----"
+            )
 
     private fun publicKeyToString(publicKey: PublicKey) =
         Base64.getEncoder()
             .encodeToString(publicKey.encoded)
             .chunked(32)
             .joinToString(
-                separator = "\n", prefix = "-----BEGIN PUBLIC KEY-----\n", postfix = "\n-----END PUBLIC KEY-----")
+                separator = "\n",
+                prefix = "-----BEGIN PUBLIC KEY-----\n",
+                postfix = "\n-----END PUBLIC KEY-----"
+            )
 }

@@ -24,14 +24,14 @@ import org.springframework.kafka.core.KafkaTemplate
 
 @ExtendWith(MockitoExtension::class)
 class MessageProducerServiceTest {
-
     @Mock private lateinit var mockedKafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
 
     private val kafkaProducerProperties =
         KafkaProducerProperties(
             KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
             KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
-            KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY))
+            KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY)
+        )
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
@@ -46,6 +46,7 @@ class MessageProducerServiceTest {
         verify(mockedKafkaTemplate)
             .send(
                 check { assertThat(it).isEqualTo(DEVICE_MESSAGE_TOPIC) },
-                check { assertThat((it as DeviceMessage).payload).isEqualTo(jsonNode.toString()) })
+                check { assertThat((it as DeviceMessage).payload).isEqualTo(jsonNode.toString()) }
+            )
     }
 }

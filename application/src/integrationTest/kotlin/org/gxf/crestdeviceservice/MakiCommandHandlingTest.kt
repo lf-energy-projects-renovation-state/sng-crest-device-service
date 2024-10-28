@@ -82,7 +82,9 @@ class MakiCommandHandlingTest {
         Awaitility.await().atMost(Duration.ofSeconds(3)).untilAsserted {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-                    DEVICE_ID, org.gxf.crestdeviceservice.command.entity.Command.CommandStatus.PENDING)
+                    DEVICE_ID,
+                    org.gxf.crestdeviceservice.command.entity.Command.CommandStatus.PENDING
+                )
 
             assertThat(savedCommand).isNotNull
         }

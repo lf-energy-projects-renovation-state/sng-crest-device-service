@@ -19,7 +19,8 @@ object CommandFactory {
             timestampIssued = timestamp,
             type = Command.CommandType.PSK,
             commandValue = null,
-            status = Command.CommandStatus.PENDING)
+            status = Command.CommandStatus.PENDING
+        )
 
     fun pendingPskSetCommand() =
         Command(
@@ -29,7 +30,8 @@ object CommandFactory {
             timestampIssued = timestamp,
             type = Command.CommandType.PSK_SET,
             commandValue = null,
-            status = Command.CommandStatus.PENDING)
+            status = Command.CommandStatus.PENDING
+        )
 
     fun pendingRebootCommand(
         timestampIssued: Instant = timestamp,
@@ -43,7 +45,8 @@ object CommandFactory {
             timestampIssued = timestampIssued,
             type = Command.CommandType.REBOOT,
             commandValue = null,
-            status = status)
+            status = status
+        )
 
     fun rebootCommandInProgress() = pendingRebootCommand().start()
 
@@ -61,5 +64,6 @@ object CommandFactory {
             timestampIssued = timestamp,
             type = Command.CommandType.FIRMWARE,
             commandValue = "the-firmware-to-install",
-            status = Command.CommandStatus.IN_PROGRESS)
+            status = Command.CommandStatus.IN_PROGRESS
+        )
 }

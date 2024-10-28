@@ -55,7 +55,8 @@ class UrcService(
             handleUrcsForCommand(urcs, command, downlink)
         } else {
             throw NoMatchingCommandException(
-                "Message received with downlink: $downlink, but there is no matching command in progress in the database.")
+                "Message received with downlink: $downlink, but there is no matching command in progress in the database."
+            )
         }
     }
 
@@ -110,7 +111,10 @@ class UrcService(
         val failedCommand = commandService.saveCommand(command.fail())
         val commandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
-                failedCommand, ExternalCommandStatus.Error, "Command failed. Error(s): $errorMessages.")
+                failedCommand,
+                ExternalCommandStatus.Error,
+                "Command failed. Error(s): $errorMessages."
+            )
         commandFeedbackService.sendFeedback(commandFeedback)
     }
 
@@ -132,7 +136,10 @@ class UrcService(
         val successfulCommand = commandService.saveCommand(command.finish())
         val commandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
-                successfulCommand, ExternalCommandStatus.Successful, "Command handled successfully")
+                successfulCommand,
+                ExternalCommandStatus.Successful,
+                "Command handled successfully"
+            )
         commandFeedbackService.sendFeedback(commandFeedback)
     }
 

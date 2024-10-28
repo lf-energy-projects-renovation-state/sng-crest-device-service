@@ -30,5 +30,6 @@ class CommandTest {
             Instant.now(),
             commandType,
             value,
-            Command.CommandStatus.PENDING)
+            Command.CommandStatus.PENDING
+        )
 }

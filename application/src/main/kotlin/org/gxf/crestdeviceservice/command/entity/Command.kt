@@ -56,7 +56,8 @@ class Command(
             "OTA",
             listOf("OTA:SUC"),
             listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER"),
-            needsCommandValue = true),
+            needsCommandValue = true
+        ),
     }
 
     enum class CommandStatus {

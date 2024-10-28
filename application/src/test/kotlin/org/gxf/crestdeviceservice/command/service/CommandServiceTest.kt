@@ -61,7 +61,9 @@ class CommandServiceTest {
         val newCommand = CommandFactory.pendingRebootCommand()
         val existingPendingCommand =
             CommandFactory.pendingRebootCommand(
-                timestampIssued = Instant.now().minusSeconds(100), correlationId = UUID.randomUUID())
+                timestampIssued = Instant.now().minusSeconds(100),
+                correlationId = UUID.randomUUID()
+            )
 
         whenever(commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()))
             .thenReturn(existingPendingCommand)
