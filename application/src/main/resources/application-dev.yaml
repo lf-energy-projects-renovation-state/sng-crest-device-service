@@ -19,8 +19,14 @@ mutual-tls:
   truststore:
     certificate: "classpath:ssl/dev-proxy-cert.pem"
 
+# port for proxy, using mutual TLS
 server:
   port: 9000
+
+config:
+  # port for web client
+  web-server:
+    port: 9001
 
 kafka:
   consumers:
@@ -33,6 +39,9 @@ kafka:
       topic: "crest-message"
     command-feedback:
       topic: "command-feedback"
+    firmware:
+      topic: "firmware"
+      key: "firmware"
 
 database:
   # This key was used to encrypt the data in db/migration/test-data/V3__test_data.sql
@@ -50,3 +59,7 @@ psk:
         -----END PRIVATE KEY-----
 message:
   max-bytes: 1024
+
+logging:
+  level:
+    org.gxf.crestdeviceservice: debug

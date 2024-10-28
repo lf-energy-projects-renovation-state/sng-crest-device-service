@@ -8,14 +8,33 @@ import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class FirmwareService(
     private val firmwareRepository: FirmwareRepository,
     private val firmwarePacketRepository: FirmwarePacketRepository,
+    private val firmwareMapper: FirmwareMapper,
     private val firmwareHashService: FirmwareHashService,
     private val deviceService: DeviceService,
 ) {
+    private val logger = KotlinLogging.logger {}
+
+    fun processFirmware(file: MultipartFile): Firmwares {
+        val firmware = firmwareMapper.mapFirmwareFileToEntity(file)
+        if (firmwareRepository.findByName(firmware.name) != null) {
+            throw FirmwareException("Firmware with name ${firmware.name} already exists")
+        }
+        save(firmware)
+        val firmwareEntities: List<Firmware> = firmwareRepository.findAll()
+        return firmwareMapper.mapEntitiesToFirmwares(firmwareEntities)
+    }
+
+    private fun save(firmware: Firmware) {
+        logger.info { "Saving firmware with name ${firmware.name} to database" }
+        firmwareRepository.save(firmware)
+    }
+
     fun findFirmwareByName(name: String) = firmwareRepository.findByName(name)
 
     /**

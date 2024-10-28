@@ -5,9 +5,10 @@
 rootProject.name = "sng-crest-device-service"
 
 include("application")
+include("components:avro")
+include("components:psk")
 include("components:device")
 include("components:firmware")
-include("components:psk")
 include("components:shared")
 include("components:base85")
 

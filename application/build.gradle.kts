@@ -13,9 +13,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.kafka:spring-kafka")
 
+    implementation(project(":components:avro"))
     implementation(project(":components:device"))
     implementation(project(":components:firmware"))
     implementation(project(":components:psk"))
@@ -26,8 +28,6 @@ dependencies {
     implementation(libs.bundles.gxfUtils)
 
     implementation(libs.commonsCodec)
-
-    implementation(libs.avro)
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     runtimeOnly("org.postgresql:postgresql")
@@ -73,12 +73,12 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
+                implementation(project(":components:avro"))
+                implementation(project(":components:psk"))
                 implementation(project(":components:device"))
                 implementation(project(":components:firmware"))
-                implementation(project(":components:psk"))
                 implementation("org.springframework.boot:spring-boot-starter-data-jpa")
                 implementation(libs.kafkaAvro)
-                implementation(libs.avro)
                 implementation("org.springframework.kafka:spring-kafka")
                 implementation("org.springframework.boot:spring-boot-starter-test")
                 implementation("org.springframework.kafka:spring-kafka-test")

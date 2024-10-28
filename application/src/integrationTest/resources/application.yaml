@@ -14,13 +14,21 @@ spring:
     hibernate:
       ddl-auto: create-drop
   kafka:
-    bootstrap-servers: ${spring.embedded.kafka.brokers}
     consumer:
       # Setting this property to "earliest" prevents failing integration tests caused
       # by the producer sending a message before the consumer has been assigned the topic/partition.
       # When not set it defaults to "latest"
       auto-offset-reset: earliest
       group-id: "gxf-sng-crest-device-service"
+
+# port for proxy, using mutual TLS
+server:
+  port: 9000
+
+config:
+  # port for web client
+  web-server:
+    port: 9001
 
 kafka:
   consumers:
@@ -33,6 +41,9 @@ kafka:
       topic: "crest-message"
     command-feedback:
       topic: "command-feedback"
+    firmware:
+      topic: "firmware"
+      key: "firmware"
 
 database:
   encryption-key: "super-secret-key"

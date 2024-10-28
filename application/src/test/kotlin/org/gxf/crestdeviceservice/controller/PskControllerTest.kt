@@ -21,19 +21,21 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @WebMvcTest(PskController::class)
 class PskControllerTest {
 
-    @Autowired private lateinit var mvcRequest: MockMvc
+    @Autowired private lateinit var mockMvc: MockMvc
 
     @MockBean private lateinit var pskService: PskService
 
     @MockBean private lateinit var metricService: MetricService
+
+    private val url = "https://localhost:9000/psk"
 
     @Test
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
         val identity = "identity"
         whenever(pskService.getCurrentActiveKey(identity)).then { throw NoExistingPskException("oops") }
 
-        mvcRequest
-            .perform(MockMvcRequestBuilders.get("/psk").header("x-device-identity", identity))
+        mockMvc
+            .perform(MockMvcRequestBuilders.get(url).header("x-device-identity", identity))
             .andExpect(MockMvcResultMatchers.status().isNotFound)
         verify(metricService, times(1)).incrementIdentityInvalidCounter()
     }
@@ -43,8 +45,8 @@ class PskControllerTest {
         val identity = "identity"
         whenever(pskService.getCurrentActiveKey(identity)).thenReturn("key")
 
-        mvcRequest
-            .perform(MockMvcRequestBuilders.get("/psk").header("x-device-identity", identity))
+        mockMvc
+            .perform(MockMvcRequestBuilders.get(url).header("x-device-identity", identity))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().string("key"))
         verify(metricService, never()).incrementIdentityInvalidCounter()
