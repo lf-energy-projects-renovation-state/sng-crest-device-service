@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
 
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.FirmwareFactory
 import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwareEntity
@@ -10,8 +11,10 @@ import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwares
 import org.gxf.crestdeviceservice.FirmwareFactory.getPreviousFirmwareEntity
 import org.gxf.crestdeviceservice.device.entity.Device
 import org.gxf.crestdeviceservice.device.service.DeviceService
-import org.gxf.crestdeviceservice.firmware.entity.FirmwareFactory
+import org.gxf.crestdeviceservice.firmware.entity.Firmware
+import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.gxf.crestdeviceservice.firmware.mapper.FirmwareMapper
+import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,11 +26,13 @@ import org.mockito.kotlin.whenever
 @ExtendWith(MockitoExtension::class)
 class FirmwareServiceTest {
     private val firmwareRepository = mock<FirmwareRepository>()
-    private val firmwarePacketRepository = mock<firmwarePacketRepository>()
+    private val firmwarePacketRepository = mock<FirmwarePacketRepository>()
     private val firmwareMapper = mock<FirmwareMapper>()
     private val firmwareHashService = mock<FirmwareHashService>()
     private val deviceService = mock<DeviceService>()
-    private val firmwareService = FirmwareService(firmwareRepository, firmwareMapper)
+    private val firmwareService =
+        FirmwareService(
+            firmwareRepository, firmwarePacketRepository, firmwareMapper, firmwareHashService, deviceService)
 
     @Test
     fun processFirmware() {
@@ -49,7 +54,7 @@ class FirmwareServiceTest {
     @Test
     fun shouldReturnFirmware() {
         val firmwareName = "useThisFirmware.txt"
-        val expectedFirmware = FirmwareFactory.getFirmware()
+        val expectedFirmware = Firmware(UUID.randomUUID(), name = "a firmware", version = "3")
         whenever(firmwareRepository.findByName(firmwareName)).thenReturn(expectedFirmware)
 
         val actualFirmware = firmwareService.findFirmwareByName(firmwareName)
@@ -63,8 +68,8 @@ class FirmwareServiceTest {
         val deviceSecret = "super-duper-hush-hush"
         val device = Device("id", deviceSecret)
         val packetNumber = 0
-        val firmware = FirmwareFactory.getFirmware()
-        val packet = FirmwareFactory.getFirmwarePacket(firmware)
+        val firmware = Firmware(UUID.randomUUID(), name = "a firmware", version = "3")
+        val packet = FirmwarePacket(firmware, 0, "the-packet-contents")
 
         whenever(firmwarePacketRepository.findByFirmwareAndPacketNumber(firmware, packetNumber)).thenReturn(packet)
         whenever(deviceService.getDevice(deviceId)).thenReturn(device)

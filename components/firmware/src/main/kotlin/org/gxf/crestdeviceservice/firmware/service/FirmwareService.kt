@@ -3,8 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
 
+import com.alliander.sng.Firmwares
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.device.service.DeviceService
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
+import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
+import org.gxf.crestdeviceservice.firmware.mapper.FirmwareMapper
 import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.springframework.stereotype.Service
@@ -35,7 +39,8 @@ class FirmwareService(
         firmwareRepository.save(firmware)
     }
 
-    fun findFirmwareByName(name: String) = firmwareRepository.findByName(name)
+    fun findFirmwareByName(name: String) =
+        checkNotNull(firmwareRepository.findByName(name)) { "Firmware with name $name not found" }
 
     /**
      * Gets a ready-to-go firmware packet for a device. If required, the firmware hashes in the packet are replaced with

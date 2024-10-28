@@ -18,7 +18,7 @@ class FirmwareHashServiceTest {
 
     @Test
     fun shouldGenerateFirstPacket() {
-        val firmware = Firmware(UUID.randomUUID(), "test-firmware", "", null, emptyList())
+        val firmware = Firmware(UUID.randomUUID(), name = "a firmware", version = "1.10")
         val rawPacket = FirmwarePacket(firmware, 0, fileContent[0])
 
         val actualPacket = firmwareHashService.generateDeviceSpecificPacket(rawPacket, "PONMLKJIHGFEDCBA")
