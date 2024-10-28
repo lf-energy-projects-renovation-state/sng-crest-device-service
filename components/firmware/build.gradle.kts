@@ -2,6 +2,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.security:spring-security-core")
 
+    implementation(project(":components:device"))
     implementation(project(":components:psk"))
     implementation(project(":components:base85"))
 

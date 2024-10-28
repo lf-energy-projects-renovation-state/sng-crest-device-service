@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
 
+import org.gxf.crestdeviceservice.device.service.DeviceService
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
-import org.gxf.crestdeviceservice.psk.service.DeviceSecretService
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,7 +14,7 @@ class FirmwareService(
     private val firmwareRepository: FirmwareRepository,
     private val firmwarePacketRepository: FirmwarePacketRepository,
     private val firmwareHashService: FirmwareHashService,
-    private val deviceSecretService: DeviceSecretService,
+    private val deviceService: DeviceService,
 ) {
     fun findFirmwareByName(name: String) = firmwareRepository.findByName(name)
 
@@ -29,7 +29,7 @@ class FirmwareService(
      */
     fun getPacketForDevice(firmware: Firmware, packetNr: Int, deviceId: String): String {
         val packet = firmwarePacketRepository.findByFirmwareAndPacketNumber(firmware, packetNr)
-        val deviceSecret = deviceSecretService.getDeviceSecret(deviceId)
+        val deviceSecret = deviceService.getDevice(deviceId).secret
         return firmwareHashService.generateDeviceSpecificPacket(packet, deviceSecret)
     }
 }

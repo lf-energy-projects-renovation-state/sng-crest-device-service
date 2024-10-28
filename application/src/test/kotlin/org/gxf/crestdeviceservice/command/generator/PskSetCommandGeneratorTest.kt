@@ -6,6 +6,9 @@ package org.gxf.crestdeviceservice.command.generator
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
+import org.gxf.crestdeviceservice.TestConstants
+import org.gxf.crestdeviceservice.device.entity.Device
+import org.gxf.crestdeviceservice.device.service.DeviceService
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -16,7 +19,8 @@ import org.mockito.kotlin.whenever
 
 class PskSetCommandGeneratorTest {
     private val pskService = mock<PskService>()
-    private val generator = PskSetCommandGenerator(pskService)
+    private val deviceService = mock<DeviceService>()
+    private val generator = PskSetCommandGenerator(pskService, deviceService)
 
     @ParameterizedTest
     @CsvSource(
@@ -26,7 +30,10 @@ class PskSetCommandGeneratorTest {
         "6543210987654321,64904d94590a354cecd8e65630289bcc22103c07b08c009b0b12a8ef0d58af9d,different-secret")
     fun shouldCreateACorrectPskSetCommandWithHash(key: String, expectedHash: String, usedSecret: String) {
         val pskCommandPending = CommandFactory.pendingPskCommand()
-        val preSharedKey = PreSharedKey("identity", 0, Instant.now(), key, usedSecret, PreSharedKeyStatus.PENDING)
+        val device = Device(TestConstants.DEVICE_ID, usedSecret)
+        val preSharedKey = PreSharedKey(TestConstants.DEVICE_ID, 0, Instant.now(), key, PreSharedKeyStatus.PENDING)
+
+        whenever(deviceService.getDevice(TestConstants.DEVICE_ID)).thenReturn(device)
         whenever(pskService.getCurrentReadyPsk(pskCommandPending.deviceId)).thenReturn(preSharedKey)
 
         val result = generator.generateCommandString(pskCommandPending)

@@ -9,7 +9,6 @@ import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.generator.CommandGenerator
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.config.MessageProperties
-import org.gxf.crestdeviceservice.device.service.DeviceService
 import org.gxf.crestdeviceservice.model.Downlink
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service
 /** Creates downlinks to be sent to a device after it makes contact. */
 @Service
 class DownlinkService(
-    private val deviceService: DeviceService,
     private val pskService: PskService,
     private val commandService: CommandService,
     private val messageProperties: MessageProperties,
