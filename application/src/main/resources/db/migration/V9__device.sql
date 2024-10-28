@@ -1,6 +1,6 @@
 create table device (
-    id char(15) not null,
-    secret char(64) not null,
+    id varchar(15) not null,
+    secret varchar(64) not null,
 
     primary key (id)
 );
