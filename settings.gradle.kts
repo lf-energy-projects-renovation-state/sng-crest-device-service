@@ -18,7 +18,7 @@ dependencyResolutionManagement {
             version("avro", "1.12.0")
             version("mockitoKotlin", "5.4.0")
             version("commonsCodec", "1.17.1")
-            version("gxfUtils", "2.0")
+            version("gxfUtils", "2.1")
 
             library("logging", "io.github.oshai", "kotlin-logging-jvm").versionRef("kotlinLogging")
 
