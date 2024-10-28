@@ -47,7 +47,8 @@ class PayloadService(
                 downlink.addIfPossible(otaCommand)
             } else {
                 throw NoMatchingCommandException(
-                    "Device $identity requests FOTA packet $fotaMessageCounter (FMC), but no running FIRMWARE command was found")
+                    "Device $identity requests FOTA packet $fotaMessageCounter (FMC), but no running FIRMWARE command was found"
+                )
             }
         }
     }

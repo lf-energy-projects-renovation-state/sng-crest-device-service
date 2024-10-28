@@ -21,12 +21,14 @@ class MessageProducerService(
 
     fun produceMessage(message: JsonNode) {
         logger.info { "Producing message for: ${message["ID"]}" }
+
         kafkaTemplate.send(
             kafkaProducerProperties.deviceMessage.topic,
             DeviceMessage().apply {
                 deviceId = message["ID"].toString()
                 timestamp = Instant.now().toEpochMilli()
                 payload = message.toString()
-            })
+            }
+        )
     }
 }

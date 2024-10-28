@@ -41,7 +41,11 @@ class DownlinkServiceTest {
 
         this.downlinkService =
             DownlinkService(
-                pskService, commandService, messageProperties, listOf(pskCommandGenerator, pskSetCommandGenerator))
+                pskService,
+                commandService,
+                messageProperties,
+                listOf(pskCommandGenerator, pskSetCommandGenerator)
+            )
     }
 
     @Test

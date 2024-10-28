@@ -32,7 +32,12 @@ class FirmwareServiceTest {
     private val deviceService = mock<DeviceService>()
     private val firmwareService =
         FirmwareService(
-            firmwareRepository, firmwarePacketRepository, firmwareMapper, firmwareHashService, deviceService)
+            firmwareRepository,
+            firmwarePacketRepository,
+            firmwareMapper,
+            firmwareHashService,
+            deviceService
+        )
 
     @Test
     fun processFirmware() {

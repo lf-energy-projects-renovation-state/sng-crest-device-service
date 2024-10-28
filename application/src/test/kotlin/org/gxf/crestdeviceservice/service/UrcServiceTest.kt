@@ -53,7 +53,11 @@ class UrcServiceTest {
         @JvmStatic
         private fun containingPskErrorUrcs() =
             Stream.of(
-                listOf("PSK:DLER"), listOf("PSK:HSER"), listOf("TS:ERR", "PSK:DLER"), listOf("PSK:DLER", "PSK:EQER"))
+                listOf("PSK:DLER"),
+                listOf("PSK:HSER"),
+                listOf("TS:ERR", "PSK:DLER"),
+                listOf("PSK:DLER", "PSK:EQER")
+            )
 
         @JvmStatic
         private fun notContainingPskUrcs() =
@@ -66,7 +70,8 @@ class UrcServiceTest {
                 listOf("BOR"),
                 listOf("EXR"),
                 listOf("POR"),
-                listOf("INIT", "BOR", "POR"))
+                listOf("INIT", "BOR", "POR")
+            )
     }
 
     @Test
@@ -136,7 +141,10 @@ class UrcServiceTest {
 
         val expectedCommandFeedback =
             CommandFeedbackMapper.commandEntityToCommandFeedback(
-                commandInProgress, CommandStatus.Successful, "Command handled successfully")
+                commandInProgress,
+                CommandStatus.Successful,
+                "Command handled successfully"
+            )
 
         verify(commandService).saveCommand(commandInProgress)
         verify(commandFeedbackService).sendFeedback(refEq(expectedCommandFeedback, "timestampStatus"))

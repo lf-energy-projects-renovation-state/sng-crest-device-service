@@ -81,7 +81,9 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK,
                 null,
-                Command.CommandStatus.PENDING))
+                Command.CommandStatus.PENDING
+            )
+        )
         commandRepository.save(
             Command(
                 UUID.randomUUID(),
@@ -90,7 +92,9 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK_SET,
                 null,
-                Command.CommandStatus.PENDING))
+                Command.CommandStatus.PENDING
+            )
+        )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message.json"), headers)
@@ -112,7 +116,9 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK,
                 null,
-                Command.CommandStatus.IN_PROGRESS))
+                Command.CommandStatus.IN_PROGRESS
+            )
+        )
         commandRepository.save(
             Command(
                 UUID.randomUUID(),
@@ -121,7 +127,9 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK_SET,
                 null,
-                Command.CommandStatus.IN_PROGRESS))
+                Command.CommandStatus.IN_PROGRESS
+            )
+        )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message_psk_set_success.json"), headers)
@@ -148,7 +156,9 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK,
                 null,
-                Command.CommandStatus.IN_PROGRESS))
+                Command.CommandStatus.IN_PROGRESS
+            )
+        )
         commandRepository.save(
             Command(
                 UUID.randomUUID(),
@@ -157,7 +167,9 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK_SET,
                 null,
-                Command.CommandStatus.IN_PROGRESS))
+                Command.CommandStatus.IN_PROGRESS
+            )
+        )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity<String>(getFileContentAsString("message_psk_set_failure.json"), headers)
@@ -184,7 +196,8 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.REBOOT,
                 null,
-                Command.CommandStatus.PENDING)
+                Command.CommandStatus.PENDING
+            )
         commandRepository.save(pendingCommand)
 
         // receiving message from device
@@ -200,7 +213,9 @@ class CoapMessageHandlingTest {
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-                    DEVICE_ID, Command.CommandStatus.IN_PROGRESS)
+                    DEVICE_ID,
+                    Command.CommandStatus.IN_PROGRESS
+                )
 
             assertThat(savedCommand).isNotNull()
         }
@@ -221,7 +236,8 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.REBOOT,
                 "reboot",
-                Command.CommandStatus.IN_PROGRESS)
+                Command.CommandStatus.IN_PROGRESS
+            )
         commandRepository.save(commandInProgress)
 
         // receiving message from device
@@ -236,7 +252,9 @@ class CoapMessageHandlingTest {
         Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-                    DEVICE_ID, Command.CommandStatus.SUCCESSFUL)
+                    DEVICE_ID,
+                    Command.CommandStatus.SUCCESSFUL
+                )
 
             assertThat(savedCommand).isNotNull
         }

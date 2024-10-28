@@ -53,7 +53,10 @@ class CommandService(
     private fun deviceHasSameCommandAlreadyInProgress(deviceId: String, commandType: Command.CommandType) =
         commandRepository
             .findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
-                deviceId, commandType, Command.CommandStatus.IN_PROGRESS)
+                deviceId,
+                commandType,
+                Command.CommandStatus.IN_PROGRESS
+            )
             .isNotEmpty()
 
     private fun getLatestCommandInDatabase(deviceId: String, commandType: Command.CommandType) =
@@ -89,14 +92,18 @@ class CommandService(
 
     fun getFirstCommandInProgressForDevice(deviceId: String) =
         commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-            deviceId, Command.CommandStatus.IN_PROGRESS)
+            deviceId,
+            Command.CommandStatus.IN_PROGRESS
+        )
 
     fun getAllPendingCommandsForDevice(deviceId: String) =
         commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(deviceId, Command.CommandStatus.PENDING)
 
     fun getAllCommandsInProgressForDevice(deviceId: String) =
         commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
-            deviceId, Command.CommandStatus.IN_PROGRESS)
+            deviceId,
+            Command.CommandStatus.IN_PROGRESS
+        )
 
     fun saveCommand(command: Command) = commandRepository.save(command)
 
