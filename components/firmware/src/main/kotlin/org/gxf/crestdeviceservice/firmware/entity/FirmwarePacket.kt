@@ -16,4 +16,14 @@ class FirmwarePacket(
     @Id val packetNumber: Int,
     @Column(length = 1024) // without this, the integration test assumes a length of 255
     val packet: String
-)
+) {
+    fun isFirstPacket() = packet.startsWith(OTA_START)
+
+    fun isLastPacket() = packet.endsWith(OTA_DONE)
+
+    companion object {
+        const val OTA_START = "OTA0000"
+        const val OTA_DONE = ":DONE"
+        const val HASH_LENGTH = 40
+    }
+}

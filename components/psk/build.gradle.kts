@@ -8,6 +8,7 @@ dependencies {
 
     implementation(project(":components:shared"))
 
+    implementation(libs.commonsCodec)
     implementation(libs.logging)
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

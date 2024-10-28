@@ -10,6 +10,7 @@ include("components:psk")
 include("components:device")
 include("components:firmware")
 include("components:shared")
+include("components:base85")
 
 dependencyResolutionManagement {
     versionCatalogs {

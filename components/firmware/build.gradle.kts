@@ -8,6 +8,11 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-web")
 
+    implementation(project(":components:device"))
+    implementation(project(":components:psk"))
+    implementation(project(":components:base85"))
+
+    implementation(libs.commonsCodec)
     implementation(libs.logging)
 
     implementation(project(":components:avro"))
