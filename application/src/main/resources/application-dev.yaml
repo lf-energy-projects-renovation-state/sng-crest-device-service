@@ -40,7 +40,7 @@ kafka:
     command-feedback:
       topic: "command-feedback"
     firmware:
-      topic: "firmware"
+      topic: "firmwares-internal"
       key: "firmware"
 
 database:
