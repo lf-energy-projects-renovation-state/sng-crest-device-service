@@ -3,12 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
 
-import com.alliander.sng.CommandStatus as ExternalCommandStatus
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
-import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.model.Downlink
@@ -109,13 +107,7 @@ class UrcService(
         }
 
         val failedCommand = commandService.saveCommand(command.fail())
-        val commandFeedback =
-            CommandFeedbackMapper.commandEntityToCommandFeedback(
-                failedCommand,
-                ExternalCommandStatus.Error,
-                "Command failed. Error(s): $errorMessages."
-            )
-        commandFeedbackService.sendFeedback(commandFeedback)
+        commandFeedbackService.sendErrorFeedback(failedCommand, "Command failed. Error(s): $errorMessages.")
     }
 
     private fun handlePskErrors(deviceId: String) {
@@ -134,13 +126,7 @@ class UrcService(
         }
 
         val successfulCommand = commandService.saveCommand(command.finish())
-        val commandFeedback =
-            CommandFeedbackMapper.commandEntityToCommandFeedback(
-                successfulCommand,
-                ExternalCommandStatus.Successful,
-                "Command handled successfully"
-            )
-        commandFeedbackService.sendFeedback(commandFeedback)
+        commandFeedbackService.sendSuccessFeedback(successfulCommand)
     }
 
     private fun handlePskSetSuccess(command: Command) {
