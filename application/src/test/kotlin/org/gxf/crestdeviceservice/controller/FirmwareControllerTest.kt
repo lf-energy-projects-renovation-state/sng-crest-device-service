@@ -3,8 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.controller
 
+import java.util.UUID
 import org.gxf.crestdeviceservice.FirmwareFileFactory
-import org.gxf.crestdeviceservice.FirmwaresFactory.getFirmwares
+import org.gxf.crestdeviceservice.firmware.entity.Firmware
+import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
 import org.gxf.crestdeviceservice.service.FirmwareProducerService
 import org.junit.jupiter.api.Test
@@ -28,13 +30,14 @@ class FirmwareControllerTest {
     @Test
     fun shouldProcessFirmwareAndSendAllFirmwares() {
         val firmwareFile = FirmwareFileFactory.getFirmwareFile()
-        val firmwares = getFirmwares()
+        val firmwareEntity = Firmware(UUID.randomUUID(), "test-fw", "1.23", packets = mutableListOf())
+        firmwareEntity.packets += FirmwarePacket(firmwareEntity, 0, "some content")
 
-        whenever(firmwareService.processFirmware(firmwareFile)).thenReturn(firmwares)
+        whenever(firmwareService.processFirmware(firmwareFile)).thenReturn(firmwareEntity)
 
         mockMvc.perform(multipart("https://localhost:9001/web/firmware").file(firmwareFile)).andExpect(status().isFound)
 
         verify(firmwareService).processFirmware(firmwareFile)
-        verify(firmwareProducerService).send(firmwares)
+        verify(firmwareProducerService).sendAllFirmwares()
     }
 }

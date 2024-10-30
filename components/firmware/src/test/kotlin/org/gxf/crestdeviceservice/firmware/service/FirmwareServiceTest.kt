@@ -7,8 +7,6 @@ import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.FirmwareFactory
 import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwareEntity
-import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwares
-import org.gxf.crestdeviceservice.FirmwareFactory.getPreviousFirmwareEntity
 import org.gxf.crestdeviceservice.device.entity.Device
 import org.gxf.crestdeviceservice.device.service.DeviceService
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
@@ -43,17 +41,14 @@ class FirmwareServiceTest {
     fun processFirmware() {
         val firmwareFile = FirmwareFactory.getFirmwareFile()
         val firmwareEntity = getFirmwareEntity(firmwareFile.name)
-        val previousFirmware = getPreviousFirmwareEntity()
-        val allFirmwareEntities = listOf(previousFirmware, firmwareEntity)
-        val firmwares = getFirmwares()
+
         whenever(firmwareMapper.mapFirmwareFileToEntity(firmwareFile)).thenReturn(firmwareEntity)
-        whenever(firmwareRepository.findAll()).thenReturn(allFirmwareEntities)
-        whenever(firmwareMapper.mapEntitiesToFirmwares(listOf(previousFirmware, firmwareEntity))).thenReturn(firmwares)
+        whenever(firmwareRepository.save(firmwareEntity)).thenReturn(firmwareEntity)
 
         val result = firmwareService.processFirmware(firmwareFile)
 
         verify(firmwareRepository).save(firmwareEntity)
-        assertThat(result).isEqualTo(firmwares)
+        assertThat(result).isEqualTo(firmwareEntity)
     }
 
     @Test
