@@ -68,6 +68,22 @@ class FirmwareServiceTest {
     }
 
     @Test
+    fun shouldCountPackets() {
+        val firmwareName = "firmware"
+        val packetCount = 10
+
+        val firmware = Firmware(id = UUID.randomUUID(), name = firmwareName, version = "1", packets = mutableListOf())
+
+        repeat(packetCount) { packetNumber ->
+            firmware.packets += FirmwarePacket(firmware, packetNumber, "packet $packetNumber")
+        }
+
+        whenever(firmwareRepository.findByName(firmwareName)).thenReturn(firmware)
+
+        assertThat(firmwareService.countFirmwarePacketsByName(firmwareName)).isEqualTo(packetCount)
+    }
+
+    @Test
     fun shouldReturnPacket() {
         val deviceId = "test-device"
         val deviceSecret = "super-duper-hush-hush"
