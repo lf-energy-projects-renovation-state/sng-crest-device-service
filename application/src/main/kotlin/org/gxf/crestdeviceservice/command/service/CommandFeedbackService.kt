@@ -6,9 +6,11 @@ package org.gxf.crestdeviceservice.command.service
 import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus.Cancelled
+import com.alliander.sng.CommandStatus.Error
 import com.alliander.sng.CommandStatus.Progress
 import com.alliander.sng.CommandStatus.Received
 import com.alliander.sng.CommandStatus.Rejected
+import com.alliander.sng.CommandStatus.Successful
 import org.apache.avro.specific.SpecificRecordBase
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.commandEntityToCommandFeedback
@@ -48,7 +50,17 @@ class CommandFeedbackService(
         sendFeedback(commandFeedback)
     }
 
-    fun sendFeedback(commandFeedback: CommandFeedback) {
+    fun sendSuccessFeedback(command: Command) {
+        val commandFeedback = commandEntityToCommandFeedback(command, Successful, "Command handled successfully")
+        sendFeedback(commandFeedback)
+    }
+
+    fun sendErrorFeedback(command: Command, error: String) {
+        val commandFeedback = commandEntityToCommandFeedback(command, Error, error)
+        sendFeedback(commandFeedback)
+    }
+
+    private fun sendFeedback(commandFeedback: CommandFeedback) {
         kafkaTemplate.send(topic, commandFeedback.deviceId, commandFeedback)
     }
 }

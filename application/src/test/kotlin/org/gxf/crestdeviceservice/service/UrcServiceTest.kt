@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.service
 
-import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -18,7 +17,6 @@ import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.TestHelper
 import org.gxf.crestdeviceservice.command.entity.Command
-import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
@@ -29,10 +27,10 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.refEq
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class UrcServiceTest {
@@ -109,7 +107,7 @@ class UrcServiceTest {
 
         verify(pskService).setPendingKeyAsInvalid(DEVICE_ID)
         verify(commandService, times(2)).saveCommand(any<Command>())
-        verify(commandFeedbackService, times(2)).sendFeedback(any<CommandFeedback>())
+        verify(commandFeedbackService, times(2)).sendErrorFeedback(any<Command>(), any<String>())
         assertThat(pskCommandInProgress.status).isEqualTo(Command.CommandStatus.ERROR)
         assertThat(pskSetCommandInProgress.status).isEqualTo(Command.CommandStatus.ERROR)
     }
@@ -139,15 +137,8 @@ class UrcServiceTest {
 
         urcService.interpretUrcsInMessage(DEVICE_ID, message)
 
-        val expectedCommandFeedback =
-            CommandFeedbackMapper.commandEntityToCommandFeedback(
-                commandInProgress,
-                CommandStatus.Successful,
-                "Command handled successfully"
-            )
-
         verify(commandService).saveCommand(commandInProgress)
-        verify(commandFeedbackService).sendFeedback(refEq(expectedCommandFeedback, "timestampStatus"))
+        verify(commandFeedbackService).sendSuccessFeedback(any<Command>())
         assertThat(commandInProgress.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
     }
 
@@ -163,7 +154,7 @@ class UrcServiceTest {
         urcService.interpretUrcsInMessage(DEVICE_ID, message)
 
         verify(commandService, never()).saveCommands(any<Command>(), any<Command>())
-        verify(commandFeedbackService, never()).sendFeedback(any<CommandFeedback>())
+        verifyNoInteractions(commandFeedbackService)
     }
 
     @ParameterizedTest(name = "should do nothing when downlink is {0}")
