@@ -5,11 +5,14 @@ package org.gxf.crestdeviceservice.command.service
 
 import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandFeedback
-import com.alliander.sng.CommandStatus
+import com.alliander.sng.CommandStatus.Cancelled
+import com.alliander.sng.CommandStatus.Progress
+import com.alliander.sng.CommandStatus.Received
+import com.alliander.sng.CommandStatus.Rejected
 import org.apache.avro.specific.SpecificRecordBase
 import org.gxf.crestdeviceservice.command.entity.Command
-import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper
 import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.commandEntityToCommandFeedback
+import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.externalCommandToCommandFeedback
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
@@ -22,18 +25,26 @@ class CommandFeedbackService(
     private val topic = kafkaProducerProperties.commandFeedback.topic
 
     fun sendReceivedFeedback(command: Command) {
-        val commandFeedback = commandEntityToCommandFeedback(command, CommandStatus.Received, "Command received")
+        val commandFeedback = commandEntityToCommandFeedback(command, Received, "Command received")
+
         sendFeedback(commandFeedback)
     }
 
     fun sendCancellationFeedback(command: Command, message: String) {
-        val commandFeedback = commandEntityToCommandFeedback(command, CommandStatus.Cancelled, message)
+        val commandFeedback = commandEntityToCommandFeedback(command, Cancelled, message)
+
         sendFeedback(commandFeedback)
     }
 
     fun sendRejectionFeedback(reason: String, command: ExternalCommand) {
-        val commandFeedback =
-            CommandFeedbackMapper.externalCommandToCommandFeedback(command, CommandStatus.Rejected, reason)
+        val commandFeedback = externalCommandToCommandFeedback(command, Rejected, reason)
+
+        sendFeedback(commandFeedback)
+    }
+
+    fun sendProgressFeedback(currentCount: Int, totalCount: Int, command: Command) {
+        val commandFeedback = commandEntityToCommandFeedback(command, Progress, "$currentCount/$totalCount")
+
         sendFeedback(commandFeedback)
     }
 
