@@ -25,10 +25,7 @@ class FirmwareController(
     private val logger = KotlinLogging.logger {}
     private val redirectUrl = "redirect:/web/firmware"
 
-    @GetMapping
-    fun showUploadForm(model: Model): String {
-        return "uploadForm"
-    }
+    @GetMapping fun showUploadForm(model: Model) = "uploadForm"
 
     @PostMapping
     fun handleFileUpload(@RequestPart("file") file: MultipartFile, redirectAttributes: RedirectAttributes): String {
@@ -46,11 +43,11 @@ class FirmwareController(
         try {
             logger.info { "Processing firmware file with name: ${file.originalFilename}" }
 
-            val firmwares = firmwareService.processFirmware(file)
-            firmwareProducerService.send(firmwares)
+            val savedFirmware = firmwareService.processFirmware(file)
+            firmwareProducerService.sendAllFirmwares()
 
             logger.info { "Firmware file successfully processed" }
-            redirectAttributes.setMessage("Successfully processed ${firmwares.firmwares.size} firmware packets")
+            redirectAttributes.setMessage("Successfully processed ${savedFirmware.packets.size} firmware packets")
         } catch (exception: FirmwareException) {
             logger.error(exception) { "Failed to process firmware file" }
             redirectAttributes.setMessage("Failed to process file: ${exception.message}")

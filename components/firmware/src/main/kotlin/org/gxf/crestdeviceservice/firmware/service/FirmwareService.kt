@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
 
-import com.alliander.sng.Firmwares
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.device.service.DeviceService
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
@@ -24,23 +23,23 @@ class FirmwareService(
 ) {
     private val logger = KotlinLogging.logger {}
 
-    fun processFirmware(file: MultipartFile): Firmwares {
+    fun processFirmware(file: MultipartFile): Firmware {
         val firmware = firmwareMapper.mapFirmwareFileToEntity(file)
         if (firmwareRepository.findByName(firmware.name) != null) {
             throw FirmwareException("Firmware with name ${firmware.name} already exists")
         }
-        save(firmware)
-        val firmwareEntities: List<Firmware> = firmwareRepository.findAll()
-        return firmwareMapper.mapEntitiesToFirmwares(firmwareEntities)
+        return save(firmware)
     }
 
-    private fun save(firmware: Firmware) {
+    private fun save(firmware: Firmware): Firmware {
         logger.info { "Saving firmware with name ${firmware.name} to database" }
-        firmwareRepository.save(firmware)
+        return firmwareRepository.save(firmware)
     }
 
     fun findFirmwareByName(name: String) =
         checkNotNull(firmwareRepository.findByName(name)) { "Firmware with name $name not found" }
+
+    fun findAllFirmwares() = firmwareRepository.findAll()
 
     fun countFirmwarePacketsByName(name: String) = findFirmwareByName(name).packets.size
 
