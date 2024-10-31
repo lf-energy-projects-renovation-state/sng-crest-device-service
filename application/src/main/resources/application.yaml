@@ -12,7 +12,7 @@ server:
 # Run the actuator under a different not tls port
 management:
   server:
-    port: 8081
+    port: 8089
     ssl:
       enabled: false
   endpoints:

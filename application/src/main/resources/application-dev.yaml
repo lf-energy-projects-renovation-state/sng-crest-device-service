@@ -31,16 +31,16 @@ config:
 kafka:
   consumers:
     pre-shared-key:
-      topic: "pre-shared-key"
+      topic: "pre-shared-key-internal"
     command:
-      topic: "command"
+      topic: "command-internal"
   producers:
     device-message:
-      topic: "crest-message"
+      topic: "crest-device-message"
     command-feedback:
-      topic: "command-feedback"
+      topic: "command-feedback-internal"
     firmware:
-      topic: "firmware"
+      topic: "firmware-internal"
       key: "firmware"
 
 database:
