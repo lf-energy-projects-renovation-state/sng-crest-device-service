@@ -96,7 +96,7 @@ class UrcServiceTest {
 
     @ParameterizedTest(name = "should set pending key as invalid for {0}")
     @MethodSource("containingPskErrorUrcs")
-    fun shouldSetPendingKeyAsInvalidWhenPskFailureURCReceived(urcs: List<String>) {
+    fun shouldSetPendingKeyAsInvalidWhenPskFailureUrcReceived(urcs: List<String>) {
         val pskCommandInProgress = CommandFactory.pskCommandInProgress()
         val pskSetCommandInProgress = CommandFactory.pskSetCommandInProgress()
 
@@ -122,7 +122,7 @@ class UrcServiceTest {
 
     @ParameterizedTest(name = "should not set pending key as invalid for {0}")
     @MethodSource("notContainingPskUrcs")
-    fun shouldNotSetPendingKeyAsInvalidWhenOtherURCReceived(urcs: List<String>) {
+    fun shouldNotSetPendingKeyAsInvalidWhenOtherUrcReceived(urcs: List<String>) {
         val pskCommands = CommandFactory.pskCommandsInProgress()
 
         every { pskService.isPendingPskPresent(DEVICE_ID) } returns true

@@ -4,6 +4,8 @@
 package org.gxf.crestdeviceservice.service
 
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
@@ -20,14 +22,18 @@ import org.gxf.crestdeviceservice.model.Downlink
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(MockKExtension::class)
 class DownlinkServiceTest {
-    private val pskService = mockk<PskService>()
-    private val commandService = mockk<CommandService>()
-    private val messageProperties = MessageProperties(1024)
-    private val pskCommandGenerator = mockk<CommandGenerator>()
-    private val pskSetCommandGenerator = mockk<CommandGenerator>()
+    @MockK private lateinit var pskService: PskService
+    @MockK private lateinit var commandService: CommandService
+    @MockK private lateinit var messageProperties: MessageProperties
+    @MockK private lateinit var pskCommandGenerator: CommandGenerator
+    @MockK private lateinit var pskSetCommandGenerator: CommandGenerator
+
     private lateinit var downlinkService: DownlinkService
+
     private val deviceId = TestConstants.DEVICE_ID
 
     private val pskCommandString = "this-is-the-generated-PSK-command"
@@ -35,6 +41,8 @@ class DownlinkServiceTest {
 
     @BeforeEach
     fun setUp() {
+        messageProperties = MessageProperties(1024)
+
         every { pskCommandGenerator.getSupportedCommand() } returns Command.CommandType.PSK
         every { pskCommandGenerator.generateCommandString(any()) } returns pskCommandString
         every { pskSetCommandGenerator.getSupportedCommand() } returns Command.CommandType.PSK_SET

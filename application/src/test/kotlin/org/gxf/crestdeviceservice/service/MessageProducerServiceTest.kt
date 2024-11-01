@@ -24,18 +24,19 @@ import org.springframework.kafka.core.KafkaTemplate
 @ExtendWith(MockKExtension::class)
 class MessageProducerServiceTest {
     @MockK(relaxed = true) private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
-
-    private val kafkaProducerProperties =
-        KafkaProducerProperties(
-            KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
-            KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
-            KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY)
-        )
+    private lateinit var kafkaProducerProperties: KafkaProducerProperties
 
     private lateinit var service: MessageProducerService
 
     @BeforeEach
     fun createService() {
+        kafkaProducerProperties =
+            KafkaProducerProperties(
+                KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
+                KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
+                KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY)
+            )
+
         service = MessageProducerService(kafkaTemplate, kafkaProducerProperties)
     }
 
