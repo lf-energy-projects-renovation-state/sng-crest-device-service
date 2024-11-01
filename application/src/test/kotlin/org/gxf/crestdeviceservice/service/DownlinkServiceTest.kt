@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 class DownlinkServiceTest {
     @MockK private lateinit var pskService: PskService
     @MockK private lateinit var commandService: CommandService
-    @MockK private lateinit var messageProperties: MessageProperties
+    private lateinit var messageProperties: MessageProperties
     @MockK private lateinit var pskCommandGenerator: CommandGenerator
     @MockK private lateinit var pskSetCommandGenerator: CommandGenerator
 
