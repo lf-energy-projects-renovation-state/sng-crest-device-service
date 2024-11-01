@@ -4,25 +4,29 @@
 package org.gxf.crestdeviceservice.consumer
 
 import com.alliander.sng.DeviceCredentials
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.justRun
+import io.mockk.verify
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
+import org.gxf.crestdeviceservice.device.entity.Device
 import org.gxf.crestdeviceservice.device.service.DeviceService
 import org.gxf.crestdeviceservice.psk.service.PskDecryptionService
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(MockKExtension::class)
 class IncomingDeviceCredentialsConsumerTest {
-    private val deviceService = mock<DeviceService>()
-    private val pskService = mock<PskService>()
-    private val pskDecryptionService = mock<PskDecryptionService>()
-    private val commandService = mock<CommandService>()
-    private val incomingDeviceCredentialsConsumer =
-        IncomingDeviceCredentialsConsumer(deviceService, pskService, pskDecryptionService, commandService)
+    @MockK private lateinit var deviceService: DeviceService
+    @MockK private lateinit var pskService: PskService
+    @MockK private lateinit var pskDecryptionService: PskDecryptionService
+    @MockK private lateinit var commandService: CommandService
+
+    @InjectMockKs private lateinit var incomingDeviceCredentialsConsumer: IncomingDeviceCredentialsConsumer
 
     @Test
     fun handleIncomingDeviceCredentialsChangeInitialPsk() {
@@ -34,16 +38,20 @@ class IncomingDeviceCredentialsConsumerTest {
         val keyRef = "1"
         val deviceCredentials = DeviceCredentials(imei, psk, secret, keyRef)
 
-        whenever(pskDecryptionService.decryptSecret(psk, keyRef)).thenReturn(decryptedPsk)
-        whenever(pskDecryptionService.decryptSecret(secret, keyRef)).thenReturn(decryptedSecret)
-        whenever(pskService.changeInitialPsk()).thenReturn(true)
+        every { pskDecryptionService.decryptSecret(psk, keyRef) } returns decryptedPsk
+        every { pskDecryptionService.decryptSecret(secret, keyRef) } returns decryptedSecret
+        every { deviceService.createDevice(any(), any()) } answers { Device(arg(0), arg(1)) }
+        justRun { pskService.setInitialKeyForDevice(any(), any()) }
+        justRun { pskService.generateNewReadyKeyForDevice(any()) }
+        every { pskService.changeInitialPsk() } returns true
+        every { commandService.saveCommands(any(), any()) } answers { args.map { it as Command } }
 
         incomingDeviceCredentialsConsumer.handleIncomingDeviceCredentials(deviceCredentials)
 
-        verify(deviceService).createDevice(imei, decryptedSecret)
-        verify(pskService).setInitialKeyForDevice(imei, decryptedPsk)
-        verify(pskService).generateNewReadyKeyForDevice(imei)
-        verify(commandService).saveCommands(any<Command>(), any<Command>())
+        verify { deviceService.createDevice(imei, decryptedSecret) }
+        verify { pskService.setInitialKeyForDevice(imei, decryptedPsk) }
+        verify { pskService.generateNewReadyKeyForDevice(imei) }
+        verify { commandService.saveCommands(any(), any()) }
     }
 
     @Test
@@ -56,15 +64,16 @@ class IncomingDeviceCredentialsConsumerTest {
         val keyRef = "1"
         val deviceCredentials = DeviceCredentials(imei, psk, secret, keyRef)
 
-        whenever(pskDecryptionService.decryptSecret(psk, keyRef)).thenReturn(decryptedPsk)
-        whenever(pskDecryptionService.decryptSecret(secret, keyRef)).thenReturn(decryptedSecret)
-        whenever(pskService.changeInitialPsk()).thenReturn(false)
+        every { pskDecryptionService.decryptSecret(psk, keyRef) } returns decryptedPsk
+        every { pskDecryptionService.decryptSecret(secret, keyRef) } returns decryptedSecret
+        every { deviceService.createDevice(any(), any()) } answers { Device(arg(0), arg(1)) }
+        every { pskService.changeInitialPsk() } returns false
 
         incomingDeviceCredentialsConsumer.handleIncomingDeviceCredentials(deviceCredentials)
 
-        verify(deviceService).createDevice(imei, decryptedSecret)
-        verify(pskService).setInitialKeyForDevice(imei, decryptedPsk)
-        verify(pskService, never()).generateNewReadyKeyForDevice(imei)
-        verify(commandService, never()).saveCommand(any<Command>())
+        verify { deviceService.createDevice(imei, decryptedSecret) }
+        verify { pskService.setInitialKeyForDevice(imei, decryptedPsk) }
+        verify(exactly = 0) { pskService.generateNewReadyKeyForDevice(imei) }
+        verify(exactly = 0) { commandService.saveCommand(any()) }
     }
 }

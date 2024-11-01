@@ -3,6 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
 
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.verify
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.FirmwareFactory
@@ -16,38 +21,31 @@ import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
-@ExtendWith(MockitoExtension::class)
+@ExtendWith(MockKExtension::class)
 class FirmwareServiceTest {
-    private val firmwareRepository = mock<FirmwareRepository>()
-    private val firmwarePacketRepository = mock<FirmwarePacketRepository>()
-    private val firmwareMapper = mock<FirmwareMapper>()
-    private val firmwareHashService = mock<FirmwareHashService>()
-    private val deviceService = mock<DeviceService>()
-    private val firmwareService =
-        FirmwareService(
-            firmwareRepository,
-            firmwarePacketRepository,
-            firmwareMapper,
-            firmwareHashService,
-            deviceService
-        )
+    @MockK private lateinit var firmwareRepository: FirmwareRepository
+    @MockK private lateinit var firmwarePacketRepository: FirmwarePacketRepository
+    @MockK private lateinit var firmwareMapper: FirmwareMapper
+    @MockK private lateinit var firmwareHashService: FirmwareHashService
+    @MockK private lateinit var deviceService: DeviceService
+
+    @InjectMockKs private lateinit var firmwareService: FirmwareService
 
     @Test
     fun processFirmware() {
         val firmwareFile = FirmwareFactory.getFirmwareFile()
         val firmwareEntity = getFirmwareEntity(firmwareFile.name)
 
-        whenever(firmwareMapper.mapFirmwareFileToEntity(firmwareFile)).thenReturn(firmwareEntity)
-        whenever(firmwareRepository.save(firmwareEntity)).thenReturn(firmwareEntity)
+        every { firmwareMapper.mapFirmwareFileToEntity(firmwareFile) } returns firmwareEntity
+        every { firmwareRepository.findByName(any()) } returns null
+        every { firmwareRepository.save(firmwareEntity) } returns firmwareEntity
+        every { firmwareRepository.save(any()) } answers { firstArg() }
 
         val result = firmwareService.processFirmware(firmwareFile)
 
-        verify(firmwareRepository).save(firmwareEntity)
+        verify { firmwareRepository.save(firmwareEntity) }
+
         assertThat(result).isEqualTo(firmwareEntity)
     }
 
@@ -55,7 +53,8 @@ class FirmwareServiceTest {
     fun shouldReturnFirmware() {
         val firmwareName = "useThisFirmware.txt"
         val expectedFirmware = Firmware(UUID.randomUUID(), name = "a firmware", version = "3")
-        whenever(firmwareRepository.findByName(firmwareName)).thenReturn(expectedFirmware)
+
+        every { firmwareRepository.findByName(firmwareName) } returns expectedFirmware
 
         val actualFirmware = firmwareService.findFirmwareByName(firmwareName)
 
@@ -73,7 +72,7 @@ class FirmwareServiceTest {
             firmware.packets += FirmwarePacket(firmware, packetNumber, "packet $packetNumber")
         }
 
-        whenever(firmwareRepository.findByName(firmwareName)).thenReturn(firmware)
+        every { firmwareRepository.findByName(firmwareName) } returns firmware
 
         assertThat(firmwareService.countFirmwarePacketsByName(firmwareName)).isEqualTo(packetCount)
     }
@@ -87,9 +86,9 @@ class FirmwareServiceTest {
         val firmware = Firmware(UUID.randomUUID(), name = "a firmware", version = "3")
         val packet = FirmwarePacket(firmware, 0, "the-packet-contents")
 
-        whenever(firmwarePacketRepository.findByFirmwareAndPacketNumber(firmware, packetNumber)).thenReturn(packet)
-        whenever(deviceService.getDevice(deviceId)).thenReturn(device)
-        whenever(firmwareHashService.generateDeviceSpecificPacket(packet, deviceSecret)).thenReturn(packet.packet)
+        every { firmwarePacketRepository.findByFirmwareAndPacketNumber(firmware, packetNumber) } returns packet
+        every { deviceService.getDevice(deviceId) } returns device
+        every { firmwareHashService.generateDeviceSpecificPacket(packet, deviceSecret) } returns packet.packet
 
         val actualPacket = firmwareService.getPacketForDevice(firmware, packetNumber, deviceId)
 

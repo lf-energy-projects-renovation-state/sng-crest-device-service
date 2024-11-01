@@ -5,6 +5,12 @@ package org.gxf.crestdeviceservice.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.justRun
+import io.mockk.verify
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
@@ -17,21 +23,15 @@ import org.gxf.crestdeviceservice.model.DeviceMessage
 import org.gxf.crestdeviceservice.model.Downlink
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
-@ExtendWith(MockitoExtension::class)
+@ExtendWith(MockKExtension::class)
 class PayloadServiceTest {
-    @InjectMocks private lateinit var payloadService: PayloadService
+    @MockK private lateinit var urcService: UrcService
+    @MockK private lateinit var firmwareService: FirmwareService
+    @MockK private lateinit var commandService: CommandService
+    @MockK(relaxed = true) private lateinit var commandFeedbackService: CommandFeedbackService
 
-    @Mock private lateinit var urcService: UrcService
-    @Mock private lateinit var firmwareService: FirmwareService
-    @Mock private lateinit var commandService: CommandService
-    @Mock private lateinit var commandFeedbackService: CommandFeedbackService
+    @InjectMockKs private lateinit var payloadService: PayloadService
 
     private val mapper = ObjectMapper()
 
@@ -41,9 +41,11 @@ class PayloadServiceTest {
         val downlink = Downlink()
         val deviceId = "device-id"
 
+        justRun { urcService.interpretUrcsInMessage(any(), any()) }
+
         payloadService.processPayload(deviceId, message, downlink)
 
-        verify(urcService, times(1)).interpretUrcsInMessage(deviceId, message)
+        verify { urcService.interpretUrcsInMessage(deviceId, message) }
     }
 
     @Test
@@ -59,16 +61,17 @@ class PayloadServiceTest {
         val firmware = Firmware(UUID.randomUUID(), firmwareName, "some-hash", null)
         val otaCommand = "OTA0003ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-        whenever(commandService.getAllCommandsInProgressForDevice(deviceId)).thenReturn(listOf(firmwareCommand))
-        whenever(firmwareService.findFirmwareByName(firmwareName)).thenReturn(firmware)
-        whenever(firmwareService.getPacketForDevice(firmware, packetNumber, deviceId)).thenReturn(otaCommand)
-        whenever(firmwareService.countFirmwarePacketsByName(firmwareName)).thenReturn(packetCount)
+        justRun { urcService.interpretUrcsInMessage(any(), any()) }
+        every { commandService.getAllCommandsInProgressForDevice(deviceId) } returns listOf(firmwareCommand)
+        every { firmwareService.findFirmwareByName(firmwareName) } returns firmware
+        every { firmwareService.getPacketForDevice(firmware, packetNumber, deviceId) } returns otaCommand
+        every { firmwareService.countFirmwarePacketsByName(firmwareName) } returns packetCount
 
         payloadService.processPayload(deviceId, message, downlink)
 
-        verify(urcService, times(1)).interpretUrcsInMessage(deviceId, message)
+        verify { urcService.interpretUrcsInMessage(deviceId, message) }
         assertThat(downlink.getDownlink()).contains(otaCommand)
 
-        verify(commandFeedbackService).sendProgressFeedback(packetNumber + 1, packetCount, firmwareCommand)
+        verify { commandFeedbackService.sendProgressFeedback(packetNumber + 1, packetCount, firmwareCommand) }
     }
 }

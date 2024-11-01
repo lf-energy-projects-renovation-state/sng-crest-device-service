@@ -3,6 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.controller
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.verify
 import java.util.UUID
 import org.gxf.crestdeviceservice.FirmwareFileFactory
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
@@ -10,22 +14,18 @@ import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
 import org.gxf.crestdeviceservice.service.FirmwareProducerService
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(FirmwareController::class)
 class FirmwareControllerTest {
+    @MockkBean private lateinit var firmwareService: FirmwareService
+    @MockkBean private lateinit var firmwareProducerService: FirmwareProducerService
+
     @Autowired private lateinit var mockMvc: MockMvc
-
-    @MockBean private lateinit var firmwareService: FirmwareService
-
-    @MockBean private lateinit var firmwareProducerService: FirmwareProducerService
 
     @Test
     fun shouldProcessFirmwareAndSendAllFirmwares() {
@@ -33,11 +33,14 @@ class FirmwareControllerTest {
         val firmwareEntity = Firmware(UUID.randomUUID(), "test-fw", "1.23", packets = mutableListOf())
         firmwareEntity.packets += FirmwarePacket(firmwareEntity, 0, "some content")
 
-        whenever(firmwareService.processFirmware(firmwareFile)).thenReturn(firmwareEntity)
+        every { firmwareService.processFirmware(firmwareFile) } returns firmwareEntity
+        justRun { firmwareProducerService.sendAllFirmwares() }
 
-        mockMvc.perform(multipart("https://localhost:9001/web/firmware").file(firmwareFile)).andExpect(status().isFound)
+        mockMvc //
+            .perform(multipart("https://localhost:9001/web/firmware").file(firmwareFile)) //
+            .andExpect(status().isFound)
 
-        verify(firmwareService).processFirmware(firmwareFile)
-        verify(firmwareProducerService).sendAllFirmwares()
+        verify { firmwareService.processFirmware(firmwareFile) }
+        verify { firmwareProducerService.sendAllFirmwares() }
     }
 }

@@ -3,39 +3,40 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.controller
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.slot
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.kotlin.capture
-import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(RspController::class)
 class RspControllerTest {
-    @MockBean private lateinit var commandService: CommandService
+    @MockkBean private lateinit var commandService: CommandService
 
     @Autowired private lateinit var mockMvc: MockMvc
 
-    @Captor private lateinit var commandCaptor: ArgumentCaptor<Command>
-
     @Test
     fun `should save RSP command`() {
+        every { commandService.saveCommand(any()) } answers { firstArg() }
+
         mockMvc //
             .perform(post("/test/{deviceId}/rsp", DEVICE_ID)) //
             .andExpect(status().isOk)
 
-        verify(commandService).saveCommand(capture(commandCaptor))
+        val commandSlot = slot<Command>()
 
-        val command = commandCaptor.value
+        verify { commandService.saveCommand(capture(commandSlot)) }
+
+        val command = commandSlot.captured
         assertThat(command.deviceId).isEqualTo(DEVICE_ID)
         assertThat(command.status).isEqualTo(Command.CommandStatus.PENDING)
         assertThat(command.type).isEqualTo(Command.CommandType.RSP)
@@ -43,13 +44,17 @@ class RspControllerTest {
 
     @Test
     fun `should save RSP2 command`() {
+        every { commandService.saveCommand(any()) } answers { firstArg() }
+
         mockMvc //
             .perform(post("/test/{deviceId}/rsp2", DEVICE_ID)) //
             .andExpect(status().isOk)
 
-        verify(commandService).saveCommand(capture(commandCaptor))
+        val commandSlot = slot<Command>()
 
-        val command = commandCaptor.value
+        verify { commandService.saveCommand(capture(commandSlot)) }
+
+        val command = commandSlot.captured
         assertThat(command.deviceId).isEqualTo(DEVICE_ID)
         assertThat(command.status).isEqualTo(Command.CommandStatus.PENDING)
         assertThat(command.type).isEqualTo(Command.CommandType.RSP2)
