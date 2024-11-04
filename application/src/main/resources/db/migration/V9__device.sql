@@ -7,7 +7,8 @@ create table device (
 
 insert into device (id, secret)
 select identity, secret
-from pre_shared_key;
+from pre_shared_key
+where revision = 0;
 
 alter table pre_shared_key
 drop column secret;
