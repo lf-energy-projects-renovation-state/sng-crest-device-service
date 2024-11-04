@@ -23,6 +23,10 @@ mutual-tls:
 server:
   port: 9000
 
+management:
+  server:
+    port: 8089
+
 config:
   # port for web client
   web-server:
