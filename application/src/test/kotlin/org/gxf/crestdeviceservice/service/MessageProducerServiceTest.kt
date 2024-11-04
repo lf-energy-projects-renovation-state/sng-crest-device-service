@@ -4,8 +4,10 @@
 package org.gxf.crestdeviceservice.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.verify
 import org.apache.avro.specific.SpecificRecordBase
-import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestConstants.COMMAND_FEEDBACK_TOPIC
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_MESSAGE_TOPIC
 import org.gxf.crestdeviceservice.TestConstants.FIRMWARE_KEY
@@ -14,39 +16,49 @@ import org.gxf.crestdeviceservice.config.KafkaProducerProperties
 import org.gxf.crestdeviceservice.config.KafkaProducerTopicKeyProperties
 import org.gxf.crestdeviceservice.config.KafkaProducerTopicProperties
 import org.gxf.sng.avro.DeviceMessage
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.verify
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.check
 import org.springframework.kafka.core.KafkaTemplate
 
-@ExtendWith(MockitoExtension::class)
+@ExtendWith(MockKExtension::class)
 class MessageProducerServiceTest {
-    @Mock private lateinit var mockedKafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
+    @MockK(relaxed = true) private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
+    private lateinit var kafkaProducerProperties: KafkaProducerProperties
 
-    private val kafkaProducerProperties =
-        KafkaProducerProperties(
-            KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
-            KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
-            KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY)
-        )
+    private lateinit var service: MessageProducerService
+
+    @BeforeEach
+    fun createService() {
+        kafkaProducerProperties =
+            KafkaProducerProperties(
+                KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
+                KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
+                KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY)
+            )
+
+        service = MessageProducerService(kafkaTemplate, kafkaProducerProperties)
+    }
 
     @Test
     fun shouldCallMessageProducerWithCorrectParams() {
-        val messageProducerService = MessageProducerService(mockedKafkaTemplate, kafkaProducerProperties)
+        val jsonNode =
+            ObjectMapper()
+                .readTree(
+                    """
+                        {
+                            "ID": 12345
+                        }
+                    """
+                )
 
-        val jsonNode = ObjectMapper().readTree("""
-            {
-                "ID":12345
-            }
-        """)
-        messageProducerService.produceMessage(jsonNode)
-        verify(mockedKafkaTemplate)
-            .send(
-                check { assertThat(it).isEqualTo(DEVICE_MESSAGE_TOPIC) },
-                check { assertThat((it as DeviceMessage).payload).isEqualTo(jsonNode.toString()) }
+        service.produceMessage(jsonNode)
+
+        verify {
+            kafkaTemplate.send(
+                DEVICE_MESSAGE_TOPIC,
+                match { (it is DeviceMessage) && (it.payload == jsonNode.toString()) }
             )
+        }
     }
 }

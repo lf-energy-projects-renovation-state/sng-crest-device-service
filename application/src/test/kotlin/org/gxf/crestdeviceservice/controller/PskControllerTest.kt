@@ -3,52 +3,52 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.controller
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.verify
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.gxf.crestdeviceservice.service.MetricService
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.never
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(PskController::class)
 class PskControllerTest {
+    @MockkBean private lateinit var pskService: PskService
+    @MockkBean(relaxed = true) private lateinit var metricService: MetricService
 
     @Autowired private lateinit var mockMvc: MockMvc
-
-    @MockBean private lateinit var pskService: PskService
-
-    @MockBean private lateinit var metricService: MetricService
 
     private val url = "https://localhost:9000/psk"
 
     @Test
     fun shouldReturn404WhenPskForIdentityIsNotFound() {
         val identity = "identity"
-        whenever(pskService.getCurrentActiveKey(identity)).then { throw NoExistingPskException("oops") }
 
-        mockMvc
-            .perform(MockMvcRequestBuilders.get(url).header("x-device-identity", identity))
-            .andExpect(MockMvcResultMatchers.status().isNotFound)
-        verify(metricService, times(1)).incrementIdentityInvalidCounter()
+        every { pskService.getCurrentActiveKey(identity) } throws NoExistingPskException("oops")
+
+        mockMvc //
+            .perform(get(url).header("x-device-identity", identity)) //
+            .andExpect(status().isNotFound)
+
+        verify(exactly = 1) { metricService.incrementIdentityInvalidCounter() }
     }
 
     @Test
     fun shouldReturnKeyForIdentity() {
         val identity = "identity"
-        whenever(pskService.getCurrentActiveKey(identity)).thenReturn("key")
+        every { pskService.getCurrentActiveKey(identity) } returns "key"
 
-        mockMvc
-            .perform(MockMvcRequestBuilders.get(url).header("x-device-identity", identity))
-            .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.content().string("key"))
-        verify(metricService, never()).incrementIdentityInvalidCounter()
+        mockMvc //
+            .perform(get(url).header("x-device-identity", identity)) //
+            .andExpect(status().isOk) //
+            .andExpect(content().string("key"))
+
+        verify(exactly = 0) { metricService.incrementIdentityInvalidCounter() }
     }
 }

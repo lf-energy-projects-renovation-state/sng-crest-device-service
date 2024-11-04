@@ -17,7 +17,8 @@ dependencyResolutionManagement {
         create("libs") {
             version("kotlinLogging", "7.0.0")
             version("avro", "1.12.0")
-            version("mockitoKotlin", "5.4.0")
+            version("mockk", "1.13.13")
+            version("springmockk", "4.0.2")
             version("commonsCodec", "1.17.1")
             version("gxfUtils", "2.1")
 
@@ -29,7 +30,8 @@ dependencyResolutionManagement {
             library("kafkaAzureOauth", "com.gxf.utilities", "kafka-azure-oauth").versionRef("gxfUtils")
             bundle("gxfUtils", listOf("kafkaAvro", "kafkaAzureOauth"))
 
-            library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").versionRef("mockitoKotlin")
+            library("mockk", "io.mockk", "mockk").versionRef("mockk")
+            library("springmockk", "com.ninja-squad", "springmockk").versionRef("springmockk")
 
             library("commonsCodec", "commons-codec", "commons-codec").versionRef("commonsCodec")
         }

@@ -12,7 +12,7 @@ dependencies {
     implementation(libs.logging)
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(libs.mockitoKotlin)
+    testImplementation(libs.mockk)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

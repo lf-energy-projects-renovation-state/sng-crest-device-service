@@ -4,6 +4,10 @@
 package org.gxf.crestdeviceservice.firmware.mapper
 
 import com.alliander.sng.FirmwareType
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import java.util.Optional
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -17,18 +21,20 @@ import org.gxf.crestdeviceservice.TestConstants.PREVIOUS_FIRMWARE_UUID
 import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(MockKExtension::class)
 class FirmwareMapperTest {
-    private val firmwareRepository = mock<FirmwareRepository>()
-    private val firmwareMapper = FirmwareMapper(firmwareRepository)
+    @MockK private lateinit var firmwareRepository: FirmwareRepository
+
+    @InjectMockKs private lateinit var firmwareMapper: FirmwareMapper
 
     @Test
     fun mapEntitiesToFirmwares() {
         val firmwareEntities = listOf(getFirmwareEntity(FIRMWARE_NAME))
         val previousFirmware = getPreviousFirmwareEntity()
-        whenever(firmwareRepository.findById(PREVIOUS_FIRMWARE_UUID)).thenReturn(Optional.of(previousFirmware))
+
+        every { firmwareRepository.findById(PREVIOUS_FIRMWARE_UUID) } returns Optional.of(previousFirmware)
 
         val result = firmwareMapper.mapEntitiesToFirmwares(firmwareEntities)
 

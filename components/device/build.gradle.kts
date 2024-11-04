@@ -8,5 +8,5 @@ dependencies {
     implementation(project(":components:shared"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(libs.mockitoKotlin)
+    testImplementation(libs.mockk)
 }

@@ -3,6 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.generator
 
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
@@ -12,15 +16,16 @@ import org.gxf.crestdeviceservice.device.service.DeviceService
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
 import org.gxf.crestdeviceservice.psk.service.PskService
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
+@ExtendWith(MockKExtension::class)
 class PskCommandGeneratorTest {
-    private val pskService = mock<PskService>()
-    private val deviceService = mock<DeviceService>()
-    private val generator = PskCommandGenerator(pskService, deviceService)
+    @MockK private lateinit var pskService: PskService
+    @MockK private lateinit var deviceService: DeviceService
+
+    @InjectMockKs private lateinit var generator: PskCommandGenerator
 
     @ParameterizedTest
     @CsvSource(
@@ -34,8 +39,8 @@ class PskCommandGeneratorTest {
         val device = Device(TestConstants.DEVICE_ID, usedSecret)
         val preSharedKey = PreSharedKey(TestConstants.DEVICE_ID, 0, Instant.now(), key, PreSharedKeyStatus.PENDING)
 
-        whenever(deviceService.getDevice(TestConstants.DEVICE_ID)).thenReturn(device)
-        whenever(pskService.getCurrentReadyPsk(pskCommandPending.deviceId)).thenReturn(preSharedKey)
+        every { deviceService.getDevice(TestConstants.DEVICE_ID) } returns device
+        every { pskService.getCurrentReadyPsk(pskCommandPending.deviceId) } returns preSharedKey
 
         val result = generator.generateCommandString(pskCommandPending)
 

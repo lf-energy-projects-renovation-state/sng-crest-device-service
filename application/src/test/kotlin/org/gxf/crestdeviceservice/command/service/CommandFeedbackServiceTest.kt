@@ -5,39 +5,36 @@ package org.gxf.crestdeviceservice.command.service
 
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.slot
+import io.mockk.verify
 import org.apache.avro.specific.SpecificRecordBase
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory.firmwareCommandInProgress
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
+import org.gxf.crestdeviceservice.config.KafkaProducerTopicProperties
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Answers
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.capture
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.springframework.kafka.core.KafkaTemplate
 
-@ExtendWith(MockitoExtension::class)
+@ExtendWith(MockKExtension::class)
 class CommandFeedbackServiceTest {
-    private val topic = "topic"
-
-    @Mock private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS) private lateinit var kafkaProducerProperties: KafkaProducerProperties
+    @MockK(relaxed = true) private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
+    @MockK private lateinit var kafkaProducerProperties: KafkaProducerProperties
+    @MockK private lateinit var commandFeedbackProperties: KafkaProducerTopicProperties
 
     private lateinit var service: CommandFeedbackService
 
-    @Captor private lateinit var feedbackCaptor: ArgumentCaptor<CommandFeedback>
+    private val topic = "topic"
 
     @BeforeEach
     fun createService() {
-        whenever(kafkaProducerProperties.commandFeedback.topic).thenReturn(topic)
+        every { kafkaProducerProperties.commandFeedback } returns commandFeedbackProperties
+        every { commandFeedbackProperties.topic } returns topic
 
         service = CommandFeedbackService(kafkaTemplate, kafkaProducerProperties)
     }
@@ -46,9 +43,11 @@ class CommandFeedbackServiceTest {
     fun `should send progress`() {
         service.sendProgressFeedback(2, 5, firmwareCommandInProgress())
 
-        verify(kafkaTemplate).send(eq(topic), eq(DEVICE_ID), capture(feedbackCaptor))
+        val feedbackSlot = slot<CommandFeedback>()
 
-        val feedback = feedbackCaptor.value
+        verify { kafkaTemplate.send(topic, DEVICE_ID, capture(feedbackSlot)) }
+
+        val feedback = feedbackSlot.captured
         assertThat(feedback.deviceId).isEqualTo(DEVICE_ID)
         assertThat(feedback.status).isEqualTo(CommandStatus.Progress)
         assertThat(feedback.message).isEqualTo("2/5")

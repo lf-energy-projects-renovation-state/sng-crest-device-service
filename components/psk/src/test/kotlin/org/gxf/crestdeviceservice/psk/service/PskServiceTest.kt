@@ -3,41 +3,38 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.psk.service
 
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.slot
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.psk.PSKTestHelper
 import org.gxf.crestdeviceservice.psk.configuration.PskConfiguration
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
-import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus.ACTIVE
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus.INACTIVE
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus.INVALID
+import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus.PENDING
 import org.gxf.crestdeviceservice.psk.repository.PskRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
-@ExtendWith(MockitoExtension::class)
+@ExtendWith(MockKExtension::class)
 class PskServiceTest {
+    @MockK private lateinit var pskRepository: PskRepository
 
-    @Mock private lateinit var pskRepository: PskRepository
+    @MockK private lateinit var pskConfiguration: PskConfiguration
 
-    @Mock private lateinit var pskConfiguration: PskConfiguration
-
-    @InjectMocks private lateinit var pskService: PskService
-
-    @Captor private lateinit var pskCaptor: ArgumentCaptor<PreSharedKey>
-
-    @Captor private lateinit var pskListCaptor: ArgumentCaptor<List<PreSharedKey>>
+    @InjectMockKs private lateinit var pskService: PskService
 
     @Test
     fun getCurrentActiveKey() {
         val deviceId = "identity"
         val psk = PSKTestHelper.preSharedKeyActive()
-        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PreSharedKeyStatus.ACTIVE))
-            .thenReturn(psk)
+
+        every { pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, ACTIVE) } returns psk
 
         val currentActiveKey = pskService.getCurrentActiveKey(deviceId)
 
@@ -48,36 +45,40 @@ class PskServiceTest {
     fun pendingKeyPresentTrue() {
         val deviceId = "identity"
         val psk = PSKTestHelper.preSharedKeyPending()
-        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PreSharedKeyStatus.PENDING))
-            .thenReturn(psk)
+
+        every { pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PENDING) } returns psk
 
         val pendingKeyPresent = pskService.isPendingPskPresent(deviceId)
 
-        assertThat(pendingKeyPresent).isEqualTo(true)
+        assertThat(pendingKeyPresent).isTrue
     }
 
     @Test
     fun pendingKeyPresentFalse() {
         val deviceId = "identity"
-        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PreSharedKeyStatus.PENDING))
-            .thenReturn(null)
+
+        every { pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PENDING) } returns null
 
         val pendingKeyPresent = pskService.isPendingPskPresent(deviceId)
 
-        assertThat(pendingKeyPresent).isEqualTo(false)
+        assertThat(pendingKeyPresent).isFalse
     }
 
     @Test
     fun setPendingKeyAsInvalid() {
         val psk = PSKTestHelper.preSharedKeyPending()
         val deviceId = psk.identity
-        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PreSharedKeyStatus.PENDING))
-            .thenReturn(psk)
+
+        every { pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PENDING) } returns psk
+        every { pskRepository.save(any()) } answers { firstArg() }
 
         pskService.setPendingKeyAsInvalid(deviceId)
 
-        verify(pskRepository).save(pskCaptor.capture())
-        assertThat(pskCaptor.value.status).isEqualTo(PreSharedKeyStatus.INVALID)
+        val pskSlot = slot<PreSharedKey>()
+
+        verify { pskRepository.save(capture(pskSlot)) }
+
+        assertThat(pskSlot.captured.status).isEqualTo(INVALID)
     }
 
     @Test
@@ -86,14 +87,17 @@ class PskServiceTest {
         val deviceId = psk.identity
         val status = psk.status
 
-        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, status)).thenReturn(psk)
-        whenever(pskRepository.save(psk)).thenReturn(psk)
+        every { pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, status) } returns psk
+        every { pskRepository.save(any()) } answers { firstArg() }
 
         val result = pskService.setPskToPendingForDevice(deviceId)
+        assertThat(result.status).isEqualTo(PENDING)
 
-        verify(pskRepository).save(pskCaptor.capture())
-        assertThat(pskCaptor.value.status).isEqualTo(PreSharedKeyStatus.PENDING)
-        assertThat(result.status).isEqualTo(PreSharedKeyStatus.PENDING)
+        val pskSlot = slot<PreSharedKey>()
+
+        verify { pskRepository.save(capture(pskSlot)) }
+
+        assertThat(pskSlot.captured.status).isEqualTo(PENDING)
     }
 
     @Test
@@ -102,17 +106,19 @@ class PskServiceTest {
         val currentPsk = PSKTestHelper.preSharedKeyActive()
         val newPsk = PSKTestHelper.preSharedKeyPending()
 
-        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PreSharedKeyStatus.ACTIVE))
-            .thenReturn(currentPsk)
-        whenever(pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PreSharedKeyStatus.PENDING))
-            .thenReturn(newPsk)
+        every { pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, ACTIVE) } returns currentPsk
+        every { pskRepository.findFirstByIdentityAndStatusOrderByRevisionDesc(deviceId, PENDING) } returns newPsk
+        every { pskRepository.saveAll(any<Iterable<PreSharedKey>>()) } answers { firstArg() }
 
         pskService.changeActiveKey(deviceId)
 
-        verify(pskRepository).saveAll(pskListCaptor.capture())
-        val actualSavedCurrentPsk = pskListCaptor.value[0]
-        val actualSavedNewPsk = pskListCaptor.value[1]
-        assertThat(actualSavedCurrentPsk.status).isEqualTo(PreSharedKeyStatus.INACTIVE)
-        assertThat(actualSavedNewPsk.status).isEqualTo(PreSharedKeyStatus.ACTIVE)
+        val pskListSlot = slot<List<PreSharedKey>>()
+
+        verify { pskRepository.saveAll(capture(pskListSlot)) }
+
+        val savedPsks = pskListSlot.captured
+        assertThat(savedPsks).hasSize(2)
+        assertThat(savedPsks.first().status).isEqualTo(INACTIVE)
+        assertThat(savedPsks.last().status).isEqualTo(ACTIVE)
     }
 }

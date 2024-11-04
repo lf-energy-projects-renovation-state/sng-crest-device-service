@@ -34,7 +34,8 @@ dependencies {
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(libs.mockitoKotlin)
+    testImplementation(libs.mockk)
+    testImplementation(libs.springmockk)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
@@ -84,7 +85,7 @@ testing {
                 implementation("org.springframework.kafka:spring-kafka-test")
                 implementation("org.testcontainers:kafka")
                 implementation("org.springframework.ws:spring-ws-test")
-                implementation(libs.mockitoKotlin)
+                implementation(libs.mockk)
                 runtimeOnly("com.h2database:h2")
             }
         }
