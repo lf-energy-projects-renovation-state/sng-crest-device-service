@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.config
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
@@ -14,16 +15,19 @@ import org.springframework.stereotype.Component
 
 @Component
 class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
+    private val logger = KotlinLogging.logger {}
+
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        if (isAllowedCombination(request)) {
+        if (isAllowedCombination(request as HttpServletRequest)) {
             chain.doFilter(request, response)
         } else {
             (response as HttpServletResponse).sendError(404)
         }
     }
 
-    private fun isAllowedCombination(request: ServletRequest): Boolean {
-        val requestUri = (request as HttpServletRequest).requestURI
+    private fun isAllowedCombination(request: HttpServletRequest): Boolean {
+        logger.debug { "Filtering request for ${request.requestURL}" }
+        val requestUri = request.requestURI
 
         return isErrorEndpoint(requestUri) ||
             if (isProxyPort(request)) {
@@ -33,11 +37,17 @@ class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
             }
     }
 
-    private fun isErrorEndpoint(requestUri: String) = requestUri.startsWith("/error")
+    private fun isErrorEndpoint(requestUri: String) =
+        requestUri.startsWith("/error").also { logger.debug { "isErrorEndpoint: $it" } }
 
-    private fun isProxyEndpoint(requestUri: String) = requestUri.startsWith("/sng") || requestUri.startsWith("/psk")
+    private fun isProxyEndpoint(requestUri: String) =
+        (requestUri.startsWith("/sng") || requestUri.startsWith("/psk")).also {
+            logger.debug { "isProxyEndpoint: $it" }
+        }
 
-    private fun isWebEndpoint(requestUri: String) = requestUri.startsWith("/web") || requestUri.startsWith("/test")
+    private fun isWebEndpoint(requestUri: String) =
+        (requestUri.startsWith("/web") || requestUri.startsWith("/test")).also { logger.debug { "isWebEndpoint: $it" } }
 
-    private fun isProxyPort(request: ServletRequest) = request.serverPort == serverProperties.port
+    private fun isProxyPort(request: ServletRequest) =
+        (request.serverPort == serverProperties.port).also { logger.debug { "isProxyPort: $it" } }
 }
