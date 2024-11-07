@@ -10,10 +10,12 @@ import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.stereotype.Component
 
 @Component
+@ConditionalOnProperty(name = ["config.api-access-filter.enabled"], matchIfMissing = true)
 class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
     private val logger = KotlinLogging.logger {}
 
@@ -49,5 +51,5 @@ class ApiAccessFilter(private val serverProperties: ServerProperties) : Filter {
         (requestUri.startsWith("/web") || requestUri.startsWith("/test")).also { logger.debug { "isWebEndpoint: $it" } }
 
     private fun isProxyPort(request: ServletRequest) =
-        (request.serverPort == serverProperties.port).also { logger.debug { "isProxyPort: $it" } }
+        (request.localPort == serverProperties.port).also { logger.debug { "isProxyPort: $it" } }
 }

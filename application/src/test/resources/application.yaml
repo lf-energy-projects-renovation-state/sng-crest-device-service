@@ -1,2 +1,6 @@
 server:
   port: 9000
+
+config:
+  api-access-filter:
+    enabled: false # localPort is not handled well by mockmvc

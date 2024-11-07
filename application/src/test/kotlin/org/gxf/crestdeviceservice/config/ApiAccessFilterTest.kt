@@ -43,7 +43,7 @@ class ApiAccessFilterTest {
     fun shouldReturnTheRightStatusCodeForRequestOnPort(port: Int, uri: String, expectedHttpCode: Int) {
         val chain = MockFilterChain()
         val request = MockHttpServletRequest()
-        request.serverPort = port
+        request.localPort = port
         request.requestURI = uri
         val response = MockHttpServletResponse()
 
