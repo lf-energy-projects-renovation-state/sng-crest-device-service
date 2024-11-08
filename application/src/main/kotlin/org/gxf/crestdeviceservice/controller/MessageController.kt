@@ -5,6 +5,7 @@ package org.gxf.crestdeviceservice.controller
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.service.DeviceMessageService
 import org.springframework.http.ResponseEntity
 import org.springframework.lang.NonNull
@@ -29,6 +30,7 @@ class MessageController(private val deviceMessageService: DeviceMessageService) 
 
         return try {
             val downlink = deviceMessageService.processDeviceMessage(body, identity)
+            logDownlink(downlink, identity)
             ResponseEntity.ok(downlink)
         } catch (e: Exception) {
             logger.error(e) {
@@ -37,6 +39,17 @@ class MessageController(private val deviceMessageService: DeviceMessageService) 
             ResponseEntity.internalServerError().build()
         } finally {
             logger.debug { "Processed message" }
+        }
+    }
+
+    private fun logDownlink(downlink: String, identity: String) {
+        logger.debug {
+            if (downlink.contains(Command.CommandType.PSK.name)) {
+                // This covers both PSK and PSK:SET, don't log the actual PSK
+                "Sending downlink with PSK to device $identity"
+            } else {
+                "Sending downlink '$downlink' to device $identity"
+            }
         }
     }
 }
