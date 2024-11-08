@@ -29,6 +29,7 @@ class MessageController(private val deviceMessageService: DeviceMessageService) 
 
         return try {
             val downlink = deviceMessageService.processDeviceMessage(body, identity)
+            logger.debug { "Sending downlink '$downlink' to device $identity" }
             ResponseEntity.ok(downlink)
         } catch (e: Exception) {
             logger.error(e) {
