@@ -3,10 +3,10 @@ plugins {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.security:spring-security-core")
-    implementation("org.springframework.kafka:spring-kafka")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation(libs.springBootStarterDataJpa)
+    implementation(libs.springSecurityCore)
+    implementation(libs.springKafka)
+    implementation(libs.springBootStarterWeb)
 
     implementation(project(":components:device"))
     implementation(project(":components:psk"))
@@ -17,8 +17,8 @@ dependencies {
 
     implementation(project(":components:avro"))
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.springBootStarterTest)
     testImplementation(libs.mockk)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly(libs.junitPlatformLauncher)
 }

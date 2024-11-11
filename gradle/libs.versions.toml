@@ -1,0 +1,56 @@
+[versions]
+avro = "1.12.0"
+avro-plugin = "1.9.1"
+commonsCodec = "1.17.1"
+dependency-management = "1.1.6"
+gxf-utils = "2.1.1"
+kotlin = "2.0.21"
+kotlin-logging = "7.0.0"
+mockk = "1.13.13"
+springmockk = "4.0.2"
+sonarqube = "5.1.0.4882"
+spotless = "6.25.0"
+spring-boot = "3.3.5"
+
+[libraries]
+avro = { group = "org.apache.avro", name = "avro", version.ref = "avro" }
+commonsCodec = { group = "commons-codec", name = "commons-codec", version.ref = "commonsCodec" }
+flyway = { group = "org.flywaydb", name = "flyway-database-postgresql" }
+h2 = { group = "com.h2database", name = "h2" }
+junitJupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api" }
+junitJupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine" }
+junitPlatformLauncher = { group = "org.junit.platform", name = "junit-platform-launcher" }
+kafkaAvro = { group = "com.gxf.utilities", name = "kafka-avro", version.ref = "gxf-utils" }
+kafkaAzureOAuth = { group = "com.gxf.utilities", name = "kafka-azure-oauth", version.ref = "gxf-utils" }
+kafkaTestContainer = { group = "org.testcontainers", name = "kafka" }
+kotlinReflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlin-logging" }
+micrometerPrometheusModule = { group = "io.micrometer", name = "micrometer-registry-prometheus" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+postgresql = { group = "org.postgresql", name = "postgresql" }
+springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "springmockk" }
+springBootStarterActuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
+springBootStarterTest = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+springBootStarterThymeleaf = { group = "org.springframework.boot", name = "spring-boot-starter-thymeleaf" }
+springBootStarterWeb = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+springBootStarterDataJpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
+springSecurityCore = { group = "org.springframework.security", name = "spring-security-core" }
+springKafka = { group = "org.springframework.kafka", name = "spring-kafka" }
+springKafkaTest = { group = "org.springframework.kafka", name = "spring-kafka-test" }
+springWsTest = { group = "org.springframework.ws", name = "spring-ws-test" }
+
+[bundles]
+gxfUtils = ["kafkaAvro", "kafkaAzureOAuth"]
+
+[plugins]
+avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plugin" }
+dependencyManagement = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
+eclipse = { id = "eclipse" }
+jacoco = { id = "jacoco" }
+jacocoReportAggregation = { id = "jacoco-report-aggregation" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
+springBoot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

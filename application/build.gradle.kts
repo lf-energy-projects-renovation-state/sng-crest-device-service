@@ -5,39 +5,39 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 // SPDX-License-Identifier: Apache-2.0
 
 plugins {
-    id("org.springframework.boot")
-    id("com.github.davidmc24.gradle.plugin.avro")
+    alias(libs.plugins.springBoot)
+    alias(libs.plugins.avro)
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.springframework.security:spring-security-core")
-    implementation("org.springframework.kafka:spring-kafka")
+    implementation(libs.springBootStarterActuator)
+    implementation(libs.springBootStarterWeb)
+    implementation(libs.springBootStarterDataJpa)
+    implementation(libs.springBootStarterThymeleaf)
+    implementation(libs.springSecurityCore)
+    implementation(libs.springKafka)
 
     implementation(project(":components:avro"))
     implementation(project(":components:device"))
     implementation(project(":components:firmware"))
     implementation(project(":components:psk"))
 
-    implementation(kotlin("reflect"))
+    implementation(libs.kotlinReflect)
     implementation(libs.logging)
 
     implementation(libs.bundles.gxfUtils)
 
     implementation(libs.commonsCodec)
 
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("org.flywaydb:flyway-database-postgresql")
+    runtimeOnly(libs.micrometerPrometheusModule)
+    runtimeOnly(libs.postgresql)
+    runtimeOnly(libs.flyway)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.springBootStarterTest)
     testImplementation(libs.mockk)
     testImplementation(libs.springmockk)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly(libs.junitPlatformLauncher)
 
     // Generate test and integration test reports
     jacocoAggregation(project(":application"))
@@ -78,15 +78,15 @@ testing {
                 implementation(project(":components:psk"))
                 implementation(project(":components:device"))
                 implementation(project(":components:firmware"))
-                implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+                implementation(libs.springBootStarterDataJpa)
                 implementation(libs.kafkaAvro)
-                implementation("org.springframework.kafka:spring-kafka")
-                implementation("org.springframework.boot:spring-boot-starter-test")
-                implementation("org.springframework.kafka:spring-kafka-test")
-                implementation("org.testcontainers:kafka")
-                implementation("org.springframework.ws:spring-ws-test")
+                implementation(libs.springKafka)
+                implementation(libs.springBootStarterTest)
+                implementation(libs.springKafkaTest)
+                implementation(libs.kafkaTestContainer)
+                implementation(libs.springWsTest)
                 implementation(libs.mockk)
-                runtimeOnly("com.h2database:h2")
+                runtimeOnly(libs.h2)
             }
         }
     }
