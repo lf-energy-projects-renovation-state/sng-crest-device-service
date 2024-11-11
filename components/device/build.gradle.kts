@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation(libs.springBootStarterDataJpa)
 
     implementation(project(":components:shared"))
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.springBootStarterTest)
     testImplementation(libs.mockk)
 }
