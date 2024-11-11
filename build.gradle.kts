@@ -41,7 +41,7 @@ subprojects {
     apply(plugin = rootProject.libs.plugins.jacoco.get().pluginId)
     apply(plugin = rootProject.libs.plugins.jacocoReportAggregation.get().pluginId)
 
-    group = "com.alliander.deviceservice"
+    group = "org.gxf.deviceservice"
     version = rootProject.version
 
     repositories {
