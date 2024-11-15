@@ -104,11 +104,6 @@ class RspCommandResultHandlerTest {
         assertThat(hasFailed).isEqualTo(expectedResult)
     }
 
-    /*
-       open var confirmationDownlinkInUrc = "CMD:RSP"
-       private val errorUrc = "DLER"
-       Example: URC:[{"DL":"MSI:1"}, "MSI:DLNA"]
-    */
     companion object {
         @JvmStatic
         fun hasSucceededTestSource(): Stream<Arguments> =
