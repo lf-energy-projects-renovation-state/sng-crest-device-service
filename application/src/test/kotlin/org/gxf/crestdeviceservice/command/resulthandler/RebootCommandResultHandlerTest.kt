@@ -34,7 +34,7 @@ class RebootCommandResultHandlerTest {
     @Test
     fun handleSuccess() {
         // arrange
-        val command = CommandFactory.pendingRebootCommand()
+        val command = CommandFactory.rebootCommandInProgress()
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 

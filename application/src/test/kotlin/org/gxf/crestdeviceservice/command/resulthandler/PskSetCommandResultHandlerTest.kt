@@ -38,7 +38,7 @@ class PskSetCommandResultHandlerTest {
     @Test
     fun handleSuccess() {
         // arrange
-        val command = CommandFactory.pendingPskSetCommand()
+        val command = CommandFactory.pskSetCommandInProgress()
         justRun { pskService.changeActiveKey(command.deviceId) }
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
@@ -55,7 +55,7 @@ class PskSetCommandResultHandlerTest {
     @Test
     fun handleFailure() {
         // arrange
-        val command = CommandFactory.pendingPskCommand()
+        val command = CommandFactory.pskSetCommandInProgress()
         val message = MessageFactory.messageWithUrc(listOf("PSK:EQER"), "")
         justRun { pskService.setPendingKeyAsInvalid(command.deviceId) }
         every { commandService.saveCommand(any()) } answers { firstArg() }
