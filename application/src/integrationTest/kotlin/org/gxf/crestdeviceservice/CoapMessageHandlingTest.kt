@@ -35,7 +35,15 @@ import org.springframework.kafka.test.utils.KafkaTestUtils
 import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@EmbeddedKafka(topics = ["\${kafka.producers.command-feedback.topic}"])
+@EmbeddedKafka(
+    topics =
+        [
+            "\${kafka.consumers.command.topic}",
+            "\${kafka.consumers.pre-shared-key.topic}",
+            "\${kafka.producers.command-feedback.topic}",
+            "\${kafka.producers.device-message.topic}"
+        ]
+)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CoapMessageHandlingTest {
     companion object {

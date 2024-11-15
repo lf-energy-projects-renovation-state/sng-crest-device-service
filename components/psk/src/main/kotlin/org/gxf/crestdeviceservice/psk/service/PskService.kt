@@ -48,18 +48,20 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     private fun isReadyPskPresent(deviceId: String) = getCurrentReadyPsk(deviceId) != null
 
+    @Throws(NoExistingPskException::class)
     fun setPendingKeyAsInvalid(deviceId: String) {
         logger.warn { "Pending key for device $deviceId is set to invalid." }
         val psk =
-            getCurrentPendingPsk(deviceId) ?: throw NoExistingPskException("No pending key exists to set as invalid")
+            getCurrentPendingPsk(deviceId) ?: throw NoExistingPskException("No pending key exists to set as invalid.")
         psk.status = PreSharedKeyStatus.INVALID
         pskRepository.save(psk)
     }
 
+    @Throws(InitialKeySetException::class)
     fun setInitialKeyForDevice(deviceId: String, psk: String) {
-        logger.info { "Prepare initial key for device $deviceId" }
+        logger.info { "Prepare initial key for device $deviceId." }
         if (pskRepository.countByIdentityAndStatus(deviceId, PreSharedKeyStatus.ACTIVE) != 0L) {
-            throw InitialKeySetException("Key already exists for device. Key cannot be overridden")
+            throw InitialKeySetException("Key already exists for device. Key cannot be overridden.")
         }
         pskRepository.save(PreSharedKey(deviceId, 0, Instant.now(), psk, PreSharedKeyStatus.ACTIVE))
     }
@@ -80,6 +82,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
             .map { ALLOWED_CHARACTERS[it] }
             .joinToString("")
 
+    @Throws(NoExistingPskException::class)
     fun setPskToPendingForDevice(deviceId: String): PreSharedKey {
         val psk = getCurrentReadyPsk(deviceId) ?: throw NoExistingPskException("There is no new key ready to be set")
         psk.status = PreSharedKeyStatus.PENDING
@@ -96,6 +99,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
      */
     @Throws(NoExistingPskException::class)
     fun changeActiveKey(deviceId: String) {
+
         val currentPsk = getCurrentActivePsk(deviceId)
         val newPsk =
             getCurrentPendingPsk(deviceId)
