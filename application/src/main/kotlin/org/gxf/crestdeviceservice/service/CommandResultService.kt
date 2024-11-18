@@ -45,7 +45,7 @@ class CommandResultService(
         when {
             resultHandler.hasSucceeded(command.deviceId, body) -> resultHandler.handleSuccess(command)
             resultHandler.hasFailed(command.deviceId, body) -> resultHandler.handleFailure(command, body)
-            else -> resultHandler.handleStillPending(command)
+            else -> resultHandler.handleStillInProgress(command)
         }
     }
 }

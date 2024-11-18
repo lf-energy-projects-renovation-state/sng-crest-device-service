@@ -63,8 +63,8 @@ abstract class CommandResultHandler(
         }
     }
 
-    fun handleStillPending(command: Command) {
-        logger.info { "Command ${command.type} still pending for device with id ${command.deviceId}." }
+    fun handleStillInProgress(command: Command) {
+        logger.info { "Command ${command.type} still in progress for device with id ${command.deviceId}." }
     }
 
     fun getUrcsFromMessage(body: JsonNode) = body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
