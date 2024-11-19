@@ -47,8 +47,10 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
         return previousVersionRegex.find(name)?.let {
             val previousFirmwareVersion = it.value
             val previousFirmware = firmwareRepository.findByVersion(previousFirmwareVersion)
+            if (previousFirmware == null) {
+                logger.warn { "Previous firmware with version $previousFirmwareVersion does not exist" }
+            }
             previousFirmware?.id
-                ?: throw FirmwareException("Previous firmware with version $previousFirmwareVersion does not exist")
         }
     }
 
