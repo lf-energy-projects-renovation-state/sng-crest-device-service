@@ -16,6 +16,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
+import org.gxf.crestdeviceservice.command.service.CommandResultService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService

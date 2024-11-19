@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.service
+package org.gxf.crestdeviceservice.command.service
 
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -12,7 +12,6 @@ import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.command.resulthandler.*
-import org.gxf.crestdeviceservice.command.service.CommandService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

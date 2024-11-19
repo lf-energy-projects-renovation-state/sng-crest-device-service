@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
+import org.gxf.crestdeviceservice.command.service.CommandResultService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
 import org.gxf.crestdeviceservice.model.DeviceMessage

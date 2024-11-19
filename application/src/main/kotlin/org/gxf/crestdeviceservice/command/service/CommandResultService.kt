@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.service
+package org.gxf.crestdeviceservice.command.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -9,7 +9,6 @@ import java.util.*
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.NoCommandResultHandlerForCommandTypeException
 import org.gxf.crestdeviceservice.command.resulthandler.CommandResultHandler
-import org.gxf.crestdeviceservice.command.service.CommandService
 import org.springframework.stereotype.Service
 
 @Service

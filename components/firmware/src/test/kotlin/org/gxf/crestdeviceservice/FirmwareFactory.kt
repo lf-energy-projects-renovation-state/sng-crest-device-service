@@ -1,15 +1,15 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.firmware
+package org.gxf.crestdeviceservice
 
 import java.util.UUID
-import org.gxf.crestdeviceservice.firmware.FirmwareTestConstants.FIRMWARE_FROM_VERSION
-import org.gxf.crestdeviceservice.firmware.FirmwareTestConstants.FIRMWARE_NAME
-import org.gxf.crestdeviceservice.firmware.FirmwareTestConstants.FIRMWARE_PACKET_0
-import org.gxf.crestdeviceservice.firmware.FirmwareTestConstants.FIRMWARE_UUID
-import org.gxf.crestdeviceservice.firmware.FirmwareTestConstants.FIRMWARE_VERSION
-import org.gxf.crestdeviceservice.firmware.FirmwareTestConstants.PREVIOUS_FIRMWARE_UUID
+import org.gxf.crestdeviceservice.FirmwareTestConstants.FIRMWARE_FROM_VERSION
+import org.gxf.crestdeviceservice.FirmwareTestConstants.FIRMWARE_NAME
+import org.gxf.crestdeviceservice.FirmwareTestConstants.FIRMWARE_PACKET_0
+import org.gxf.crestdeviceservice.FirmwareTestConstants.FIRMWARE_UUID
+import org.gxf.crestdeviceservice.FirmwareTestConstants.FIRMWARE_VERSION
+import org.gxf.crestdeviceservice.FirmwareTestConstants.PREVIOUS_FIRMWARE_UUID
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.springframework.core.io.ClassPathResource

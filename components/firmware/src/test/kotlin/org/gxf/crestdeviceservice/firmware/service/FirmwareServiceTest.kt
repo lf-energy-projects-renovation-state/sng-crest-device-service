@@ -10,11 +10,11 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
+import org.gxf.crestdeviceservice.FirmwareFactory
+import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwareEntity
+import org.gxf.crestdeviceservice.FirmwareTestConstants.FIRMWARE_FILE_FULL_NAME
 import org.gxf.crestdeviceservice.device.entity.Device
 import org.gxf.crestdeviceservice.device.service.DeviceService
-import org.gxf.crestdeviceservice.firmware.FirmwareFactory
-import org.gxf.crestdeviceservice.firmware.FirmwareFactory.getFirmwareEntity
-import org.gxf.crestdeviceservice.firmware.FirmwareTestConstants.FIRMWARE_FILE_FULL_NAME
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.gxf.crestdeviceservice.firmware.mapper.FirmwareMapper
