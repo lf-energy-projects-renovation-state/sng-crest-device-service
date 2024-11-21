@@ -15,15 +15,9 @@ abstract class CommandResultHandler(
     private val commandService: CommandService,
     private val commandFeedbackService: CommandFeedbackService
 ) {
-
-    companion object {
-        private const val URC_FIELD = "URC"
-        private const val DL_FIELD = "DL"
-    }
-
     private val logger = KotlinLogging.logger {}
 
-    abstract fun forCommandType(): CommandType
+    abstract val supportedCommandType: CommandType
 
     abstract fun hasSucceeded(deviceId: String, body: JsonNode): Boolean
 
@@ -52,7 +46,7 @@ abstract class CommandResultHandler(
         handleCommandSpecificFailure(command, body)
 
         val failedCommand = commandService.saveCommand(command.fail())
-        val errorMessages = getUrcsFromMessage(body).joinToString(". ") { urc -> getMessageFromCode(urc) }
+        val errorMessages = body.urcs().joinToString(". ") { urc -> getMessageFromCode(urc) }
         commandFeedbackService.sendErrorFeedback(failedCommand, "Command failed. Error(s): $errorMessages.")
     }
 
@@ -67,8 +61,13 @@ abstract class CommandResultHandler(
         logger.info { "Command ${command.type} still in progress for device with id ${command.deviceId}." }
     }
 
-    fun getUrcsFromMessage(body: JsonNode) = body[URC_FIELD].filter { it.isTextual }.map { it.asText() }
+    companion object {
+        private const val URC_FIELD = "URC"
+        private const val DL_FIELD = "DL"
 
-    fun getDownlinksFromMessage(body: JsonNode): List<String> =
-        body[URC_FIELD].first { it.isObject }[DL_FIELD].asText().replace("!", "").split(";")
+        fun JsonNode.urcs(): List<String> = this[URC_FIELD].filter { it.isTextual }.map { it.asText() }
+
+        fun JsonNode.downlinks(): List<String> =
+            this[URC_FIELD].first { it.isObject }[DL_FIELD].asText().replace("!", "").split(";")
+    }
 }

@@ -25,82 +25,57 @@ import org.junit.jupiter.params.provider.MethodSource
 
 @ExtendWith(MockKExtension::class)
 class PskCommandResultHandlerTest {
-
     @MockK private lateinit var commandService: CommandService
-
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
     @InjectMockKs private lateinit var pskCommandResultHandler: PskCommandResultHandler
 
     @Test
     fun handleSuccess() {
-        // arrange
         val command = CommandFactory.pskCommandInProgress()
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
-        // act
         pskCommandResultHandler.handleSuccess(command)
 
-        // assert
-        assertThat(command.status == Command.CommandStatus.SUCCESSFUL)
+        assertThat(command.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
         verify { commandService.saveCommand(command) }
         verify { commandFeedbackService.sendSuccessFeedback(command) }
     }
 
     @Test
     fun handleFailure() {
-        // arrange
         val command = CommandFactory.pskCommandInProgress()
         val message = MessageFactory.messageWithUrc(listOf("PSK:HSER"), "")
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }
 
-        // act
         pskCommandResultHandler.handleFailure(command, message)
 
-        // assert
-        assertThat(command.status == Command.CommandStatus.ERROR)
+        assertThat(command.status).isEqualTo(Command.CommandStatus.ERROR)
         verify { commandService.saveCommand(command) }
         verify {
             commandFeedbackService.sendErrorFeedback(command, match { error -> error.contains("SHA256 hash error") })
         }
     }
 
-    @Test
-    fun forCommandType() {
-        // nothing to arrange
-
-        // act
-        val commandType = pskCommandResultHandler.forCommandType()
-
-        // assert
-        assertThat(commandType).isEqualTo(Command.CommandType.PSK)
-    }
-
     @ParameterizedTest
     @MethodSource("hasSucceededTestSource")
     fun hasSucceeded(urcs: List<String>, downlink: String, expectedResult: Boolean) {
-        // arrange
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        // act
         val hasSucceeded = pskCommandResultHandler.hasSucceeded(TestConstants.DEVICE_ID, message)
 
-        // assert
         assertThat(hasSucceeded).isEqualTo(expectedResult)
     }
 
     @ParameterizedTest
     @MethodSource("hasFailedTestSource")
     fun hasFailed(urcs: List<String>, downlink: String, expectedResult: Boolean) {
-        // arrange
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        // act
         val hasFailed = pskCommandResultHandler.hasFailed(TestConstants.DEVICE_ID, message)
 
-        // assert
         assertThat(hasFailed).isEqualTo(expectedResult)
     }
 

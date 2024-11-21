@@ -25,82 +25,57 @@ import org.junit.jupiter.params.provider.MethodSource
 
 @ExtendWith(MockKExtension::class)
 class Rsp2CommandResultHandlerTest {
-
     @MockK private lateinit var commandService: CommandService
-
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
     @InjectMockKs private lateinit var rsp2CommandResultHandler: Rsp2CommandResultHandler
 
     @Test
     fun handleSuccess() {
-        // arrange
         val command = CommandFactory.rsp2CommandInProgress()
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
-        // act
         rsp2CommandResultHandler.handleSuccess(command)
 
-        // assert
-        assertThat(command.status == Command.CommandStatus.SUCCESSFUL)
+        assertThat(command.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
         verify { commandService.saveCommand(command) }
         verify { commandFeedbackService.sendSuccessFeedback(command) }
     }
 
     @Test
     fun handleFailure() {
-        // arrange
         val command = CommandFactory.rsp2CommandInProgress()
         val message = MessageFactory.messageWithUrc(listOf("PSK:HSER"), "")
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }
 
-        // act
         rsp2CommandResultHandler.handleFailure(command, message)
 
-        // assert
-        assertThat(command.status == Command.CommandStatus.ERROR)
+        assertThat(command.status).isEqualTo(Command.CommandStatus.ERROR)
         verify { commandService.saveCommand(command) }
         verify {
             commandFeedbackService.sendErrorFeedback(command, match { error -> error.contains("SHA256 hash error") })
         }
     }
 
-    @Test
-    fun forCommandType() {
-        // nothing to arrange
-
-        // act
-        val commandType = rsp2CommandResultHandler.forCommandType()
-
-        // assert
-        assertThat(commandType).isEqualTo(Command.CommandType.RSP2)
-    }
-
     @ParameterizedTest
     @MethodSource("hasSucceededTestSource")
     fun hasSucceeded(urcs: List<String>, downlink: String, expectedResult: Boolean) {
-        // arrange
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        // act
         val hasSucceeded = rsp2CommandResultHandler.hasSucceeded(TestConstants.DEVICE_ID, message)
 
-        // assert
         assertThat(hasSucceeded).isEqualTo(expectedResult)
     }
 
     @ParameterizedTest
     @MethodSource("hasFailedTestSource")
     fun hasFailed(urcs: List<String>, downlink: String, expectedResult: Boolean) {
-        // arrange
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        // act
         val hasFailed = rsp2CommandResultHandler.hasFailed(TestConstants.DEVICE_ID, message)
 
-        // assert
         assertThat(hasFailed).isEqualTo(expectedResult)
     }
 

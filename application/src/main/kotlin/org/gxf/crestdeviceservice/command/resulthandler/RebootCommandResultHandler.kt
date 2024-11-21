@@ -15,11 +15,9 @@ class RebootCommandResultHandler(commandService: CommandService, commandFeedback
 
     private val succesUrcs = listOf("INIT", "WDR")
 
-    override fun forCommandType() = CommandType.REBOOT
+    override val supportedCommandType = CommandType.REBOOT
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) = containsSuccessUrcs(body)
+    override fun hasSucceeded(deviceId: String, body: JsonNode) = body.urcs().containsAll(succesUrcs)
 
     override fun hasFailed(deviceId: String, body: JsonNode) = false
-
-    private fun containsSuccessUrcs(body: JsonNode) = getUrcsFromMessage(body).containsAll(succesUrcs)
 }

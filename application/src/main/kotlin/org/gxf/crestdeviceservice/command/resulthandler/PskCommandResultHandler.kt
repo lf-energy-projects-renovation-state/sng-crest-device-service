@@ -16,13 +16,9 @@ class PskCommandResultHandler(commandService: CommandService, commandFeedbackSer
     private val succesUrc = "PSK:TMP"
     private val errorUrcs = listOf("PSK:DLER", "PSK:HSER")
 
-    override fun forCommandType() = CommandType.PSK
+    override val supportedCommandType = CommandType.PSK
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) = containsSuccessUrc(body)
+    override fun hasSucceeded(deviceId: String, body: JsonNode) = succesUrc in body.urcs()
 
-    override fun hasFailed(deviceId: String, body: JsonNode) = containsErrorUrc(body)
-
-    private fun containsSuccessUrc(body: JsonNode) = getUrcsFromMessage(body).contains(succesUrc)
-
-    private fun containsErrorUrc(body: JsonNode) = getUrcsFromMessage(body).any { it in errorUrcs }
+    override fun hasFailed(deviceId: String, body: JsonNode) = body.urcs().any { it in errorUrcs }
 }

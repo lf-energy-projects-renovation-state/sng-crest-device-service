@@ -26,61 +26,40 @@ import org.junit.jupiter.params.provider.MethodSource
 @ExtendWith(MockKExtension::class)
 class RebootCommandResultHandlerTest {
     @MockK private lateinit var commandService: CommandService
-
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
     @InjectMockKs private lateinit var rebootCommandResultHandler: RebootCommandResultHandler
 
     @Test
     fun handleSuccess() {
-        // arrange
         val command = CommandFactory.rebootCommandInProgress()
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
-        // act
         rebootCommandResultHandler.handleSuccess(command)
 
-        // assert
-        assertThat(command.status == Command.CommandStatus.SUCCESSFUL)
+        assertThat(command.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
         verify { commandService.saveCommand(command) }
         verify { commandFeedbackService.sendSuccessFeedback(command) }
-    }
-
-    @Test
-    fun forCommandType() {
-        // nothing to arrange
-
-        // act
-        val commandType = rebootCommandResultHandler.forCommandType()
-
-        // assert
-        assertThat(commandType).isEqualTo(Command.CommandType.REBOOT)
     }
 
     @ParameterizedTest
     @MethodSource("hasSucceededTestSource")
     fun hasSucceeded(urcs: List<String>, downlink: String, expectedResult: Boolean) {
-        // arrange
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        // act
         val hasSucceeded = rebootCommandResultHandler.hasSucceeded(TestConstants.DEVICE_ID, message)
 
-        // assert
         assertThat(hasSucceeded).isEqualTo(expectedResult)
     }
 
     @ParameterizedTest
     @MethodSource("hasFailedTestSource")
     fun hasFailed(urcs: List<String>, downlink: String, expectedResult: Boolean) {
-        // arrange
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        // act
         val hasFailed = rebootCommandResultHandler.hasFailed(TestConstants.DEVICE_ID, message)
 
-        // assert
         assertThat(hasFailed).isEqualTo(expectedResult)
     }
 

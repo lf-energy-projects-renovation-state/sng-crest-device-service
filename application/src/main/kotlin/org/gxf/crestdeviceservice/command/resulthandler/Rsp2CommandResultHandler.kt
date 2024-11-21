@@ -15,5 +15,5 @@ class Rsp2CommandResultHandler(commandService: CommandService, commandFeedbackSe
     override val confirmationDownlinkInUrc = "CMD:RSP2"
     override val errorUrc = "RSP2:DLER"
 
-    override fun forCommandType() = CommandType.RSP2
+    override val supportedCommandType = CommandType.RSP2
 }

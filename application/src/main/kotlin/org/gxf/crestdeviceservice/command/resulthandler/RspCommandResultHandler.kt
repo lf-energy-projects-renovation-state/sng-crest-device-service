@@ -16,15 +16,10 @@ class RspCommandResultHandler(commandService: CommandService, commandFeedbackSer
     val confirmationDownlinkInUrc = "CMD:RSP"
     val errorUrc = "RSP:DLER"
 
-    override fun forCommandType() = CommandType.RSP
+    override val supportedCommandType = CommandType.RSP
 
     override fun hasSucceeded(deviceId: String, body: JsonNode) =
-        containsConfirmationDownlinkInUrc(body) && !containsErrorUrc(body)
+        confirmationDownlinkInUrc in body.downlinks() && errorUrc !in body.urcs()
 
-    override fun hasFailed(deviceId: String, body: JsonNode) = containsErrorUrc(body)
-
-    private fun containsConfirmationDownlinkInUrc(body: JsonNode) =
-        getDownlinksFromMessage(body).contains(confirmationDownlinkInUrc)
-
-    private fun containsErrorUrc(body: JsonNode) = getUrcsFromMessage(body).contains(errorUrc)
+    override fun hasFailed(deviceId: String, body: JsonNode) = errorUrc in body.urcs()
 }

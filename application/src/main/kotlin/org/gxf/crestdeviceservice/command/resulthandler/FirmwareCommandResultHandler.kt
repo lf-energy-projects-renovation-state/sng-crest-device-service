@@ -18,13 +18,9 @@ class FirmwareCommandResultHandler(
     private val succesUrc = "OTA:SUC"
     private val errorUrcs = listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER")
 
-    override fun forCommandType() = CommandType.FIRMWARE
+    override val supportedCommandType = CommandType.FIRMWARE
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) = containsSuccessUrc(body)
+    override fun hasSucceeded(deviceId: String, body: JsonNode) = succesUrc in body.urcs()
 
-    override fun hasFailed(deviceId: String, body: JsonNode) = containsErrorUrc(body)
-
-    private fun containsSuccessUrc(body: JsonNode) = getUrcsFromMessage(body).contains(succesUrc)
-
-    private fun containsErrorUrc(body: JsonNode) = getUrcsFromMessage(body).any { it in errorUrcs }
+    override fun hasFailed(deviceId: String, body: JsonNode) = body.urcs().any { it in errorUrcs }
 }
