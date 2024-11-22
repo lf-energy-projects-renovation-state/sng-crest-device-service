@@ -66,4 +66,26 @@ object CommandFactory {
             commandValue = "the-firmware-to-install",
             status = Command.CommandStatus.IN_PROGRESS
         )
+
+    fun rspCommandInProgress() =
+        Command(
+            id = UUID.randomUUID(),
+            deviceId = DEVICE_ID,
+            correlationId = CORRELATION_ID,
+            timestampIssued = timestamp,
+            type = Command.CommandType.RSP,
+            commandValue = null,
+            status = Command.CommandStatus.IN_PROGRESS
+        )
+
+    fun rsp2CommandInProgress() =
+        Command(
+            id = UUID.randomUUID(),
+            deviceId = DEVICE_ID,
+            correlationId = CORRELATION_ID,
+            timestampIssued = timestamp,
+            type = Command.CommandType.RSP2,
+            commandValue = null,
+            status = Command.CommandStatus.IN_PROGRESS
+        )
 }

@@ -41,23 +41,13 @@ class Command(
 
     fun cancel() = apply { status = CommandStatus.CANCELLED }
 
-    enum class CommandType(
-        val downlink: String,
-        val urcsSuccess: List<String>,
-        val urcsError: List<String>,
-        val needsCommandValue: Boolean = false
-    ) {
-        PSK("PSK", listOf("PSK:TMP"), listOf("PSK:DLER", "PSK:HSER")),
-        PSK_SET("PSK:SET", listOf("PSK:SET"), listOf("PSK:DLER", "PSK:HSER", "PSK:EQER")),
-        REBOOT("CMD:REBOOT", listOf("INIT", "WDR"), listOf()),
-        RSP("CMD:RSP", listOf("CMD:RSP"), listOf("DLER")),
-        RSP2("CMD:RSP2", listOf("CMD:RSP2"), listOf("DLER")),
-        FIRMWARE(
-            "OTA",
-            listOf("OTA:SUC"),
-            listOf("OTA:CSER", "OTA:HSER", "OTA:RST", "OTA:SWNA", "OTA:FLER"),
-            needsCommandValue = true
-        ),
+    enum class CommandType(val downlink: String, val needsCommandValue: Boolean = false) {
+        PSK("PSK"),
+        PSK_SET("PSK:SET"),
+        REBOOT("CMD:REBOOT"),
+        RSP("CMD:RSP"),
+        RSP2("CMD:RSP2"),
+        FIRMWARE("OTA", needsCommandValue = true),
     }
 
     enum class CommandStatus {

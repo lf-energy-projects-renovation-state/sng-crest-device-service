@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.NoMatchingCommandException
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
+import org.gxf.crestdeviceservice.command.service.CommandResultService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.firmware.service.FirmwareService
 import org.gxf.crestdeviceservice.model.DeviceMessage
@@ -15,14 +16,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class PayloadService(
-    private val urcService: UrcService,
+    private val commandResultService: CommandResultService,
     private val firmwareService: FirmwareService,
     private val commandService: CommandService,
     private val commandFeedbackService: CommandFeedbackService,
 ) {
     /**
      * Process the payload. This includes
-     * - checking URCs and updating the corresponding Commands
+     * - checking the payload for results for the commands sent via downlinks
      * - checking the payload for FMC (request for new FOTA packet)
      *
      * @param identity The identity of the device
@@ -30,7 +31,7 @@ class PayloadService(
      * @param downlink The downlink to be returned to the device, fill it here if needed
      */
     fun processPayload(identity: String, body: JsonNode, downlink: Downlink) {
-        urcService.interpretUrcsInMessage(identity, body)
+        commandResultService.handleMessage(identity, body)
 
         val deviceMessage = DeviceMessage(body)
 
