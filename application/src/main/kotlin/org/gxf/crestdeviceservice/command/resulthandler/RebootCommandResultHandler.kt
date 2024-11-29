@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component
 class RebootCommandResultHandler(commandService: CommandService, commandFeedbackService: CommandFeedbackService) :
     CommandResultHandler(commandService, commandFeedbackService) {
 
-    private val succesUrcs = listOf("INIT", "WDR")
+    private val successUrc = "INIT"
 
     override val supportedCommandType = CommandType.REBOOT
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) = body.urcs().containsAll(succesUrcs)
+    override fun hasSucceeded(deviceId: String, body: JsonNode) = successUrc in body.urcs()
 
     override fun hasFailed(deviceId: String, body: JsonNode) = false
 }

@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component
 class PskCommandResultHandler(commandService: CommandService, commandFeedbackService: CommandFeedbackService) :
     CommandResultHandler(commandService, commandFeedbackService) {
 
-    private val succesUrc = "PSK:TMP"
+    private val successUrc = "PSK:TMP"
     private val errorUrcs = listOf("PSK:DLER", "PSK:HSER")
 
     override val supportedCommandType = CommandType.PSK
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) = succesUrc in body.urcs()
+    override fun hasSucceeded(deviceId: String, body: JsonNode) = successUrc in body.urcs()
 
     override fun hasFailed(deviceId: String, body: JsonNode) = body.urcs().any { it in errorUrcs }
 }

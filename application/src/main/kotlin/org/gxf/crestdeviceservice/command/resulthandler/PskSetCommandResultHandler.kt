@@ -21,12 +21,12 @@ class PskSetCommandResultHandler(
 
     private val logger = KotlinLogging.logger {}
 
-    private val succesUrc = "PSK:SET"
+    private val successUrc = "PSK:SET"
     private val errorUrcs = listOf("PSK:DLER", "PSK:HSER", "PSK:EQER")
 
     override val supportedCommandType = CommandType.PSK_SET
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) = succesUrc in body.urcs()
+    override fun hasSucceeded(deviceId: String, body: JsonNode) = successUrc in body.urcs()
 
     override fun hasFailed(deviceId: String, body: JsonNode) = body.urcs().any { it in errorUrcs }
 

@@ -68,7 +68,7 @@ class RebootCommandResultHandlerTest {
         fun hasSucceededTestSource(): Stream<Arguments> =
             Stream.of(
                 Arguments.of(listOf("INIT", "WDR"), "0", true),
-                Arguments.of(listOf("INIT"), "0", false),
+                Arguments.of(listOf("INIT"), "0", true),
                 Arguments.of(listOf("WDR"), "0", false),
                 Arguments.of(listOf("PSK:TMP", "PSK:SET"), "!PSK:######;PSK:######SET", false),
             )
