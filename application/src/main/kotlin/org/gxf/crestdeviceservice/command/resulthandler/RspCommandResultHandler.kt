@@ -13,13 +13,12 @@ import org.springframework.stereotype.Component
 class RspCommandResultHandler(commandService: CommandService, commandFeedbackService: CommandFeedbackService) :
     CommandResultHandler(commandService, commandFeedbackService) {
 
-    val confirmationDownlinkInUrc = "CMD:RSP"
+    val successUrc = "RSP:OK"
     val errorUrc = "RSP:DLER"
 
     override val supportedCommandType = CommandType.RSP
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) =
-        confirmationDownlinkInUrc in body.downlinks() && errorUrc !in body.urcs()
+    override fun hasSucceeded(deviceId: String, body: JsonNode) = successUrc in body.urcs()
 
     override fun hasFailed(deviceId: String, body: JsonNode) = errorUrc in body.urcs()
 }

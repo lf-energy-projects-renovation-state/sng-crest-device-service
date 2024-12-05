@@ -83,9 +83,10 @@ class RspCommandResultHandlerTest {
         @JvmStatic
         fun hasSucceededTestSource(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(listOf<String>(), "CMD:RSP", true),
-                Arguments.of(listOf("PSK:TMP"), "!PSK:######;CMD:RSP", true),
-                Arguments.of(listOf("PSK:TMP"), "!CMD:RSP;PSK:######", true),
+                Arguments.of(listOf("RSP:OK"), "CMD:RSP", true),
+                Arguments.of(listOf<String>(), "CMD:RSP", false),
+                Arguments.of(listOf("PSK:TMP", "RSP:OK"), "!PSK:######;CMD:RSP", true),
+                Arguments.of(listOf("RSP:OK", "PSK:TMP"), "!CMD:RSP;PSK:######", true),
                 Arguments.of(listOf("RSP:DLER"), "CMD:RSP", false),
                 Arguments.of(listOf("RSP:DLER", "PSK:TMP"), "!CMD:RSP;PSK:######", false),
                 Arguments.of(listOf("INIT", "WDR"), "0", false),

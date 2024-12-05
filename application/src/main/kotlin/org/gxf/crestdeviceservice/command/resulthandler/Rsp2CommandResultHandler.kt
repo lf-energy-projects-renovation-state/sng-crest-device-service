@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class Rsp2CommandResultHandler(commandService: CommandService, commandFeedbackService: CommandFeedbackService) :
     RspCommandResultHandler(commandService, commandFeedbackService) {
 
-    override val confirmationDownlinkInUrc = "CMD:RSP2"
+    override val successUrc = "RSP2:OK"
     override val errorUrc = "RSP2:DLER"
 
     override val supportedCommandType = CommandType.RSP2
