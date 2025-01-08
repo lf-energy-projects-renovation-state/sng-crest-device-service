@@ -18,10 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
 @RequestMapping("/web/firmware")
-class FirmwareController(
-    val firmwareService: FirmwareService,
-    val firmwareProducerService: FirmwareProducerService,
-) {
+class FirmwareController(val firmwareService: FirmwareService, val firmwareProducerService: FirmwareProducerService) {
     private val logger = KotlinLogging.logger {}
     private val redirectUrl = "redirect:/web/firmware"
 

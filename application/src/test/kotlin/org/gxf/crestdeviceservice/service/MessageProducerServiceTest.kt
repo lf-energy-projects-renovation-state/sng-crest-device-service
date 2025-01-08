@@ -34,7 +34,7 @@ class MessageProducerServiceTest {
             KafkaProducerProperties(
                 KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
                 KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
-                KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY)
+                KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY),
             )
 
         service = MessageProducerService(kafkaTemplate, kafkaProducerProperties)
@@ -57,7 +57,7 @@ class MessageProducerServiceTest {
         verify {
             kafkaTemplate.send(
                 DEVICE_MESSAGE_TOPIC,
-                match { (it is DeviceMessage) && (it.payload == jsonNode.toString()) }
+                match { (it is DeviceMessage) && (it.payload == jsonNode.toString()) },
             )
         }
     }

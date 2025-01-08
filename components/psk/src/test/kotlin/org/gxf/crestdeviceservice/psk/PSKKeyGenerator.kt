@@ -54,7 +54,7 @@ class PSKKeyGenerator {
             .joinToString(
                 separator = "\n",
                 prefix = "-----BEGIN PRIVATE KEY-----\n",
-                postfix = "\n-----END PRIVATE KEY-----"
+                postfix = "\n-----END PRIVATE KEY-----",
             )
 
     private fun publicKeyToString(publicKey: PublicKey) =
@@ -64,6 +64,6 @@ class PSKKeyGenerator {
             .joinToString(
                 separator = "\n",
                 prefix = "-----BEGIN PUBLIC KEY-----\n",
-                postfix = "\n-----END PUBLIC KEY-----"
+                postfix = "\n-----END PUBLIC KEY-----",
             )
 }

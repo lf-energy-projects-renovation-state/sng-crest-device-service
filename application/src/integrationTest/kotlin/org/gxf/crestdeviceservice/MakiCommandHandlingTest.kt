@@ -83,7 +83,7 @@ class MakiCommandHandlingTest {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
                     DEVICE_ID,
-                    org.gxf.crestdeviceservice.command.entity.Command.CommandStatus.PENDING
+                    org.gxf.crestdeviceservice.command.entity.Command.CommandStatus.PENDING,
                 )
 
             assertThat(savedCommand).isNotNull

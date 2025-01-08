@@ -16,12 +16,12 @@ interface CommandRepository : CrudRepository<Command, UUID> {
 
     fun findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
         deviceId: String,
-        status: Command.CommandStatus
+        status: Command.CommandStatus,
     ): List<Command>
 
     fun findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
         deviceId: String,
         type: Command.CommandType,
-        status: Command.CommandStatus
+        status: Command.CommandStatus,
     ): List<Command>
 }
