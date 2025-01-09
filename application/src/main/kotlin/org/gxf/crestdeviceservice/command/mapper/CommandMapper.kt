@@ -26,6 +26,7 @@ object CommandMapper {
         } catch (exception: IllegalArgumentException) {
             throw CommandValidationException("Command unknown: ${externalCommand.command}")
         } catch (exception: IllegalStateException) {
+            // for port number in value todo
             throw CommandValidationException("Command value unknown: ${externalCommand.value}")
         }
     }
