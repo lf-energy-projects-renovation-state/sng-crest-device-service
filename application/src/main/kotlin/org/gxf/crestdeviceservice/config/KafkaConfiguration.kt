@@ -34,7 +34,7 @@ class KafkaConfiguration(private val kafkaProperties: KafkaProperties, private v
         DefaultKafkaConsumerFactory(
             kafkaProperties.buildConsumerProperties(sslBundles),
             StringDeserializer(),
-            AvroDeserializer(listOf(DeviceCredentials.getClassSchema(), Command.getClassSchema()))
+            AvroDeserializer(listOf(DeviceCredentials.getClassSchema(), Command.getClassSchema())),
         )
 
     @Bean
@@ -45,6 +45,6 @@ class KafkaConfiguration(private val kafkaProperties: KafkaProperties, private v
         DefaultKafkaProducerFactory(
             kafkaProperties.buildProducerProperties(sslBundles),
             StringSerializer(),
-            AvroSerializer()
+            AvroSerializer(),
         )
 }

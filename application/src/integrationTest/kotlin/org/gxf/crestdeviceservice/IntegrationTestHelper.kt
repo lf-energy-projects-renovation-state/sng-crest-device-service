@@ -23,7 +23,7 @@ import org.springframework.util.ResourceUtils
 object IntegrationTestHelper {
     fun createKafkaConsumer(
         embeddedKafkaBroker: EmbeddedKafkaBroker,
-        topic: String
+        topic: String,
     ): Consumer<String, SpecificRecordBase> {
         val testProperties = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker)
         val consumerFactory =
@@ -32,7 +32,7 @@ object IntegrationTestHelper {
                 StringDeserializer(),
                 AvroDeserializer(
                     listOf(DeviceMessage.getClassSchema(), CommandFeedback.getClassSchema(), Firmwares.getClassSchema())
-                )
+                ),
             )
         val consumer = consumerFactory.createConsumer()
         embeddedKafkaBroker.consumeFromAnEmbeddedTopic(consumer, topic)
@@ -57,7 +57,7 @@ object IntegrationTestHelper {
             ProducerConfig.LINGER_MS_CONFIG to 1,
             ProducerConfig.BUFFER_MEMORY_CONFIG to "33554432",
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to AvroSerializer::class.java
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to AvroSerializer::class.java,
         )
     }
 

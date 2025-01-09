@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 @Service
 class MessageProducerService(
     private val kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>,
-    private val kafkaProducerProperties: KafkaProducerProperties
+    private val kafkaProducerProperties: KafkaProducerProperties,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -28,7 +28,7 @@ class MessageProducerService(
                 deviceId = message["ID"].toString()
                 timestamp = Instant.now().toEpochMilli()
                 payload = message.toString()
-            }
+            },
         )
     }
 }

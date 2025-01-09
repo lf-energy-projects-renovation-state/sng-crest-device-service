@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 @Service
 class CommandResultService(
     private val commandService: CommandService,
-    private val commandResultHandlersByType: Map<Command.CommandType, CommandResultHandler>
+    private val commandResultHandlersByType: Map<Command.CommandType, CommandResultHandler>,
 ) {
     private val logger = KotlinLogging.logger {}
 

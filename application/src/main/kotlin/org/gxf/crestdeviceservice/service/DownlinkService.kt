@@ -20,7 +20,7 @@ class DownlinkService(
     private val pskService: PskService,
     private val commandService: CommandService,
     private val messageProperties: MessageProperties,
-    commandGenerators: List<CommandGenerator>
+    commandGenerators: List<CommandGenerator>,
 ) {
 
     private val logger = KotlinLogging.logger {}

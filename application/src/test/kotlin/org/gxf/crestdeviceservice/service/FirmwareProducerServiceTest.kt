@@ -40,7 +40,7 @@ class FirmwareProducerServiceTest {
             KafkaProducerProperties(
                 KafkaProducerTopicProperties(DEVICE_MESSAGE_TOPIC),
                 KafkaProducerTopicProperties(COMMAND_FEEDBACK_TOPIC),
-                KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY)
+                KafkaProducerTopicKeyProperties(FIRMWARE_TOPIC, FIRMWARE_KEY),
             )
 
         service = FirmwareProducerService(kafkaTemplate, kafkaProducerProperties, firmwareService, firmwareMapper)

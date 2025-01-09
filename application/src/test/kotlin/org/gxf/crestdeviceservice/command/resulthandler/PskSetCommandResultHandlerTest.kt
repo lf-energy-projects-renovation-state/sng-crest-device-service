@@ -61,7 +61,7 @@ class PskSetCommandResultHandlerTest {
         verify {
             commandFeedbackService.sendErrorFeedback(
                 command,
-                match { error -> error.contains("Set PSK does not equal earlier PSK") }
+                match { error -> error.contains("Set PSK does not equal earlier PSK") },
             )
         }
     }
