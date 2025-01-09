@@ -13,7 +13,7 @@ import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.getMessageFromCode
 
 abstract class CommandResultHandler(
     private val commandService: CommandService,
-    private val commandFeedbackService: CommandFeedbackService
+    private val commandFeedbackService: CommandFeedbackService,
 ) {
     private val logger = KotlinLogging.logger {}
 

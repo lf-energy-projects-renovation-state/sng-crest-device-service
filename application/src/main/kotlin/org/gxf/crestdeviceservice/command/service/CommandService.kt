@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 @Service
 class CommandService(
     private val commandRepository: CommandRepository,
-    private val commandFeedbackService: CommandFeedbackService
+    private val commandFeedbackService: CommandFeedbackService,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -42,7 +42,7 @@ class CommandService(
     private fun deviceHasNewerSameCommand(
         deviceId: String,
         commandType: Command.CommandType,
-        timestampNewCommand: Instant
+        timestampNewCommand: Instant,
     ): Boolean {
         val latestCommandInDatabase = getLatestCommandInDatabase(deviceId, commandType) ?: return false
 
@@ -55,7 +55,7 @@ class CommandService(
             .findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(
                 deviceId,
                 commandType,
-                Command.CommandStatus.IN_PROGRESS
+                Command.CommandStatus.IN_PROGRESS,
             )
             .isNotEmpty()
 
@@ -93,7 +93,7 @@ class CommandService(
     fun getFirstCommandInProgressForDevice(deviceId: String) =
         commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
             deviceId,
-            Command.CommandStatus.IN_PROGRESS
+            Command.CommandStatus.IN_PROGRESS,
         )
 
     fun getAllPendingCommandsForDevice(deviceId: String) =
@@ -102,7 +102,7 @@ class CommandService(
     fun getAllCommandsInProgressForDevice(deviceId: String) =
         commandRepository.findAllByDeviceIdAndStatusOrderByTimestampIssuedAsc(
             deviceId,
-            Command.CommandStatus.IN_PROGRESS
+            Command.CommandStatus.IN_PROGRESS,
         )
 
     fun saveCommand(command: Command) = commandRepository.save(command)
