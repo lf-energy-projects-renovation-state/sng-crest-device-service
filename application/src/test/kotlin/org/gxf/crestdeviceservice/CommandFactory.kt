@@ -20,7 +20,7 @@ object CommandFactory {
             timestampIssued = timestamp,
             type = Command.CommandType.PSK,
             commandValue = null,
-            status = Command.CommandStatus.PENDING
+            status = Command.CommandStatus.PENDING,
         )
 
     fun pendingPskSetCommand() =
@@ -31,13 +31,13 @@ object CommandFactory {
             timestampIssued = timestamp,
             type = Command.CommandType.PSK_SET,
             commandValue = null,
-            status = Command.CommandStatus.PENDING
+            status = Command.CommandStatus.PENDING,
         )
 
     fun pendingRebootCommand(
         timestampIssued: Instant = timestamp,
         correlationId: UUID = CORRELATION_ID,
-        status: Command.CommandStatus = Command.CommandStatus.PENDING
+        status: Command.CommandStatus = Command.CommandStatus.PENDING,
     ) =
         Command(
             id = UUID.randomUUID(),
@@ -46,7 +46,7 @@ object CommandFactory {
             timestampIssued = timestampIssued,
             type = Command.CommandType.REBOOT,
             commandValue = null,
-            status = status
+            status = status,
         )
 
     fun pendingAnalogAlarmThresholdsPort3Command(
@@ -81,7 +81,7 @@ object CommandFactory {
             timestampIssued = timestamp,
             type = Command.CommandType.FIRMWARE,
             commandValue = "the-firmware-to-install",
-            status = Command.CommandStatus.IN_PROGRESS
+            status = Command.CommandStatus.IN_PROGRESS,
         )
 
     fun rspCommandInProgress() =
@@ -92,7 +92,7 @@ object CommandFactory {
             timestampIssued = timestamp,
             type = Command.CommandType.RSP,
             commandValue = null,
-            status = Command.CommandStatus.IN_PROGRESS
+            status = Command.CommandStatus.IN_PROGRESS,
         )
 
     fun rsp2CommandInProgress() =
@@ -103,6 +103,6 @@ object CommandFactory {
             timestampIssued = timestamp,
             type = Command.CommandType.RSP2,
             commandValue = null,
-            status = Command.CommandStatus.IN_PROGRESS
+            status = Command.CommandStatus.IN_PROGRESS,
         )
 }

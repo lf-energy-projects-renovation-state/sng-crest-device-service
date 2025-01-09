@@ -11,5 +11,5 @@ enum class PreSharedKeyStatus {
     /** Acknowledged by device */
     ACTIVE,
     INACTIVE,
-    INVALID
+    INVALID,
 }

@@ -43,7 +43,7 @@ class PayloadService(
     private fun addFirmwareCommandIfRequested(
         deviceMessage: DeviceMessage,
         identity: String,
-        downlink: Downlink
+        downlink: Downlink,
     ): Command? =
         deviceMessage
             .getFotaMessageCounter()

@@ -18,7 +18,7 @@ object CommandMapper {
                 timestampIssued = externalCommand.timestamp,
                 type = commandNameToType(externalCommand.command),
                 status = status,
-                commandValue = translateCommandValue(externalCommand)
+                commandValue = translateCommandValue(externalCommand),
             )
         } catch (exception: IllegalArgumentException) {
             throw CommandValidationException("Command unknown: ${externalCommand.command}")

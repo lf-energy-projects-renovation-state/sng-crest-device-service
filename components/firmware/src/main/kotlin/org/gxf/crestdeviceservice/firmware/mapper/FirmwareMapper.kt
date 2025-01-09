@@ -30,7 +30,7 @@ class FirmwareMapper(private val firmwareRepository: FirmwareRepository) {
                 name,
                 getFirmwareVersionFromName(name),
                 getPreviousFirmwareIdFromName(name),
-                mutableListOf()
+                mutableListOf(),
             )
 
         val packets = mapLinesToPackets(fileContent.lines(), firmware)

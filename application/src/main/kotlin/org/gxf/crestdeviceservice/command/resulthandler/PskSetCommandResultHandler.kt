@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component
 class PskSetCommandResultHandler(
     val pskService: PskService,
     val commandService: CommandService,
-    val commandFeedbackService: CommandFeedbackService
+    val commandFeedbackService: CommandFeedbackService,
 ) : CommandResultHandler(commandService, commandFeedbackService) {
 
     private val logger = KotlinLogging.logger {}
