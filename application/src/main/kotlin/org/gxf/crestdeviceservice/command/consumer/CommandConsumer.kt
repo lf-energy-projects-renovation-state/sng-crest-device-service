@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service
 class CommandConsumer(
     private val commandService: CommandService,
     private val commandFeedbackService: CommandFeedbackService,
-    private val pskService: PskService,
+    private val pskService: PskService
 ) {
     private val logger = KotlinLogging.logger {}
 

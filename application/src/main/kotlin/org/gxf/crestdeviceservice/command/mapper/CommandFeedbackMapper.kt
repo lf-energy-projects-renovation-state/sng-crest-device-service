@@ -13,7 +13,7 @@ object CommandFeedbackMapper {
     fun commandEntityToCommandFeedback(
         command: Command,
         status: ExternalCommandStatus,
-        message: String,
+        message: String
     ): CommandFeedback =
         CommandFeedback.newBuilder()
             .setDeviceId(command.deviceId)
@@ -26,7 +26,7 @@ object CommandFeedbackMapper {
     fun externalCommandToCommandFeedback(
         command: ExternalCommand,
         status: ExternalCommandStatus,
-        message: String,
+        message: String
     ): CommandFeedback =
         CommandFeedback.newBuilder()
             .setDeviceId(command.deviceId)

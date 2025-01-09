@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 @Component
 class AnalogAlarmThresholdPort3ResultHandler(
     val commandService: CommandService,
-    val commandFeedbackService: CommandFeedbackService,
+    val commandFeedbackService: CommandFeedbackService
 ) : CommandResultHandler(commandService, commandFeedbackService) {
     private val successUrc = "AL6:SET"
     private val errorUrcs = listOf("AL6:DLER", "AL6:ERR")

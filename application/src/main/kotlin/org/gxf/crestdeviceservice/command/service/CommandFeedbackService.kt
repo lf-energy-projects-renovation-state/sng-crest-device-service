@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service
 @Service
 class CommandFeedbackService(
     private val kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>,
-    kafkaProducerProperties: KafkaProducerProperties,
+    kafkaProducerProperties: KafkaProducerProperties
 ) {
     private val topic = kafkaProducerProperties.commandFeedback.topic
 

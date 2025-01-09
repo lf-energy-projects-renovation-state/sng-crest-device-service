@@ -21,7 +21,7 @@ class IncomingDeviceCredentialsConsumer(
     private val deviceService: DeviceService,
     private val pskService: PskService,
     private val pskDecryptionService: PskDecryptionService,
-    private val commandService: CommandService,
+    private val commandService: CommandService
 ) {
     private val logger = KotlinLogging.logger {}
 

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 @Component
 class FirmwareCommandResultHandler(
     val commandService: CommandService,
-    val commandFeedbackService: CommandFeedbackService,
+    val commandFeedbackService: CommandFeedbackService
 ) : CommandResultHandler(commandService, commandFeedbackService) {
 
     private val successUrc = "OTA:SUC"

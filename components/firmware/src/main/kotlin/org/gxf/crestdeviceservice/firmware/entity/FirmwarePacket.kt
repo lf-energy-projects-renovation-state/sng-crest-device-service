@@ -15,7 +15,7 @@ class FirmwarePacket(
     @ManyToOne @Id val firmware: Firmware,
     @Id val packetNumber: Int,
     @Column(length = 1024) // without this, the integration test assumes a length of 255
-    val packet: String,
+    val packet: String
 ) {
     fun isFirstPacket() = packet.startsWith(OTA_START)
 

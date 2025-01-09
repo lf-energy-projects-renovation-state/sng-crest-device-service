@@ -53,7 +53,7 @@ class DownlinkServiceTest {
                 pskService,
                 commandService,
                 messageProperties,
-                listOf(pskCommandGenerator, pskSetCommandGenerator),
+                listOf(pskCommandGenerator, pskSetCommandGenerator)
             )
     }
 

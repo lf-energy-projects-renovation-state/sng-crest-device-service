@@ -57,6 +57,6 @@ class Command(
         IN_PROGRESS,
         SUCCESSFUL,
         ERROR,
-        CANCELLED,
+        CANCELLED
     }
 }

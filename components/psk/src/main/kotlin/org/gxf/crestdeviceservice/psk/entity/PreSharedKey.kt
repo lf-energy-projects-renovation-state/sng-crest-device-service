@@ -19,5 +19,5 @@ class PreSharedKey(
     @Id val revision: Int,
     val revisionTime: Instant,
     @Convert(converter = DatabaseFieldEncryptor::class) val preSharedKey: String,
-    @Enumerated(EnumType.STRING) var status: PreSharedKeyStatus,
+    @Enumerated(EnumType.STRING) var status: PreSharedKeyStatus
 )

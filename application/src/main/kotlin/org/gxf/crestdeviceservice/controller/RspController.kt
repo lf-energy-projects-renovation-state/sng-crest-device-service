@@ -42,7 +42,7 @@ class RspController(private val commandService: CommandService) {
                 timestampIssued = Instant.now(),
                 type = commandType,
                 status = Command.CommandStatus.PENDING,
-                commandValue = null,
+                commandValue = null
             )
         )
     }

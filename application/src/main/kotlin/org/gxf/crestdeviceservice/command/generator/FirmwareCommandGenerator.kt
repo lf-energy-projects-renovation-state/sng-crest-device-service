@@ -8,7 +8,9 @@ import org.gxf.crestdeviceservice.firmware.service.FirmwareService
 import org.springframework.stereotype.Component
 
 @Component
-class FirmwareCommandGenerator(private val firmwareService: FirmwareService) : CommandGenerator {
+class FirmwareCommandGenerator(
+    private val firmwareService: FirmwareService,
+) : CommandGenerator {
     override fun generateCommandString(command: Command): String {
         requireNotNull(command.commandValue) { "commandValue should have a firmware name" }
         val deviceId = command.deviceId

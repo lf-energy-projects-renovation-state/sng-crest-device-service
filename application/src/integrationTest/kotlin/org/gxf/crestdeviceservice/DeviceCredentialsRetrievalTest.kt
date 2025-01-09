@@ -24,7 +24,9 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@EmbeddedKafka(topics = ["\${kafka.producers.device-message.topic}"])
+@EmbeddedKafka(
+    topics = ["\${kafka.producers.device-message.topic}"],
+)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class DeviceCredentialsRetrievalTest {
     companion object {

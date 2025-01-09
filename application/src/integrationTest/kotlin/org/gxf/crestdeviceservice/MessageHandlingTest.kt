@@ -24,7 +24,9 @@ import org.springframework.test.annotation.DirtiesContext
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@EmbeddedKafka(topics = ["\${kafka.producers.device-message.topic}"])
+@EmbeddedKafka(
+    topics = ["\${kafka.producers.device-message.topic}"],
+)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EnableConfigurationProperties(KafkaProducerProperties::class)
 class MessageHandlingTest {

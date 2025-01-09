@@ -41,7 +41,7 @@ import org.springframework.test.annotation.DirtiesContext
             "\${kafka.consumers.command.topic}",
             "\${kafka.consumers.pre-shared-key.topic}",
             "\${kafka.producers.command-feedback.topic}",
-            "\${kafka.producers.device-message.topic}",
+            "\${kafka.producers.device-message.topic}"
         ]
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -89,7 +89,7 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK,
                 null,
-                Command.CommandStatus.PENDING,
+                Command.CommandStatus.PENDING
             )
         )
         commandRepository.save(
@@ -100,7 +100,7 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK_SET,
                 null,
-                Command.CommandStatus.PENDING,
+                Command.CommandStatus.PENDING
             )
         )
 
@@ -124,7 +124,7 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK,
                 null,
-                Command.CommandStatus.IN_PROGRESS,
+                Command.CommandStatus.IN_PROGRESS
             )
         )
         commandRepository.save(
@@ -135,7 +135,7 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK_SET,
                 null,
-                Command.CommandStatus.IN_PROGRESS,
+                Command.CommandStatus.IN_PROGRESS
             )
         )
 
@@ -164,7 +164,7 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK,
                 null,
-                Command.CommandStatus.IN_PROGRESS,
+                Command.CommandStatus.IN_PROGRESS
             )
         )
         commandRepository.save(
@@ -175,7 +175,7 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.PSK_SET,
                 null,
-                Command.CommandStatus.IN_PROGRESS,
+                Command.CommandStatus.IN_PROGRESS
             )
         )
 
@@ -204,7 +204,7 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.REBOOT,
                 null,
-                Command.CommandStatus.PENDING,
+                Command.CommandStatus.PENDING
             )
         commandRepository.save(pendingCommand)
 
@@ -222,7 +222,7 @@ class CoapMessageHandlingTest {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
                     DEVICE_ID,
-                    Command.CommandStatus.IN_PROGRESS,
+                    Command.CommandStatus.IN_PROGRESS
                 )
 
             assertThat(savedCommand).isNotNull()
@@ -244,7 +244,7 @@ class CoapMessageHandlingTest {
                 Instant.now(),
                 Command.CommandType.REBOOT,
                 "reboot",
-                Command.CommandStatus.IN_PROGRESS,
+                Command.CommandStatus.IN_PROGRESS
             )
         commandRepository.save(commandInProgress)
 
@@ -261,7 +261,7 @@ class CoapMessageHandlingTest {
             val savedCommand =
                 commandRepository.findFirstByDeviceIdAndStatusOrderByTimestampIssuedAsc(
                     DEVICE_ID,
-                    Command.CommandStatus.SUCCESSFUL,
+                    Command.CommandStatus.SUCCESSFUL
                 )
 
             assertThat(savedCommand).isNotNull

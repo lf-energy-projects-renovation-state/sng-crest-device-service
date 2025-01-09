@@ -30,7 +30,7 @@ class PskDecryptionServiceTest {
             PskDecryptionService(
                 PskDecryptionConfiguration(
                     mapOf(keyRef to keyPair.private as RSAPrivateKey),
-                    "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING",
+                    "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING"
                 )
             )
 
@@ -54,7 +54,7 @@ class PskDecryptionServiceTest {
             PskDecryptionService(
                 PskDecryptionConfiguration(
                     mapOf(keyRef to keyPair.private as RSAPrivateKey),
-                    "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING",
+                    "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING"
                 )
             )
 
