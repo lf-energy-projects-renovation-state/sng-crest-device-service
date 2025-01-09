@@ -40,5 +40,9 @@ object CommandMapper {
         }
 
     private fun translateAnalogAlarmsThresholdValue(value: String) =
-        value.split(",").map { it.toDouble() }.map { VoltBarCalculator.getBarToVolt(it) }.joinToString { "," }
+        value
+            .split(",")
+            .map { it.toDouble() }
+            .map { AnalogAlarmThresholdCalculator.getPayloadFromBar(it) }
+            .joinToString { "," }
 }

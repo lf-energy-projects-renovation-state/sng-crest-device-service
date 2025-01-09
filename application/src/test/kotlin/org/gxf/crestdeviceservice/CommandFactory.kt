@@ -5,6 +5,7 @@ package org.gxf.crestdeviceservice
 
 import java.time.Instant
 import java.util.UUID
+import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_PAYLOAD
 import org.gxf.crestdeviceservice.TestConstants.CORRELATION_ID
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.TestConstants.timestamp
@@ -52,7 +53,7 @@ object CommandFactory {
         timestampIssued: Instant = timestamp,
         correlationId: UUID = CORRELATION_ID,
         status: Command.CommandStatus = Command.CommandStatus.PENDING,
-        value: String = "0.00,1.25,2.50,3.75,0.10"
+        value: String = ANALOG_ALARM_THRESHOLDS_PAYLOAD
     ) =
         Command(
             id = UUID.randomUUID(),

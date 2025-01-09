@@ -24,6 +24,15 @@ class CommandMapperTest {
     }
 
     @Test
+    fun externalCommandToCommandEntityAlarmThresholds() {
+        val externalCommand = ExternalCommandFactory.externalAnalogAlarmThresholdsPort3Command()
+        val status = Command.CommandStatus.PENDING
+        val expected = CommandFactory.pendingAnalogAlarmThresholdsPort3Command()
+        val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
+        assertThat(result).usingRecursiveComparison().ignoringFields("id", "timestampIssued").isEqualTo(expected)
+    }
+
+    @Test
     fun externalCommandToCommandEntityException() {
         val externalCommand = ExternalCommandFactory.externalRebootCommandInvalid()
         val status = Command.CommandStatus.PENDING
