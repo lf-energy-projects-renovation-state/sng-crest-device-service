@@ -11,17 +11,16 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
-class AnalogAlarmsSetThresholdPort3CommandGeneratorTest {
-    private val generator = AnalogAlarmsSetThresholdPort3CommandGenerator()
+class AnalogAlarmsThresholdCommandGeneratorTest {
+    private val generator = AnalogAlarmsThresholdCommandGenerator()
 
     @Test
     fun shouldCreateACorrectCommandString() {
         val receivedValue = ANALOG_ALARM_THRESHOLDS_PAYLOAD
         val pendingCommand = CommandFactory.pendingAnalogAlarmThresholdsPort3Command(value = receivedValue)
-        val expectedResult = "AL6:$ANALOG_ALARM_THRESHOLDS_PAYLOAD"
 
         val result = generator.generateCommandString(pendingCommand)
 
-        assertThat(result).isEqualTo(expectedResult)
+        assertThat(result).isEqualTo(receivedValue)
     }
 }

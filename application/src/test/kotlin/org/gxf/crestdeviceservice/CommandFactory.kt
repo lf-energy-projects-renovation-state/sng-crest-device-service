@@ -60,7 +60,7 @@ object CommandFactory {
             deviceId = DEVICE_ID,
             correlationId = correlationId,
             timestampIssued = timestampIssued,
-            type = Command.CommandType.ANALOG_ALARM_THRESHOLDS_PORT_3,
+            type = Command.CommandType.ANALOG_ALARM_THRESHOLDS,
             commandValue = value,
             status = status
         )
@@ -72,22 +72,6 @@ object CommandFactory {
     fun pskSetCommandInProgress() = pendingPskSetCommand().start()
 
     fun analogAlarmThresholdsPort3InProgress() = pendingAnalogAlarmThresholdsPort3Command().start()
-
-    fun analogAlarmThresholdsPort4InProgress(
-        timestampIssued: Instant = timestamp,
-        correlationId: UUID = CORRELATION_ID,
-        status: Command.CommandStatus = Command.CommandStatus.IN_PROGRESS,
-        value: String = ANALOG_ALARM_THRESHOLDS_PAYLOAD
-    ) =
-        Command(
-            id = UUID.randomUUID(),
-            deviceId = DEVICE_ID,
-            correlationId = correlationId,
-            timestampIssued = timestampIssued,
-            type = Command.CommandType.ANALOG_ALARM_THRESHOLDS_PORT_4,
-            commandValue = value,
-            status = status
-        )
 
     fun firmwareCommandInProgress() =
         Command(

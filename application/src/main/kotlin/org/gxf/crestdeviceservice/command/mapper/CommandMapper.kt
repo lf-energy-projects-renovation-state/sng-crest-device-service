@@ -8,9 +8,6 @@ import java.util.UUID
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 
-private const val ANALOG_ALARM_THRESHOLDS_PORT_3 = "analog_alarm_thresholds_port_3"
-private const val ANALOG_ALARM_THRESHOLDS_PORT_4 = "analog_alarm_thresholds_port_4"
-
 object CommandMapper {
     fun externalCommandToCommandEntity(externalCommand: ExternalCommand, status: Command.CommandStatus): Command {
         try {
@@ -25,25 +22,36 @@ object CommandMapper {
             )
         } catch (exception: IllegalArgumentException) {
             throw CommandValidationException("Command unknown: ${externalCommand.command}")
-        } catch (exception: IllegalStateException) {
-            // for port number in value todo
-            throw CommandValidationException("Command value unknown: ${externalCommand.value}")
         }
     }
 
     fun commandNameToType(command: String) = Command.CommandType.valueOf(command.uppercase())
 
-    private fun translateCommandValue(command: ExternalCommand) =
-        when (command.command) {
-            ANALOG_ALARM_THRESHOLDS_PORT_3,
-            ANALOG_ALARM_THRESHOLDS_PORT_4 -> translateAnalogAlarmsThresholdValue(command.value)
+    private fun translateCommandValue(command: ExternalCommand): String? {
+        val analogAlarmThresholds = Command.CommandType.ANALOG_ALARM_THRESHOLDS.name.lowercase()
+        return when (command.command) {
+            analogAlarmThresholds -> translateAnalogAlarmsThresholdValue(command.value)
             else -> command.value
         }
+    }
 
-    private fun translateAnalogAlarmsThresholdValue(value: String) =
-        value
-            .split(",")
-            .map { it.toDouble() }
-            .map { AnalogAlarmThresholdCalculator.getPayloadFromBar(it) }
-            .joinToString { "," }
+    private fun translateAnalogAlarmsThresholdValue(value: String): String {
+        val port = value.substringBefore(':')
+        val channel = translatePortToChannel(port)
+        val pressureValues =
+            value
+                .substringAfter(':')
+                .split(",")
+                .map { it.toInt() }
+                .map { AnalogAlarmThresholdCalculator.getPayloadFromMBar(it) }
+                .joinToString(",")
+        return "$channel:$pressureValues"
+    }
+
+    private fun translatePortToChannel(port: String) =
+        when (port) {
+            "3" -> "AL6"
+            "4" -> "AL7"
+            else -> throw CommandValidationException("Device port unknown: $port")
+        }
 }

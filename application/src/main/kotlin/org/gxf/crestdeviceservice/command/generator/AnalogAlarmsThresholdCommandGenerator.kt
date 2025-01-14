@@ -7,8 +7,8 @@ import org.gxf.crestdeviceservice.command.entity.Command
 import org.springframework.stereotype.Component
 
 @Component
-class AnalogAlarmsSetThresholdPort4CommandGenerator : CommandGenerator {
-    override fun getSupportedCommand() = Command.CommandType.ANALOG_ALARM_THRESHOLDS_PORT_4
+class AnalogAlarmsThresholdCommandGenerator : CommandGenerator {
+    override fun getSupportedCommand() = Command.CommandType.ANALOG_ALARM_THRESHOLDS
 
-    override fun generateCommandString(command: Command) = "${getSupportedCommand().downlink}:${command.commandValue}"
+    override fun generateCommandString(command: Command) = command.commandValue!!
 }

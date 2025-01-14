@@ -17,7 +17,7 @@ class AnalogAlarmThresholdPort3ResultHandler(
     private val successUrc = "AL6:SET"
     private val errorUrcs = listOf("AL6:DLER", "AL6:ERR")
 
-    override val supportedCommandType = Command.CommandType.ANALOG_ALARM_THRESHOLDS_PORT_3
+    override val supportedCommandType = Command.CommandType.ANALOG_ALARM_THRESHOLDS
 
     override fun hasSucceeded(deviceId: String, body: JsonNode) = successUrc in body.urcs()
 

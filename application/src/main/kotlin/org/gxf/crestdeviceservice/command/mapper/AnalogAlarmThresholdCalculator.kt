@@ -6,9 +6,9 @@ package org.gxf.crestdeviceservice.command.mapper
 import kotlin.math.roundToInt
 
 object AnalogAlarmThresholdCalculator {
-    // volt = bar * 2
+    // volt = mbar / 500
     // payload value = volt * 200
-    fun getPayloadFromBar(barValue: Double) = (barValue * 2 * 200).roundToInt() // todo range payload values
+    fun getPayloadFromMBar(mBarValue: Int) = (mBarValue * 0.4).roundToInt() // todo range payload values
 
-    fun getBarFromPayload(payloadValue: Int) = payloadValue / 2.0 / 200.0
+    fun getMBarFromPayload(payloadValue: Int) = payloadValue * 2.5.roundToInt()
 }

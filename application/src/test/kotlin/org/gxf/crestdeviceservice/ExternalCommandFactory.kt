@@ -4,7 +4,7 @@
 package org.gxf.crestdeviceservice
 
 import com.alliander.sng.Command as ExternalCommand
-import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_BAR
+import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_MBAR
 import org.gxf.crestdeviceservice.TestConstants.CORRELATION_ID
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.TestConstants.timestamp
@@ -34,7 +34,16 @@ object ExternalCommandFactory {
             .setDeviceId(DEVICE_ID)
             .setCorrelationId(CORRELATION_ID)
             .setTimestamp(timestamp)
-            .setCommand(Command.CommandType.ANALOG_ALARM_THRESHOLDS_PORT_3.name.lowercase())
-            .setValue(ANALOG_ALARM_THRESHOLDS_BAR)
+            .setCommand(Command.CommandType.ANALOG_ALARM_THRESHOLDS.name.lowercase())
+            .setValue(ANALOG_ALARM_THRESHOLDS_MBAR)
+            .build()!!
+
+    fun externalAnalogAlarmThresholdsPort3CommandInvalid() =
+        ExternalCommand.newBuilder()
+            .setDeviceId(DEVICE_ID)
+            .setCorrelationId(CORRELATION_ID)
+            .setTimestamp(timestamp)
+            .setCommand(Command.CommandType.ANALOG_ALARM_THRESHOLDS.name.lowercase())
+            .setValue(ANALOG_ALARM_THRESHOLDS_MBAR)
             .build()!!
 }

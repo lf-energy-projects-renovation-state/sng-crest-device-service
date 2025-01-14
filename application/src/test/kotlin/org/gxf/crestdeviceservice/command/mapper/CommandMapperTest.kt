@@ -10,6 +10,8 @@ import org.gxf.crestdeviceservice.ExternalCommandFactory
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
 class CommandMapperTest {
     @Test
@@ -32,6 +34,33 @@ class CommandMapperTest {
         val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
 
         assertThat(result).usingRecursiveComparison().ignoringFields("id", "timestampIssued").isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidCommandValues")
+    fun externalCommandToCommandEntityAlarmThresholdsException(value: String) {
+        val externalCommand = ExternalCommandFactory.externalAnalogAlarmThresholdsPort3Command()
+        val status = Command.CommandStatus.PENDING
+        val expected = CommandFactory.pendingAnalogAlarmThresholdsPort3Command()
+
+        val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
+
+        assertThat(result).usingRecursiveComparison().ignoringFields("id", "timestampIssued").isEqualTo(expected)
+    }
+
+    companion object {
+        @JvmStatic
+        private fun invalidCommandValues() =
+            listOf(
+                "",
+                "0,1250,2500,3750,100",
+                "5:0,1250,2500,3750,100",
+                "L:0,1250,2500,3750,100",
+                "4:bla",
+                "4:0,1.25,2.5,3.75,0.1",
+                "4,0,1250,2500,3750,100",
+                "3:een,twee,drie,vier"
+            )
     }
 
     @Test
