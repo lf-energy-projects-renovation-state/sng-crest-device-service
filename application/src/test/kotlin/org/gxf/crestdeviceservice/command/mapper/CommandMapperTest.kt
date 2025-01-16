@@ -59,7 +59,7 @@ class CommandMapperTest {
                 "4:bla",
                 "4:0,1.25,2.5,3.75,0.1",
                 "4,0,1250,2500,3750,100",
-                "3:een,twee,drie,vier"
+                "3:een,twee,drie,vier",
             )
     }
 

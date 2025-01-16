@@ -58,7 +58,7 @@ class AnalogAlarmThresholdPort3ResultHandlerTest {
         verify {
             commandFeedbackService.sendErrorFeedback(
                 command,
-                match { error -> error.contains("Downlink (syntax) error") }
+                match { error -> error.contains("Downlink (syntax) error") },
             )
         }
     }
