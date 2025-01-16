@@ -29,7 +29,7 @@ class CommandMapperTest {
     fun externalCommandToCommandEntityAlarmThresholds() {
         val externalCommand = ExternalCommandFactory.externalAnalogAlarmThresholdsPort3Command()
         val status = Command.CommandStatus.PENDING
-        val expected = CommandFactory.pendingAnalogAlarmThresholdsPort3Command()
+        val expected = CommandFactory.pendingAnalogAlarmThresholdsCommand()
 
         val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
 
@@ -41,7 +41,7 @@ class CommandMapperTest {
     fun externalCommandToCommandEntityAlarmThresholdsException(value: String) {
         val externalCommand = ExternalCommandFactory.externalAnalogAlarmThresholdsPort3Command()
         val status = Command.CommandStatus.PENDING
-        val expected = CommandFactory.pendingAnalogAlarmThresholdsPort3Command()
+        val expected = CommandFactory.pendingAnalogAlarmThresholdsCommand()
 
         val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
 

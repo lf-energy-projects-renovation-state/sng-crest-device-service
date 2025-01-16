@@ -17,7 +17,7 @@ class AnalogAlarmsThresholdCommandGeneratorTest {
     @Test
     fun shouldCreateACorrectCommandString() {
         val receivedValue = ANALOG_ALARM_THRESHOLDS_PAYLOAD
-        val pendingCommand = CommandFactory.pendingAnalogAlarmThresholdsPort3Command(value = receivedValue)
+        val pendingCommand = CommandFactory.pendingAnalogAlarmThresholdsCommand(value = receivedValue)
 
         val result = generator.generateCommandString(pendingCommand)
 

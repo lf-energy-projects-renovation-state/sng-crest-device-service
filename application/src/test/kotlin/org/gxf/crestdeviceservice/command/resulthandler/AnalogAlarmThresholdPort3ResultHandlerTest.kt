@@ -32,7 +32,7 @@ class AnalogAlarmThresholdPort3ResultHandlerTest {
 
     @Test
     fun handleSuccess() {
-        val command = CommandFactory.analogAlarmThresholdsPort3InProgress()
+        val command = CommandFactory.analogAlarmThresholdsCommandInProgess()
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
@@ -45,7 +45,7 @@ class AnalogAlarmThresholdPort3ResultHandlerTest {
 
     @Test
     fun handleFailure() {
-        val command = CommandFactory.analogAlarmThresholdsPort3InProgress()
+        val command = CommandFactory.analogAlarmThresholdsCommandInProgess()
         val message = MessageFactory.messageWithUrc(listOf("AL6:DLER"), "")
 
         every { commandService.saveCommand(any()) } answers { firstArg() }
