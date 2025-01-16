@@ -8,7 +8,7 @@ import kotlin.math.roundToInt
 object AnalogAlarmThresholdCalculator {
     // volt = mbar / 500
     // payload value = volt * 200
-    fun getPayloadFromMBar(mBarValue: Int) = (mBarValue * 0.4).roundToInt() // todo range payload values
+    fun getPayloadFromMBar(mBarValue: Int) = (mBarValue * 0.4).roundToInt()
 
     fun getMBarFromPayload(payloadValue: Int) = payloadValue * 2.5.roundToInt()
 }
