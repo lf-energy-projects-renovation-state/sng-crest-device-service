@@ -33,9 +33,8 @@ class CommandServiceTest {
 
     @Test
     fun validateSucceeded() {
-        every { //
-            commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any())
-        } returns pendingRebootCommand(Instant.now().minusSeconds(100))
+        every { commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()) } returns
+            pendingRebootCommand(Instant.now().minusSeconds(100))
         every {
             commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(any(), any(), any())
         } returns listOf()
@@ -45,9 +44,8 @@ class CommandServiceTest {
 
     @Test
     fun `Check if command is rejected when latest same command is in the future`() {
-        every { //
-            commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any())
-        } returns pendingRebootCommand(Instant.now().plusSeconds(100))
+        every { commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()) } returns
+            pendingRebootCommand(Instant.now().plusSeconds(100))
 
         assertThatThrownBy { commandService.validate(pendingRebootCommand()) }
             .usingRecursiveComparison()
@@ -68,9 +66,8 @@ class CommandServiceTest {
     @ParameterizedTest
     @MethodSource("invalidCommandValues")
     fun `Check if command is rejected when analog alarm thresholds command does not match regex`(commandValue: String) {
-        every { //
-            commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any())
-        } returns pendingRebootCommand(Instant.now().minusSeconds(100))
+        every { commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()) } returns
+            pendingRebootCommand(Instant.now().minusSeconds(100))
         every {
             commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(any(), any(), any())
         } returns listOf()
@@ -86,9 +83,8 @@ class CommandServiceTest {
         val existingPendingCommand =
             pendingRebootCommand(timestampIssued = Instant.now().minusSeconds(100), correlationId = UUID.randomUUID())
 
-        every { //
-            commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any())
-        } returns existingPendingCommand
+        every { commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()) } returns
+            existingPendingCommand
         every { commandRepository.save(any()) } answers { firstArg() }
 
         commandService.cancelOlderCommandIfNecessary(newCommand)
