@@ -7,8 +7,8 @@ import io.mockk.junit5.MockKExtension
 import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
-import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_MBAR_PORT_3
-import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_MBAR_PORT_4
+import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_3
+import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_4
 import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_3
 import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_4
 import org.junit.jupiter.api.extension.ExtendWith
@@ -34,8 +34,8 @@ class AnalogAlarmsThresholdCommandGeneratorTest {
         @JvmStatic
         private fun valueTranslations() =
             Stream.of(
-                Arguments.of(ANALOG_ALARM_THRESHOLDS_MBAR_PORT_3, ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_3),
-                Arguments.of(ANALOG_ALARM_THRESHOLDS_MBAR_PORT_4, ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_4),
+                Arguments.of(ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_3, ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_3),
+                Arguments.of(ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_4, ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_4),
             )
     }
 }

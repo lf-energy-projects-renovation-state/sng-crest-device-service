@@ -21,7 +21,7 @@ class AnalogAlarmsThresholdCommandGenerator : CommandGenerator {
                 .substringAfter(':')
                 .split(",")
                 .map { it.toInt() }
-                .map { AnalogAlarmThresholdCalculator.getPayloadFromMBar(it) }
+                .map { AnalogAlarmThresholdCalculator.getPayloadFromMillibar(it) }
                 .joinToString(",")
         return "$channel:$pressureValues"
     }
