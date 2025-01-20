@@ -13,7 +13,6 @@ import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
-import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -64,7 +63,8 @@ class FirmwareCommandResultHandlerTest {
     fun hasSucceeded(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasSucceeded = firmwareCommandResultHandler.hasSucceeded(TestConstants.DEVICE_ID, message)
+        val hasSucceeded =
+            firmwareCommandResultHandler.hasSucceeded(CommandFactory.firmwareCommandInProgress(), message)
 
         assertThat(hasSucceeded).isEqualTo(expectedResult)
     }
@@ -74,7 +74,7 @@ class FirmwareCommandResultHandlerTest {
     fun hasFailed(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasFailed = firmwareCommandResultHandler.hasFailed(TestConstants.DEVICE_ID, message)
+        val hasFailed = firmwareCommandResultHandler.hasFailed(CommandFactory.firmwareCommandInProgress(), message)
 
         assertThat(hasFailed).isEqualTo(expectedResult)
     }

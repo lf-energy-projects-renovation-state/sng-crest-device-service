@@ -19,9 +19,9 @@ abstract class CommandResultHandler(
 
     abstract val supportedCommandType: CommandType
 
-    abstract fun hasSucceeded(deviceId: String, body: JsonNode): Boolean
+    abstract fun hasSucceeded(command: Command, body: JsonNode): Boolean
 
-    abstract fun hasFailed(deviceId: String, body: JsonNode): Boolean
+    abstract fun hasFailed(command: Command, body: JsonNode): Boolean
 
     fun handleSuccess(command: Command) {
         logger.info { "Command ${command.type} succeeded for device with id ${command.deviceId}." }

@@ -13,7 +13,6 @@ import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
-import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -24,11 +23,11 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 @ExtendWith(MockKExtension::class)
-class AnalogAlarmThresholdPort3ResultHandlerTest {
+class AnalogAlarmThresholdResultHandlerTest {
     @MockK private lateinit var commandService: CommandService
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
-    @InjectMockKs private lateinit var resultHandler: AnalogAlarmThresholdPort3ResultHandler
+    @InjectMockKs private lateinit var resultHandler: AnalogAlarmThresholdResultHandler
 
     @Test
     fun handleSuccess() {
@@ -68,7 +67,7 @@ class AnalogAlarmThresholdPort3ResultHandlerTest {
     fun hasSucceeded(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasSucceeded = resultHandler.hasSucceeded(TestConstants.DEVICE_ID, message)
+        val hasSucceeded = resultHandler.hasSucceeded(CommandFactory.analogAlarmThresholdsCommandInProgess(), message)
 
         assertThat(hasSucceeded).isEqualTo(expectedResult)
     }
@@ -78,7 +77,7 @@ class AnalogAlarmThresholdPort3ResultHandlerTest {
     fun hasFailed(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasFailed = resultHandler.hasFailed(TestConstants.DEVICE_ID, message)
+        val hasFailed = resultHandler.hasFailed(CommandFactory.analogAlarmThresholdsCommandInProgess(), message)
 
         assertThat(hasFailed).isEqualTo(expectedResult)
     }

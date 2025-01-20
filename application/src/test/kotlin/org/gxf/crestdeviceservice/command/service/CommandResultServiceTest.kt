@@ -45,8 +45,8 @@ class CommandResultServiceTest {
 
         commandResultService.handleMessage(DEVICE_ID, message)
 
-        verify(exactly = 1) { rebootCommandResultHandler.hasSucceeded(DEVICE_ID, message) }
-        verify(exactly = 0) { rebootCommandResultHandler.hasFailed(DEVICE_ID, message) }
+        verify(exactly = 1) { rebootCommandResultHandler.hasSucceeded(command, message) }
+        verify(exactly = 0) { rebootCommandResultHandler.hasFailed(command, message) }
         verify(exactly = 1) { rebootCommandResultHandler.handleSuccess(command) }
         verify(exactly = 0) { rebootCommandResultHandler.handleFailure(command, message) }
     }
@@ -63,9 +63,9 @@ class CommandResultServiceTest {
 
         commandResultService.handleMessage(DEVICE_ID, message)
 
-        verify(exactly = 1) { rspCommandResultHandler.hasSucceeded(DEVICE_ID, message) }
+        verify(exactly = 1) { rspCommandResultHandler.hasSucceeded(command, message) }
         verify(exactly = 0) { rspCommandResultHandler.handleSuccess(command) }
-        verify(exactly = 1) { rspCommandResultHandler.hasFailed(DEVICE_ID, message) }
+        verify(exactly = 1) { rspCommandResultHandler.hasFailed(command, message) }
         verify(exactly = 1) { rspCommandResultHandler.handleFailure(command, message) }
     }
 
@@ -81,9 +81,9 @@ class CommandResultServiceTest {
 
         commandResultService.handleMessage(DEVICE_ID, message)
 
-        verify(exactly = 1) { rspCommandResultHandler.hasSucceeded(DEVICE_ID, message) }
+        verify(exactly = 1) { rspCommandResultHandler.hasSucceeded(command, message) }
         verify(exactly = 0) { rspCommandResultHandler.handleSuccess(command) }
-        verify(exactly = 1) { rspCommandResultHandler.hasFailed(DEVICE_ID, message) }
+        verify(exactly = 1) { rspCommandResultHandler.hasFailed(command, message) }
         verify(exactly = 0) { rspCommandResultHandler.handleFailure(command, message) }
         verify(exactly = 1) { rspCommandResultHandler.handleStillInProgress(command) }
     }
@@ -102,14 +102,14 @@ class CommandResultServiceTest {
 
         commandResultService.handleMessage(DEVICE_ID, message)
 
-        verify(exactly = 1) { rebootCommandResultHandler.hasSucceeded(DEVICE_ID, message) }
+        verify(exactly = 1) { rebootCommandResultHandler.hasSucceeded(rebootCommand, message) }
         verify(exactly = 1) { rebootCommandResultHandler.handleSuccess(rebootCommand) }
-        verify(exactly = 0) { rebootCommandResultHandler.hasFailed(DEVICE_ID, message) }
+        verify(exactly = 0) { rebootCommandResultHandler.hasFailed(rebootCommand, message) }
         verify(exactly = 0) { rebootCommandResultHandler.handleFailure(rebootCommand, message) }
 
-        verify(exactly = 1) { rspCommandResultHandler.hasSucceeded(DEVICE_ID, message) }
+        verify(exactly = 1) { rspCommandResultHandler.hasSucceeded(rspCommand, message) }
         verify(exactly = 1) { rspCommandResultHandler.handleSuccess(rspCommand) }
-        verify(exactly = 0) { rspCommandResultHandler.hasFailed(DEVICE_ID, message) }
+        verify(exactly = 0) { rspCommandResultHandler.hasFailed(rspCommand, message) }
         verify(exactly = 0) { rspCommandResultHandler.handleFailure(rspCommand, message) }
     }
 
@@ -128,14 +128,14 @@ class CommandResultServiceTest {
 
         commandResultService.handleMessage(DEVICE_ID, message)
 
-        verify(exactly = 1) { rebootCommandResultHandler.hasSucceeded(DEVICE_ID, message) }
+        verify(exactly = 1) { rebootCommandResultHandler.hasSucceeded(rebootCommand, message) }
         verify(exactly = 1) { rebootCommandResultHandler.handleSuccess(rebootCommand) }
-        verify(exactly = 0) { rebootCommandResultHandler.hasFailed(DEVICE_ID, message) }
+        verify(exactly = 0) { rebootCommandResultHandler.hasFailed(rebootCommand, message) }
         verify(exactly = 0) { rebootCommandResultHandler.handleFailure(rebootCommand, message) }
 
-        verify(exactly = 1) { rspCommandResultHandler.hasSucceeded(DEVICE_ID, message) }
+        verify(exactly = 1) { rspCommandResultHandler.hasSucceeded(rspCommand, message) }
         verify(exactly = 0) { rspCommandResultHandler.handleSuccess(rspCommand) }
-        verify(exactly = 1) { rspCommandResultHandler.hasFailed(DEVICE_ID, message) }
+        verify(exactly = 1) { rspCommandResultHandler.hasFailed(rspCommand, message) }
         verify(exactly = 1) { rspCommandResultHandler.handleFailure(rspCommand, message) }
     }
 }

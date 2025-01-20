@@ -4,6 +4,7 @@
 package org.gxf.crestdeviceservice.command.resulthandler
 
 import com.fasterxml.jackson.databind.JsonNode
+import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandType
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -18,7 +19,7 @@ class RspCommandResultHandler(commandService: CommandService, commandFeedbackSer
 
     override val supportedCommandType = CommandType.RSP
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) = successUrc in body.urcs()
+    override fun hasSucceeded(command: Command, body: JsonNode) = successUrc in body.urcs()
 
-    override fun hasFailed(deviceId: String, body: JsonNode) = errorUrc in body.urcs()
+    override fun hasFailed(command: Command, body: JsonNode) = errorUrc in body.urcs()
 }
