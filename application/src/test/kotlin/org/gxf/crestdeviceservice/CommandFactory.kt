@@ -5,7 +5,8 @@ package org.gxf.crestdeviceservice
 
 import java.time.Instant
 import java.util.UUID
-import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_PAYLOAD
+import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_MBAR_PORT_3
+import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_3
 import org.gxf.crestdeviceservice.TestConstants.CORRELATION_ID
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.TestConstants.timestamp
@@ -53,7 +54,7 @@ object CommandFactory {
         timestampIssued: Instant = timestamp,
         correlationId: UUID = CORRELATION_ID,
         status: Command.CommandStatus = Command.CommandStatus.PENDING,
-        value: String = ANALOG_ALARM_THRESHOLDS_PAYLOAD,
+        value: String = ANALOG_ALARM_THRESHOLDS_MBAR_PORT_3,
     ) =
         Command(
             id = UUID.randomUUID(),
@@ -65,7 +66,8 @@ object CommandFactory {
             status = status,
         )
 
-    fun analogAlarmThresholdsCommandInProgess() = pendingAnalogAlarmThresholdsCommand().start()
+    fun analogAlarmThresholdsCommandInProgess(value: String = ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_3) =
+        pendingAnalogAlarmThresholdsCommand(value = value).start()
 
     fun rebootCommandInProgress() = pendingRebootCommand().start()
 

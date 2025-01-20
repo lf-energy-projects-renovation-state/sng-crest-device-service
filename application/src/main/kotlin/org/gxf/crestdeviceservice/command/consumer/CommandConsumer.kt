@@ -5,7 +5,6 @@ package org.gxf.crestdeviceservice.command.consumer
 
 import com.alliander.sng.Command as ExternalCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 import org.gxf.crestdeviceservice.command.mapper.CommandMapper
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
@@ -28,8 +27,7 @@ class CommandConsumer(
             "Received command ${externalCommand.command} for device: ${externalCommand.deviceId}, with correlation id: ${externalCommand.correlationId}"
         }
         try {
-            val pendingCommand =
-                CommandMapper.externalCommandToCommandEntity(externalCommand, Command.CommandStatus.PENDING)
+            val pendingCommand = CommandMapper.externalCommandToCommandEntity(externalCommand)
 
             commandService.validate(pendingCommand)
             commandFeedbackService.sendReceivedFeedback(pendingCommand)

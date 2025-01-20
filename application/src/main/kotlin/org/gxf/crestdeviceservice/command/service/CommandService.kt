@@ -33,6 +33,13 @@ class CommandService(
         if (deviceHasSameCommandAlreadyInProgress(command.deviceId, command.type)) {
             throw CommandValidationException("A command of the same type is already in progress.")
         }
+
+        if (command.type == Command.CommandType.ANALOG_ALARM_THRESHOLDS) {
+            val regex = Regex("([34]):-*(\\d+),-*(\\d+),-*(\\d+),-*(\\d+),-*(\\d+)")
+            if (!regex.matches(command.commandValue!!)) {
+                throw CommandValidationException("Analog alarm thresholds command value does not match regex.")
+            }
+        }
     }
 
     /**
