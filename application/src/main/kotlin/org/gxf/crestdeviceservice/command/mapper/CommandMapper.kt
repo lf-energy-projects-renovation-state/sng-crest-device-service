@@ -9,7 +9,7 @@ import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 
 object CommandMapper {
-    fun externalCommandToCommandEntity(externalCommand: ExternalCommand, status: Command.CommandStatus): Command {
+    fun externalCommandToCommandEntity(externalCommand: ExternalCommand): Command {
         try {
             return Command(
                 id = UUID.randomUUID(),
@@ -17,7 +17,7 @@ object CommandMapper {
                 correlationId = externalCommand.correlationId,
                 timestampIssued = externalCommand.timestamp,
                 type = commandNameToType(externalCommand.command),
-                status = status,
+                status = Command.CommandStatus.PENDING,
                 commandValue = externalCommand.value,
             )
         } catch (exception: IllegalArgumentException) {

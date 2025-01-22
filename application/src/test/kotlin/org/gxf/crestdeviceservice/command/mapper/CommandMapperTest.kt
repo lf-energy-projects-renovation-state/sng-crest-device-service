@@ -15,10 +15,9 @@ class CommandMapperTest {
     @Test
     fun externalCommandToCommandEntity() {
         val externalCommand = ExternalCommandFactory.externalRebootCommand()
-        val status = Command.CommandStatus.PENDING
         val expected = CommandFactory.pendingRebootCommand()
 
-        val result = CommandMapper.externalCommandToCommandEntity(externalCommand, status)
+        val result = CommandMapper.externalCommandToCommandEntity(externalCommand)
 
         assertThat(result).usingRecursiveComparison().ignoringFields("id", "timestampIssued").isEqualTo(expected)
     }
@@ -26,9 +25,8 @@ class CommandMapperTest {
     @Test
     fun externalCommandToCommandEntityException() {
         val externalCommand = ExternalCommandFactory.externalRebootCommandInvalid()
-        val status = Command.CommandStatus.PENDING
 
-        val actual = catchThrowable { CommandMapper.externalCommandToCommandEntity(externalCommand, status) }
+        val actual = catchThrowable { CommandMapper.externalCommandToCommandEntity(externalCommand) }
 
         assertThat(actual)
             .isInstanceOf(CommandValidationException::class.java)

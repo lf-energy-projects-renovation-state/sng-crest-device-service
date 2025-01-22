@@ -23,19 +23,19 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 @ExtendWith(MockKExtension::class)
-class FirmwareCommandResultHandlerTest {
+class AnalogAlarmThresholdResultHandlerTest {
     @MockK private lateinit var commandService: CommandService
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
-    @InjectMockKs private lateinit var firmwareCommandResultHandler: FirmwareCommandResultHandler
+    @InjectMockKs private lateinit var resultHandler: AnalogAlarmThresholdResultHandler
 
     @Test
     fun handleSuccess() {
-        val command = CommandFactory.firmwareCommandInProgress()
+        val command = CommandFactory.analogAlarmThresholdsCommandInProgess()
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
-        firmwareCommandResultHandler.handleSuccess(command)
+        resultHandler.handleSuccess(command)
 
         assertThat(command.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
         verify { commandService.saveCommand(command) }
@@ -44,17 +44,21 @@ class FirmwareCommandResultHandlerTest {
 
     @Test
     fun handleFailure() {
-        val command = CommandFactory.firmwareCommandInProgress()
-        val message = MessageFactory.messageWithUrc(listOf("OTA:HSER"), "")
+        val command = CommandFactory.analogAlarmThresholdsCommandInProgess()
+        val message = MessageFactory.messageWithUrc(listOf("AL6:DLER"), "")
+
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }
 
-        firmwareCommandResultHandler.handleFailure(command, message)
+        resultHandler.handleFailure(command, message)
 
         assertThat(command.status).isEqualTo(Command.CommandStatus.ERROR)
         verify { commandService.saveCommand(command) }
         verify {
-            commandFeedbackService.sendErrorFeedback(command, match { error -> error.contains("SHA256 hash error") })
+            commandFeedbackService.sendErrorFeedback(
+                command,
+                match { error -> error.contains("Downlink (syntax) error") },
+            )
         }
     }
 
@@ -63,8 +67,7 @@ class FirmwareCommandResultHandlerTest {
     fun hasSucceeded(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasSucceeded =
-            firmwareCommandResultHandler.hasSucceeded(CommandFactory.firmwareCommandInProgress(), message)
+        val hasSucceeded = resultHandler.hasSucceeded(CommandFactory.analogAlarmThresholdsCommandInProgess(), message)
 
         assertThat(hasSucceeded).isEqualTo(expectedResult)
     }
@@ -74,7 +77,7 @@ class FirmwareCommandResultHandlerTest {
     fun hasFailed(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasFailed = firmwareCommandResultHandler.hasFailed(CommandFactory.firmwareCommandInProgress(), message)
+        val hasFailed = resultHandler.hasFailed(CommandFactory.analogAlarmThresholdsCommandInProgess(), message)
 
         assertThat(hasFailed).isEqualTo(expectedResult)
     }
@@ -83,21 +86,18 @@ class FirmwareCommandResultHandlerTest {
         @JvmStatic
         fun hasSucceededTestSource(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(listOf("OTA:SUC"), "0", true),
+                Arguments.of(listOf("AL6:SET"), "0", true),
                 Arguments.of(listOf("INIT", "WDR"), "0", false),
-                Arguments.of(listOf("INIT", "WDR", "OTA:SUC"), "0", true),
+                Arguments.of(listOf("INIT", "WDR", "AL6:SET"), "0", true),
             )
 
         @JvmStatic
         fun hasFailedTestSource(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(listOf("OTA:SUC"), "0", false),
+                Arguments.of(listOf("AL6:SET"), "0", false),
                 Arguments.of(listOf("INIT", "WDR"), "0", false),
-                Arguments.of(listOf("OTA:CSER"), "0", true),
-                Arguments.of(listOf("OTA:HSER"), "0", true),
-                Arguments.of(listOf("OTA:RST"), "0", true),
-                Arguments.of(listOf("OTA:SWNA"), "0", true),
-                Arguments.of(listOf("OTA:FLER"), "0", true),
+                Arguments.of(listOf("AL6:DLER"), "0", true),
+                Arguments.of(listOf("AL6:ERR"), "0", true),
             )
     }
 }

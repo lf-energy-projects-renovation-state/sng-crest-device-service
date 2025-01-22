@@ -13,7 +13,6 @@ import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
-import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -64,7 +63,7 @@ class Rsp2CommandResultHandlerTest {
     fun hasSucceeded(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasSucceeded = rsp2CommandResultHandler.hasSucceeded(TestConstants.DEVICE_ID, message)
+        val hasSucceeded = rsp2CommandResultHandler.hasSucceeded(CommandFactory.rsp2CommandInProgress(), message)
 
         assertThat(hasSucceeded).isEqualTo(expectedResult)
     }
@@ -74,7 +73,7 @@ class Rsp2CommandResultHandlerTest {
     fun hasFailed(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasFailed = rsp2CommandResultHandler.hasFailed(TestConstants.DEVICE_ID, message)
+        val hasFailed = rsp2CommandResultHandler.hasFailed(CommandFactory.rsp2CommandInProgress(), message)
 
         assertThat(hasFailed).isEqualTo(expectedResult)
     }

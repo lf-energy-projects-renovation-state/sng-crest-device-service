@@ -4,6 +4,7 @@
 package org.gxf.crestdeviceservice.command.resulthandler
 
 import com.fasterxml.jackson.databind.JsonNode
+import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.entity.Command.CommandType
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -20,7 +21,7 @@ class FirmwareCommandResultHandler(
 
     override val supportedCommandType = CommandType.FIRMWARE
 
-    override fun hasSucceeded(deviceId: String, body: JsonNode) = successUrc in body.urcs()
+    override fun hasSucceeded(command: Command, body: JsonNode) = successUrc in body.urcs()
 
-    override fun hasFailed(deviceId: String, body: JsonNode) = body.urcs().any { it in errorUrcs }
+    override fun hasFailed(command: Command, body: JsonNode) = body.urcs().any { it in errorUrcs }
 }

@@ -13,7 +13,6 @@ import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
-import org.gxf.crestdeviceservice.TestConstants
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
@@ -64,7 +63,7 @@ class PskCommandResultHandlerTest {
     fun hasSucceeded(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasSucceeded = pskCommandResultHandler.hasSucceeded(TestConstants.DEVICE_ID, message)
+        val hasSucceeded = pskCommandResultHandler.hasSucceeded(CommandFactory.pskCommandInProgress(), message)
 
         assertThat(hasSucceeded).isEqualTo(expectedResult)
     }
@@ -74,7 +73,7 @@ class PskCommandResultHandlerTest {
     fun hasFailed(urcs: List<String>, downlink: String, expectedResult: Boolean) {
         val message = MessageFactory.messageWithUrc(urcs, downlink)
 
-        val hasFailed = pskCommandResultHandler.hasFailed(TestConstants.DEVICE_ID, message)
+        val hasFailed = pskCommandResultHandler.hasFailed(CommandFactory.pskCommandInProgress(), message)
 
         assertThat(hasFailed).isEqualTo(expectedResult)
     }

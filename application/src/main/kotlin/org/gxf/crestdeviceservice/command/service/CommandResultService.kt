@@ -33,8 +33,8 @@ class CommandResultService(
                 )
 
         when {
-            resultHandler.hasSucceeded(command.deviceId, body) -> resultHandler.handleSuccess(command)
-            resultHandler.hasFailed(command.deviceId, body) -> resultHandler.handleFailure(command, body)
+            resultHandler.hasSucceeded(command, body) -> resultHandler.handleSuccess(command)
+            resultHandler.hasFailed(command, body) -> resultHandler.handleFailure(command, body)
             else -> resultHandler.handleStillInProgress(command)
         }
     }
