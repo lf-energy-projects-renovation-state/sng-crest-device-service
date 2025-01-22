@@ -66,8 +66,7 @@ class CommandServiceTest {
     @ParameterizedTest
     @MethodSource("invalidCommandValues")
     fun `Check if command is rejected when analog alarm thresholds command does not match regex`(commandValue: String) {
-        every { commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()) } returns
-            pendingRebootCommand(Instant.now().minusSeconds(100))
+        every { commandRepository.findFirstByDeviceIdAndTypeOrderByTimestampIssuedDesc(any(), any()) } returns null
         every {
             commandRepository.findAllByDeviceIdAndTypeAndStatusOrderByTimestampIssuedAsc(any(), any(), any())
         } returns listOf()

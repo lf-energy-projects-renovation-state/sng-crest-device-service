@@ -10,5 +10,5 @@ object AnalogAlarmThresholdCalculator {
     // payload value = volt * 200
     fun getPayloadFromMillibar(millibarValue: Int) = (millibarValue * 0.4).roundToInt()
 
-    fun getMillibarFromPayload(payloadValue: Int) = payloadValue * 2.5.roundToInt()
+    fun getMillibarFromPayload(payloadValue: Int) = (payloadValue * 2.5).roundToInt()
 }
