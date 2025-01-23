@@ -10,7 +10,7 @@ import org.gxf.crestdeviceservice.command.service.CommandService
 import org.springframework.stereotype.Component
 
 @Component
-class AnalogAlarmThresholdResultHandler(
+class AnalogAlarmThresholdsResultHandler(
     val commandService: CommandService,
     val commandFeedbackService: CommandFeedbackService,
 ) : CommandResultHandler(commandService, commandFeedbackService) {

@@ -23,11 +23,11 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 @ExtendWith(MockKExtension::class)
-class AnalogAlarmThresholdResultHandlerTest {
+class AnalogAlarmThresholdsResultHandlerTest {
     @MockK private lateinit var commandService: CommandService
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
-    @InjectMockKs private lateinit var resultHandler: AnalogAlarmThresholdResultHandler
+    @InjectMockKs private lateinit var resultHandler: AnalogAlarmThresholdsResultHandler
 
     @Test
     fun handleSuccess() {
