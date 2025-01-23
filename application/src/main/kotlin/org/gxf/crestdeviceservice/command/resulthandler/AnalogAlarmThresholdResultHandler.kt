@@ -5,6 +5,7 @@ package org.gxf.crestdeviceservice.command.resulthandler
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.mapper.AnalogAlarmsThresholdTranslator
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.springframework.stereotype.Component
@@ -31,5 +32,9 @@ class AnalogAlarmThresholdResultHandler(
         return body.urcs().any { it in fullErrorUrcs }
     }
 
-    private fun getChannelFromCommand(command: Command) = command.commandValue?.substringBefore(':')
+    private fun getChannelFromCommand(command: Command): String {
+        val commandValue = command.commandValue!!
+        val port = commandValue.substringBefore(':')
+        return AnalogAlarmsThresholdTranslator.translatePortToChannel(port)
+    }
 }
