@@ -23,7 +23,7 @@ class InfoAlarmsThresholdsResultHandler(
     override val supportedCommandType = Command.CommandType.INFO_ALARMS
 
     override fun hasSucceeded(command: Command, body: JsonNode) =
-        body.downlinks().any { it.contains(supportedCommandType.name) && containsAlarmsInfo(it) }
+        body.downlinks().any { it.contains(supportedCommandType.downlink) && containsAlarmsInfo(it) }
 
     private fun containsAlarmsInfo(downlink: String) =
         try {
