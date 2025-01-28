@@ -16,23 +16,27 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 class InfoAlarmsThresholdsResultHandlerTest {
-
     @MockK private lateinit var commandService: CommandService
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
     @InjectMockKs private lateinit var resultHandler: InfoAlarmsThresholdsResultHandler
 
+    val command = CommandFactory.infoAlarmsCommandInProgress()
+    val urcs = listOf<String>()
+    val downlink = "\"!INFO:ALARMS\", {\"AL0\":[0,1,0,1,0], \"AL1\":[0,0,0,0,0], \"AL6\":[100,200,300,400,10]}"
+    val message = MessageFactory.messageWithUrc(urcs, downlink)
+
     @Test
     fun hasSucceeded() {
-        val command = CommandFactory.infoAlarmsCommandInProgress()
-        val urcs = listOf<String>()
-        val downlink = "\"!INFO:ALARMS\", {\"AL0\":[0,1,0,1,0], \"AL1\":[0,0,0,0,0], \"AL6\":[100,200,300,400,10]}"
-        val message = MessageFactory.messageWithUrc(urcs, downlink)
-
         val result = resultHandler.hasSucceeded(command, message)
 
         assertThat(result).isTrue()
     }
 
-    @Test fun handleCommandSpecificSuccess() {}
+    @Test
+    fun handleCommandSpecificSuccess() {
+        val result = resultHandler.handleCommandSpecificSuccess(command, message)
+
+        assertThat(result!!.contains("AL6"))
+    }
 }

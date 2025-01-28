@@ -33,7 +33,7 @@ class CommandResultService(
                 )
 
         when {
-            resultHandler.hasSucceeded(command, body) -> resultHandler.handleSuccess(command)
+            resultHandler.hasSucceeded(command, body) -> resultHandler.handleSuccess(command, body)
             resultHandler.hasFailed(command, body) -> resultHandler.handleFailure(command, body)
             else -> resultHandler.handleStillInProgress(command)
         }

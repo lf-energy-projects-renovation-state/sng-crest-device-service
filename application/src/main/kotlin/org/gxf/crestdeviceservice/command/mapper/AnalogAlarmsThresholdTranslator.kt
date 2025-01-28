@@ -12,4 +12,17 @@ object AnalogAlarmsThresholdTranslator {
             "4" -> "AL7"
             else -> throw CommandValidationException("Device port unknown: $port")
         }
+
+    fun translateFromChannel(channel: String) =
+        when (channel) {
+            "AL0" -> "tamper"
+            "AL1" -> "digital"
+            "AL2" -> "T1"
+            "AL3" -> "H1"
+            "AL4" -> "1"
+            "AL5" -> "2"
+            "AL6" -> "3"
+            "AL7" -> "4"
+            else -> channel
+        }
 }

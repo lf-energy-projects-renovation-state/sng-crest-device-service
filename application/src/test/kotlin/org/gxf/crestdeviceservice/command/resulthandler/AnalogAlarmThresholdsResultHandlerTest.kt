@@ -32,10 +32,11 @@ class AnalogAlarmThresholdsResultHandlerTest {
     @Test
     fun handleSuccess() {
         val command = CommandFactory.analogAlarmThresholdsCommandInProgess()
+        val message = MessageFactory.messageWithUrc(listOf("AL6:SET"), "")
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
-        resultHandler.handleSuccess(command)
+        resultHandler.handleSuccess(command, message)
 
         assertThat(command.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
         verify { commandService.saveCommand(command) }

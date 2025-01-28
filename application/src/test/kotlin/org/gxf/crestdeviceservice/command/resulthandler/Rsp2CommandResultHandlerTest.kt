@@ -32,10 +32,11 @@ class Rsp2CommandResultHandlerTest {
     @Test
     fun handleSuccess() {
         val command = CommandFactory.rsp2CommandInProgress()
+        val message = MessageFactory.messageWithUrc(listOf(rsp2CommandResultHandler.successUrc), "")
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
-        rsp2CommandResultHandler.handleSuccess(command)
+        rsp2CommandResultHandler.handleSuccess(command, message)
 
         assertThat(command.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
         verify { commandService.saveCommand(command) }

@@ -23,23 +23,24 @@ class InfoAlarmsThresholdsResultHandler(
     override val supportedCommandType = Command.CommandType.INFO_ALARMS
 
     override fun hasSucceeded(command: Command, body: JsonNode) =
-        body.downlinks().any { it.contains(supportedCommandType.downlink) && containsAlarmsInfo(it) }
-
-    private fun containsAlarmsInfo(downlink: String) =
         try {
-            getAlarmsInfo(downlink)
+            getAlarmsInfo(body)
             true
         } catch (e: Exception) {
             false
         }
 
-    private fun getAlarmsInfo(downlink: String): AlarmsInfo {
+    override fun hasFailed(command: Command, body: JsonNode): Boolean = body.urcs().any { it in errorUrcs }
+
+    override fun handleCommandSpecificSuccess(command: Command, body: JsonNode): String? {
+        val alarmsInfo = getAlarmsInfo(body)
+        return alarmsInfo.toString()
+    }
+
+    private fun getAlarmsInfo(body: JsonNode): AlarmsInfo {
+        val downlink = body.downlinks().first { it.contains(supportedCommandType.downlink) }
         val json = downlink.substringAfter(", ")
 
         return mapper.readValue<AlarmsInfo>(json) // catch exception
     }
-
-    override fun hasFailed(command: Command, body: JsonNode): Boolean = body.urcs().any { it in errorUrcs }
-
-    override fun handleCommandSpecificSuccess(command: Command) {}
 }
