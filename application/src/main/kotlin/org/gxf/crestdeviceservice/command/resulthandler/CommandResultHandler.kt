@@ -15,7 +15,6 @@ import org.gxf.crestdeviceservice.model.ErrorUrc.Companion.getMessageFromCode
 abstract class CommandResultHandler(
     private val commandService: CommandService,
     private val commandFeedbackService: CommandFeedbackService,
-    private val commandFeedbackGeneratorsByType: Map<CommandType, CommandFeedbackGenerator>,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -25,7 +24,7 @@ abstract class CommandResultHandler(
 
     abstract fun hasFailed(command: Command, body: JsonNode): Boolean
 
-    fun handleSuccess(command: Command, body: JsonNode) {
+    fun handleSuccess(command: Command, body: JsonNode, feedbackGenerator: CommandFeedbackGenerator? = null) {
         logger.info { "Command ${command.type} succeeded for device with id ${command.deviceId}." }
 
         handleCommandSpecificSuccess(command, body)
@@ -33,7 +32,6 @@ abstract class CommandResultHandler(
         logger.debug { "Saving command and sending feedback to Maki." }
         val successfulCommand = commandService.saveCommand(command.finish())
 
-        val feedbackGenerator = commandFeedbackGeneratorsByType[command.type]
         if (feedbackGenerator != null) {
             val feedback = feedbackGenerator.generateFeedback(body)
             commandFeedbackService.sendSuccessFeedback(successfulCommand, feedback)
@@ -43,11 +41,10 @@ abstract class CommandResultHandler(
     }
 
     /** Override this method when custom success actions are needed. */
-    open fun handleCommandSpecificSuccess(command: Command, body: JsonNode): String? {
+    open fun handleCommandSpecificSuccess(command: Command, body: JsonNode) {
         logger.debug {
             "Command ${command.type} for device with id ${command.deviceId} does not require specific success handling."
         }
-        return null
     }
 
     fun handleFailure(command: Command, body: JsonNode) {

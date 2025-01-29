@@ -30,10 +30,9 @@ class PskSetCommandResultHandler(
 
     override fun hasFailed(command: Command, body: JsonNode) = body.urcs().any { it in errorUrcs }
 
-    override fun handleCommandSpecificSuccess(command: Command, body: JsonNode): String? {
+    override fun handleCommandSpecificSuccess(command: Command, body: JsonNode) {
         logger.info { "PSK SET command succeeded: Changing active key for device ${command.deviceId}" }
         pskService.changeActiveKey(command.deviceId)
-        return null
     }
 
     override fun handleCommandSpecificFailure(command: Command, body: JsonNode) {

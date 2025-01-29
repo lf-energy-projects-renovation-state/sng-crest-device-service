@@ -11,8 +11,11 @@ import io.mockk.justRun
 import io.mockk.verify
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
+import org.gxf.crestdeviceservice.TestConstants.ALARMS_INFO_DOWNLINK
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.feedbackgenerator.CommandFeedbackGenerator
+import org.gxf.crestdeviceservice.command.feedbackgenerator.InfoAlarmsFeedbackGenerator
 import org.gxf.crestdeviceservice.command.resulthandler.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,9 +25,13 @@ import org.junit.jupiter.api.extension.ExtendWith
 class CommandResultServiceTest {
     @MockK private lateinit var rebootCommandResultHandler: RebootCommandResultHandler
     @MockK private lateinit var rspCommandResultHandler: RspCommandResultHandler
+    @MockK private lateinit var infoAlarmsResultHandler: InfoAlarmsResultHandler
+
+    @MockK private lateinit var infoAlarmsFeedbackGenerator: InfoAlarmsFeedbackGenerator
 
     @MockK private lateinit var commandService: CommandService
     @MockK private lateinit var commandResultHandlersByType: Map<Command.CommandType, CommandResultHandler>
+    @MockK private lateinit var commandFeedbackGeneratorsByType: Map<Command.CommandType, CommandFeedbackGenerator>
 
     @InjectMockKs private lateinit var commandResultService: CommandResultService
 
@@ -32,6 +39,13 @@ class CommandResultServiceTest {
     fun setUp() {
         every { commandResultHandlersByType[Command.CommandType.REBOOT] } answers { rebootCommandResultHandler }
         every { commandResultHandlersByType[Command.CommandType.RSP] } answers { rspCommandResultHandler }
+        every { commandResultHandlersByType[Command.CommandType.INFO_ALARMS] } answers { infoAlarmsResultHandler }
+        every { commandFeedbackGeneratorsByType[Command.CommandType.REBOOT] } answers { null }
+        every { commandFeedbackGeneratorsByType[Command.CommandType.RSP] } answers { null }
+        every { commandFeedbackGeneratorsByType[Command.CommandType.INFO_ALARMS] } answers
+            {
+                infoAlarmsFeedbackGenerator
+            }
     }
 
     @Test
@@ -137,5 +151,25 @@ class CommandResultServiceTest {
         verify(exactly = 0) { rspCommandResultHandler.handleSuccess(rspCommand, message) }
         verify(exactly = 1) { rspCommandResultHandler.hasFailed(rspCommand, message) }
         verify(exactly = 1) { rspCommandResultHandler.handleFailure(rspCommand, message) }
+    }
+
+    @Test
+    fun shouldHandleMessageWithCommandSpecificFeedback() {
+        val downlink = ALARMS_INFO_DOWNLINK
+        val message = MessageFactory.messageWithUrc(listOf(), downlink)
+        val infoAlarmsCommand = CommandFactory.infoAlarmsCommandInProgress()
+
+        every { commandService.getAllCommandsInProgressForDevice(any()) } returns listOf(infoAlarmsCommand)
+        every { infoAlarmsResultHandler.hasSucceeded(any(), any()) } returns true
+        justRun { infoAlarmsResultHandler.handleSuccess(any(), any(), any()) }
+
+        commandResultService.handleMessage(DEVICE_ID, message)
+
+        verify(exactly = 1) { infoAlarmsResultHandler.hasSucceeded(infoAlarmsCommand, message) }
+        verify(exactly = 1) {
+            infoAlarmsResultHandler.handleSuccess(infoAlarmsCommand, message, infoAlarmsFeedbackGenerator)
+        }
+        verify(exactly = 0) { infoAlarmsResultHandler.hasFailed(infoAlarmsCommand, message) }
+        verify(exactly = 0) { infoAlarmsResultHandler.handleFailure(infoAlarmsCommand, message) }
     }
 }

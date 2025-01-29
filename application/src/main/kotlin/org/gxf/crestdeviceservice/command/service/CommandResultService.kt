@@ -6,14 +6,17 @@ package org.gxf.crestdeviceservice.command.service
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.entity.Command.CommandType
 import org.gxf.crestdeviceservice.command.exception.NoCommandResultHandlerForCommandTypeException
+import org.gxf.crestdeviceservice.command.feedbackgenerator.CommandFeedbackGenerator
 import org.gxf.crestdeviceservice.command.resulthandler.CommandResultHandler
 import org.springframework.stereotype.Service
 
 @Service
 class CommandResultService(
     private val commandService: CommandService,
-    private val commandResultHandlersByType: Map<Command.CommandType, CommandResultHandler>,
+    private val commandResultHandlersByType: Map<CommandType, CommandResultHandler>,
+    private val commandFeedbackGeneratorsByType: Map<CommandType, CommandFeedbackGenerator>,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -31,9 +34,10 @@ class CommandResultService(
                 ?: throw NoCommandResultHandlerForCommandTypeException(
                     "No command result handler for command type ${command.type}"
                 )
+        val feedbackGenerator = commandFeedbackGeneratorsByType[command.type]
 
         when {
-            resultHandler.hasSucceeded(command, body) -> resultHandler.handleSuccess(command, body)
+            resultHandler.hasSucceeded(command, body) -> resultHandler.handleSuccess(command, body, feedbackGenerator)
             resultHandler.hasFailed(command, body) -> resultHandler.handleFailure(command, body)
             else -> resultHandler.handleStillInProgress(command)
         }
