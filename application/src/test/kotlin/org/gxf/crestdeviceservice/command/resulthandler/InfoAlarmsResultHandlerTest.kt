@@ -10,6 +10,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.justRun
 import io.mockk.verify
 import java.io.IOException
+import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
@@ -22,6 +23,9 @@ import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.model.AlarmsInfo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 @ExtendWith(MockKExtension::class)
 class InfoAlarmsResultHandlerTest {
@@ -37,6 +41,13 @@ class InfoAlarmsResultHandlerTest {
     private val urcs = listOf<String>()
     val downlink = ALARMS_INFO_DOWNLINK
     val message = MessageFactory.messageWithUrc(urcs, downlink)
+
+    @Test
+    fun supportedCommandType() {
+        val result = resultHandler.supportedCommandType
+
+        assertThat(result).isEqualTo(Command.CommandType.INFO_ALARMS)
+    }
 
     @Test
     fun hasSucceeded() {
@@ -56,6 +67,16 @@ class InfoAlarmsResultHandlerTest {
         assertThat(result).isFalse()
     }
 
+    @ParameterizedTest
+    @MethodSource("hasFailedTestSource")
+    fun hasFailed(urcs: List<String>, downlink: String, expected: Boolean) {
+        val message = MessageFactory.messageWithUrc(urcs, downlink)
+
+        val result = resultHandler.hasFailed(command, message)
+
+        assertThat(result).isEqualTo(expected)
+    }
+
     @Test
     fun handleSuccess() {
         val command = CommandFactory.infoAlarmsCommandInProgress()
@@ -70,5 +91,37 @@ class InfoAlarmsResultHandlerTest {
         assertThat(command.status).isEqualTo(Command.CommandStatus.SUCCESSFUL)
         verify { commandService.saveCommand(command) }
         verify { commandFeedbackService.sendSuccessFeedback(command, generatedFeedback) }
+    }
+
+    @Test
+    fun handleFailure() {
+        val command = CommandFactory.infoAlarmsCommandInProgress()
+        val message = MessageFactory.messageWithUrc(listOf("INFO:DLER"), "")
+
+        every { commandService.saveCommand(any()) } answers { firstArg() }
+        justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }
+
+        resultHandler.handleFailure(command, message)
+
+        assertThat(command.status).isEqualTo(Command.CommandStatus.ERROR)
+        verify { commandService.saveCommand(command) }
+        verify {
+            commandFeedbackService.sendErrorFeedback(
+                command,
+                match { error -> error.contains("Downlink (syntax) error") },
+            )
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun hasFailedTestSource(): Stream<Arguments> =
+            Stream.of(
+                Arguments.of(listOf("AL6:SET"), "0", false),
+                Arguments.of(listOf("INIT", "WDR"), "0", false),
+                Arguments.of(listOf("INFO:DLER"), "0", true),
+                Arguments.of(listOf("INFO:ERR"), "0", true),
+                Arguments.of(listOf("INFO:DLNA", "INIT"), "0", true),
+            )
     }
 }

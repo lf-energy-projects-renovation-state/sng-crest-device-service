@@ -24,7 +24,7 @@ class InfoAlarmsFeedbackGeneratorTest {
     @InjectMockKs private lateinit var infoAlarmsFeedbackGenerator: InfoAlarmsFeedbackGenerator
 
     @Test
-    fun getSupportedCommandType() {
+    fun supportedCommandType() {
         val result = infoAlarmsFeedbackGenerator.supportedCommandType
 
         assertThat(result).isEqualTo(Command.CommandType.INFO_ALARMS)

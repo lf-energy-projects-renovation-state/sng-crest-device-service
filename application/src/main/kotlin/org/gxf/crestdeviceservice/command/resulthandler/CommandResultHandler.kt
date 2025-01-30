@@ -32,6 +32,14 @@ abstract class CommandResultHandler(
         logger.debug { "Saving command and sending feedback to Maki." }
         val successfulCommand = commandService.saveCommand(command.finish())
 
+        sendSuccessFeedback(feedbackGenerator, message, successfulCommand)
+    }
+
+    private fun sendSuccessFeedback(
+        feedbackGenerator: CommandFeedbackGenerator?,
+        message: JsonNode,
+        successfulCommand: Command,
+    ) {
         if (feedbackGenerator != null) {
             val feedback = feedbackGenerator.generateFeedback(message)
             commandFeedbackService.sendSuccessFeedback(successfulCommand, feedback)
