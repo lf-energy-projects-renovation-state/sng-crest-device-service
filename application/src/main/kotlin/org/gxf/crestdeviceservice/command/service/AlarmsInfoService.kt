@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service
 class AlarmsInfoService {
     private val mapper = jacksonObjectMapper()
 
-    fun getAlarmsInfo(body: JsonNode): AlarmsInfo {
-        val downlink = body.downlinks().first { it.contains(Command.CommandType.INFO_ALARMS.downlink) }
+    fun getAlarmsInfo(message: JsonNode): AlarmsInfo {
+        val downlink = message.downlinks().first { it.contains(Command.CommandType.INFO_ALARMS.downlink) }
         val json = downlink.substringAfter(", ")
 
         return mapper.readValue<AlarmsInfo>(json)

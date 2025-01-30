@@ -14,12 +14,12 @@ class DeviceMessageService(
 ) {
     private val locks: MutableMap<String, Any> = mutableMapOf()
 
-    fun processDeviceMessage(body: JsonNode, identity: String): String {
-        messageProducerService.produceMessage(body)
+    fun processDeviceMessage(message: JsonNode, identity: String): String {
+        messageProducerService.produceMessage(message)
 
         synchronized(lock(identity)) {
             val downlink = downlinkService.createDownlink()
-            payloadService.processPayload(identity, body, downlink)
+            payloadService.processPayload(identity, message, downlink)
             downlinkService.getDownlinkForDevice(identity, downlink)
             return downlink.getDownlink()
         }

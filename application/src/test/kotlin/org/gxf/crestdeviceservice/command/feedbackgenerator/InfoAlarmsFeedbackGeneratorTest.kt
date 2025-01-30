@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.MessageFactory
 import org.gxf.crestdeviceservice.TestConstants.ALARMS_INFO
 import org.gxf.crestdeviceservice.TestConstants.ALARMS_INFO_DOWNLINK
+import org.gxf.crestdeviceservice.TestConstants.ALARMS_INFO_FEEDBACK
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.AlarmsInfoService
 import org.junit.jupiter.api.Test
@@ -33,7 +34,7 @@ class InfoAlarmsFeedbackGeneratorTest {
     fun generateFeedback() {
         val downlink = ALARMS_INFO_DOWNLINK
         val message = MessageFactory.messageWithUrc(listOf(), downlink)
-        val expected = "{\"tamper\":[0, 1, 0, 1, 0], \"digital\":[0, 0, 0, 0, 0], \"3\":[100, 200, 300, 400, 10]}"
+        val expected = ALARMS_INFO_FEEDBACK
         val alarmsInfo = ALARMS_INFO
         every { alarmsInfoService.getAlarmsInfo(any()) } returns alarmsInfo
 

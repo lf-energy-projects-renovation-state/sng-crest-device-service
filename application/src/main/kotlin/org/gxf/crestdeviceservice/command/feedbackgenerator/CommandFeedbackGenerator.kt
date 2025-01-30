@@ -9,5 +9,5 @@ import org.gxf.crestdeviceservice.command.entity.Command.CommandType
 interface CommandFeedbackGenerator {
     val supportedCommandType: CommandType
 
-    fun generateFeedback(body: JsonNode): String
+    fun generateFeedback(message: JsonNode): String
 }

@@ -25,11 +25,11 @@ class MessageController(private val deviceMessageService: DeviceMessageService) 
      * same downlink twice.
      */
     @PostMapping("/{identity}")
-    fun post(@NonNull @PathVariable identity: String, @NonNull @RequestBody body: JsonNode): ResponseEntity<String> {
-        logger.debug { "Processing message $body for device $identity" }
+    fun post(@NonNull @PathVariable identity: String, @NonNull @RequestBody message: JsonNode): ResponseEntity<String> {
+        logger.debug { "Processing message $message for device $identity" }
 
         return try {
-            val downlink = deviceMessageService.processDeviceMessage(body, identity)
+            val downlink = deviceMessageService.processDeviceMessage(message, identity)
             logDownlink(downlink, identity)
             ResponseEntity.ok(downlink)
         } catch (e: Exception) {

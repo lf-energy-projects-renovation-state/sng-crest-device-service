@@ -20,13 +20,13 @@ class InfoAlarmsResultHandler(
 
     override val supportedCommandType = Command.CommandType.INFO_ALARMS
 
-    override fun hasSucceeded(command: Command, body: JsonNode) =
+    override fun hasSucceeded(command: Command, message: JsonNode) =
         try {
-            alarmsInfoService.getAlarmsInfo(body)
+            alarmsInfoService.getAlarmsInfo(message)
             true
         } catch (e: Exception) {
             false
         }
 
-    override fun hasFailed(command: Command, body: JsonNode): Boolean = body.urcs().any { it in errorUrcs }
+    override fun hasFailed(command: Command, message: JsonNode): Boolean = message.urcs().any { it in errorUrcs }
 }

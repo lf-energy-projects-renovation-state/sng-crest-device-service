@@ -20,13 +20,13 @@ class CommandResultService(
 ) {
     private val logger = KotlinLogging.logger {}
 
-    fun handleMessage(deviceId: String, body: JsonNode) {
+    fun handleMessage(deviceId: String, message: JsonNode) {
         val commandsInProgress = commandService.getAllCommandsInProgressForDevice(deviceId)
 
-        commandsInProgress.forEach { checkResult(it, body) }
+        commandsInProgress.forEach { checkResult(it, message) }
     }
 
-    private fun checkResult(command: Command, body: JsonNode) {
+    private fun checkResult(command: Command, message: JsonNode) {
         logger.debug { "Checking result for pending command of type ${command.type} for device ${command.deviceId}" }
 
         val resultHandler =
@@ -37,8 +37,9 @@ class CommandResultService(
         val feedbackGenerator = commandFeedbackGeneratorsByType[command.type]
 
         when {
-            resultHandler.hasSucceeded(command, body) -> resultHandler.handleSuccess(command, body, feedbackGenerator)
-            resultHandler.hasFailed(command, body) -> resultHandler.handleFailure(command, body)
+            resultHandler.hasSucceeded(command, message) ->
+                resultHandler.handleSuccess(command, message, feedbackGenerator)
+            resultHandler.hasFailed(command, message) -> resultHandler.handleFailure(command, message)
             else -> resultHandler.handleStillInProgress(command)
         }
     }

@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice.command.feedbackgenerator
 import com.fasterxml.jackson.databind.JsonNode
 import kotlin.reflect.full.memberProperties
 import org.gxf.crestdeviceservice.command.entity.Command
+import org.gxf.crestdeviceservice.command.mapper.AnalogAlarmThresholdCalculator
 import org.gxf.crestdeviceservice.command.mapper.AnalogAlarmsThresholdTranslator
 import org.gxf.crestdeviceservice.command.service.AlarmsInfoService
 import org.gxf.crestdeviceservice.model.AlarmsInfo
@@ -24,10 +25,15 @@ class InfoAlarmsFeedbackGenerator(private val alarmsInfoService: AlarmsInfoServi
         """{${
             AlarmsInfo::class.memberProperties
                 .filter { it.get(alarmsInfo) != null }
-                .map { printThresholdsForOneChannel(it.name, it.get(alarmsInfo)) }
+                .map { printThresholdsForOneChannel(it.name, it.get(alarmsInfo) as List<Int>) }
                 .joinToString(", ") { it }
         }}"""
 
-    private fun printThresholdsForOneChannel(channel: String, thresholds: Any?) =
-        "\"${AnalogAlarmsThresholdTranslator.translateFromChannel(channel)}\":$thresholds"
+    private fun printThresholdsForOneChannel(channel: String, thresholds: List<Int>): String {
+        val input = AnalogAlarmsThresholdTranslator.translateFromChannel(channel)
+        return "\"$input\":${printThresholdsCalculated(input, thresholds)}"
+    }
+
+    private fun printThresholdsCalculated(input: String, thresholds: List<Int>) =
+        thresholds.map { AnalogAlarmThresholdCalculator.calculateThresholdFromDevice(input, it) }
 }

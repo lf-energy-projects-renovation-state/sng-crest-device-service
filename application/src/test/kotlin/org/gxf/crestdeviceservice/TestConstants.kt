@@ -30,7 +30,9 @@ object TestConstants {
     const val ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_4 = "AL7:0,500,1000,1500,10"
 
     const val ALARMS_INFO_DOWNLINK =
-        "\"!INFO:ALARMS\", {\"AL0\":[0,1,0,1,0], \"AL1\":[0,0,0,0,0], \"AL6\":[100,200,300,400,10]}"
+        "\"!INFO:ALARMS\", {\"AL0\":[0,1,0,1,0], \"AL1\":[0,0,0,0,0], \"AL6\":[0,500,1000,1500,10]}"
     val ALARMS_INFO =
-        AlarmsInfo(AL0 = listOf(0, 1, 0, 1, 0), AL1 = listOf(0, 0, 0, 0, 0), AL6 = listOf(100, 200, 300, 400, 10))
+        AlarmsInfo(AL0 = listOf(0, 1, 0, 1, 0), AL1 = listOf(0, 0, 0, 0, 0), AL6 = listOf(0, 500, 1000, 1500, 10))
+    const val ALARMS_INFO_FEEDBACK =
+        "{\"tamper\":[0, 1, 0, 1, 0], \"digital\":[0, 0, 0, 0, 0], \"3\":[0, 1250, 2500, 3750, 25]}"
 }

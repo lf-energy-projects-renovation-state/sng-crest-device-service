@@ -20,20 +20,20 @@ abstract class CommandResultHandler(
 
     abstract val supportedCommandType: CommandType
 
-    abstract fun hasSucceeded(command: Command, body: JsonNode): Boolean
+    abstract fun hasSucceeded(command: Command, message: JsonNode): Boolean
 
-    abstract fun hasFailed(command: Command, body: JsonNode): Boolean
+    abstract fun hasFailed(command: Command, message: JsonNode): Boolean
 
-    fun handleSuccess(command: Command, body: JsonNode, feedbackGenerator: CommandFeedbackGenerator? = null) {
+    fun handleSuccess(command: Command, message: JsonNode, feedbackGenerator: CommandFeedbackGenerator? = null) {
         logger.info { "Command ${command.type} succeeded for device with id ${command.deviceId}." }
 
-        handleCommandSpecificSuccess(command, body)
+        handleCommandSpecificSuccess(command, message)
 
         logger.debug { "Saving command and sending feedback to Maki." }
         val successfulCommand = commandService.saveCommand(command.finish())
 
         if (feedbackGenerator != null) {
-            val feedback = feedbackGenerator.generateFeedback(body)
+            val feedback = feedbackGenerator.generateFeedback(message)
             commandFeedbackService.sendSuccessFeedback(successfulCommand, feedback)
         } else {
             commandFeedbackService.sendSuccessFeedback(successfulCommand)
@@ -41,24 +41,24 @@ abstract class CommandResultHandler(
     }
 
     /** Override this method when custom success actions are needed. */
-    open fun handleCommandSpecificSuccess(command: Command, body: JsonNode) {
+    open fun handleCommandSpecificSuccess(command: Command, message: JsonNode) {
         logger.debug {
             "Command ${command.type} for device with id ${command.deviceId} does not require specific success handling."
         }
     }
 
-    fun handleFailure(command: Command, body: JsonNode) {
+    fun handleFailure(command: Command, message: JsonNode) {
         logger.info { "Command ${command.type} failed for device with id ${command.deviceId}." }
 
-        handleCommandSpecificFailure(command, body)
+        handleCommandSpecificFailure(command, message)
 
         val failedCommand = commandService.saveCommand(command.fail())
-        val errorMessages = body.urcs().joinToString(". ") { urc -> getMessageFromCode(urc) }
+        val errorMessages = message.urcs().joinToString(". ") { urc -> getMessageFromCode(urc) }
         commandFeedbackService.sendErrorFeedback(failedCommand, "Command failed. Error(s): $errorMessages.")
     }
 
     /** Override this method when command specific failure actions are needed */
-    open fun handleCommandSpecificFailure(command: Command, body: JsonNode) {
+    open fun handleCommandSpecificFailure(command: Command, message: JsonNode) {
         logger.debug {
             "Command ${command.type} for device with id ${command.deviceId} does not require specific failure handling."
         }
