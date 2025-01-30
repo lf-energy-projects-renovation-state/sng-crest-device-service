@@ -5,6 +5,7 @@ package org.gxf.crestdeviceservice
 
 import java.time.Instant
 import java.util.UUID
+import org.gxf.crestdeviceservice.model.AlarmsInfo
 
 object TestConstants {
     const val DEVICE_ID = "device-id"
@@ -30,4 +31,6 @@ object TestConstants {
 
     const val ALARMS_INFO_DOWNLINK =
         "\"!INFO:ALARMS\", {\"AL0\":[0,1,0,1,0], \"AL1\":[0,0,0,0,0], \"AL6\":[100,200,300,400,10]}"
+    val ALARMS_INFO =
+        AlarmsInfo(AL0 = listOf(0, 1, 0, 1, 0), AL1 = listOf(0, 0, 0, 0, 0), AL6 = listOf(100, 200, 300, 400, 10))
 }
