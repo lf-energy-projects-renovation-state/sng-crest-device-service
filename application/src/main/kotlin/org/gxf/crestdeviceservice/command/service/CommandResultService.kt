@@ -34,6 +34,10 @@ class CommandResultService(
                 ?: throw NoCommandResultHandlerForCommandTypeException(
                     "No command result handler for command type ${command.type}"
                 )
+        handleResult(command, resultHandler, message)
+    }
+
+    private fun handleResult(command: Command, resultHandler: CommandResultHandler, message: JsonNode) {
         val feedbackGenerator = commandFeedbackGeneratorsByType[command.type]
 
         when {
