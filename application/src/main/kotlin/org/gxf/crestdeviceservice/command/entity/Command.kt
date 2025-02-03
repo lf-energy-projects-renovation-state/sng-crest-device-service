@@ -41,13 +41,9 @@ class Command(
 
     fun cancel() = apply { status = CommandStatus.CANCELLED }
 
-    enum class CommandType(
-        val downlink: String,
-        val needsCommandValue: Boolean = false,
-        generatesFeedback: Boolean = false,
-    ) {
+    enum class CommandType(val downlink: String, val needsCommandValue: Boolean = false) {
         ANALOG_ALARM_THRESHOLDS("AL", needsCommandValue = true),
-        INFO_ALARMS("INFO:ALARMS", generatesFeedback = true),
+        INFO_ALARMS("INFO:ALARMS"),
         PSK("PSK"),
         PSK_SET("PSK:SET"),
         REBOOT("CMD:REBOOT"),

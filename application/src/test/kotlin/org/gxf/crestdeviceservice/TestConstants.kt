@@ -33,6 +33,5 @@ object TestConstants {
         "\"!INFO:ALARMS\", {\"AL0\":[0,1,0,1,0], \"AL1\":[0,0,0,0,0], \"AL6\":[0,500,1000,1500,10]}"
     val ALARMS_INFO =
         AlarmsInfo(AL0 = listOf(0, 1, 0, 1, 0), AL1 = listOf(0, 0, 0, 0, 0), AL6 = listOf(0, 500, 1000, 1500, 10))
-    const val ALARMS_INFO_FEEDBACK =
-        "{\"tamper\":[0, 1, 0, 1, 0], \"digital\":[0, 0, 0, 0, 0], \"3\":[0, 1250, 2500, 3750, 25]}"
+    const val ALARMS_INFO_FEEDBACK = "{\"tamper\":[0,1,0,1,0],\"digital\":[0,0,0,0,0],\"3\":[0,1250,2500,3750,25]}"
 }

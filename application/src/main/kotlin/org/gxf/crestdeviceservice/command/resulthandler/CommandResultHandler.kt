@@ -40,11 +40,11 @@ abstract class CommandResultHandler(
         message: JsonNode,
         successfulCommand: Command,
     ) {
-        if (feedbackGenerator != null) {
+        if (feedbackGenerator == null) {
+            commandFeedbackService.sendSuccessFeedback(successfulCommand)
+        } else {
             val feedback = feedbackGenerator.generateFeedback(message)
             commandFeedbackService.sendSuccessFeedback(successfulCommand, feedback)
-        } else {
-            commandFeedbackService.sendSuccessFeedback(successfulCommand)
         }
     }
 

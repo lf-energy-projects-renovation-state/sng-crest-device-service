@@ -24,7 +24,7 @@ class InfoAlarmsResultHandler(
         try {
             alarmsInfoService.getAlarmsInfo(message)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
 
