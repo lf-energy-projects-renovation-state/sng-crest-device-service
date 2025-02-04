@@ -16,7 +16,10 @@ import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.feedbackgenerator.CommandFeedbackGenerator
 import org.gxf.crestdeviceservice.command.feedbackgenerator.InfoAlarmsFeedbackGenerator
-import org.gxf.crestdeviceservice.command.resulthandler.*
+import org.gxf.crestdeviceservice.command.resulthandler.CommandResultHandler
+import org.gxf.crestdeviceservice.command.resulthandler.InfoAlarmsResultHandler
+import org.gxf.crestdeviceservice.command.resulthandler.RebootCommandResultHandler
+import org.gxf.crestdeviceservice.command.resulthandler.RspCommandResultHandler
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

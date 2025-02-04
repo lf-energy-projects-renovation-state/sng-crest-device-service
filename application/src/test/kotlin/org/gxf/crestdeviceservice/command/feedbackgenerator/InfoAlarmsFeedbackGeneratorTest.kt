@@ -24,14 +24,14 @@ class InfoAlarmsFeedbackGeneratorTest {
     @InjectMockKs private lateinit var infoAlarmsFeedbackGenerator: InfoAlarmsFeedbackGenerator
 
     @Test
-    fun supportedCommandType() {
+    fun `should support INFO_ALARMS command type`() {
         val result = infoAlarmsFeedbackGenerator.supportedCommandType
 
         assertThat(result).isEqualTo(Command.CommandType.INFO_ALARMS)
     }
 
     @Test
-    fun generateFeedback() {
+    fun `should generate translated and calculated alarm thresholds feedback`() {
         val downlink = ALARMS_INFO_DOWNLINK
         val message = MessageFactory.messageWithUrc(listOf(), downlink)
         val expected = ALARMS_INFO_FEEDBACK
