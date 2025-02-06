@@ -46,7 +46,7 @@ class AnalogAlarmThresholdsResultHandlerTest {
     @Test
     fun handleFailure() {
         val command = CommandFactory.analogAlarmThresholdsCommandInProgess()
-        val message = MessageFactory.messageWithUrc(listOf("AL6:DLER"), "")
+        val message = MessageFactory.messageWithUrc(listOf("AL6:DLER"))
 
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }

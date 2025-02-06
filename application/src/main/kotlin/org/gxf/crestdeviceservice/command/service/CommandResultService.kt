@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 class CommandResultService(
     private val commandService: CommandService,
     private val commandResultHandlersByType: Map<CommandType, CommandResultHandler>,
-    private val commandFeedbackGeneratorsByType: Map<CommandType, CommandFeedbackGenerator>,
+    private val commandFeedbackGenerators: List<CommandFeedbackGenerator>,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -38,7 +38,7 @@ class CommandResultService(
     }
 
     private fun handleResult(command: Command, resultHandler: CommandResultHandler, message: JsonNode) {
-        val feedbackGenerator = commandFeedbackGeneratorsByType[command.type]
+        val feedbackGenerator = commandFeedbackGenerators.firstOrNull { it.supportedCommandType == command.type }
 
         when {
             resultHandler.hasSucceeded(command, message) ->

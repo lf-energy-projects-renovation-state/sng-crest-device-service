@@ -101,7 +101,7 @@ class InfoAlarmsResultHandlerTest {
 
     @Test
     fun handleFailure() {
-        val failureMessage = MessageFactory.messageWithUrc(listOf("INFO:DLER"), "")
+        val failureMessage = MessageFactory.messageWithUrc(listOf("INFO:DLER"))
 
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }

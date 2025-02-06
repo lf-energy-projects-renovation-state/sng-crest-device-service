@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
 
+import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -34,7 +35,7 @@ class CommandResultServiceTest {
 
     @MockK private lateinit var commandService: CommandService
     @MockK private lateinit var commandResultHandlersByType: Map<Command.CommandType, CommandResultHandler>
-    @MockK private lateinit var commandFeedbackGeneratorsByType: Map<Command.CommandType, CommandFeedbackGenerator>
+    @SpykBean private val commandFeedbackGenerators: MutableList<CommandFeedbackGenerator> = mutableListOf()
 
     @InjectMockKs private lateinit var commandResultService: CommandResultService
 
@@ -43,12 +44,8 @@ class CommandResultServiceTest {
         every { commandResultHandlersByType[Command.CommandType.REBOOT] } answers { rebootCommandResultHandler }
         every { commandResultHandlersByType[Command.CommandType.RSP] } answers { rspCommandResultHandler }
         every { commandResultHandlersByType[Command.CommandType.INFO_ALARMS] } answers { infoAlarmsResultHandler }
-        every { commandFeedbackGeneratorsByType[Command.CommandType.REBOOT] } answers { null }
-        every { commandFeedbackGeneratorsByType[Command.CommandType.RSP] } answers { null }
-        every { commandFeedbackGeneratorsByType[Command.CommandType.INFO_ALARMS] } answers
-            {
-                infoAlarmsFeedbackGenerator
-            }
+        every { infoAlarmsFeedbackGenerator.supportedCommandType } answers { Command.CommandType.INFO_ALARMS }
+        commandFeedbackGenerators.add(infoAlarmsFeedbackGenerator)
     }
 
     @Test

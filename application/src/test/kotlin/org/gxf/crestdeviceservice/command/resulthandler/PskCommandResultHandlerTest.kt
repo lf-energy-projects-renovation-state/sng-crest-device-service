@@ -32,7 +32,7 @@ class PskCommandResultHandlerTest {
     @Test
     fun handleSuccess() {
         val command = CommandFactory.pskCommandInProgress()
-        val message = MessageFactory.messageWithUrc(listOf("PSK:TMP"), "")
+        val message = MessageFactory.messageWithUrc(listOf("PSK:TMP"))
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
@@ -46,7 +46,7 @@ class PskCommandResultHandlerTest {
     @Test
     fun handleFailure() {
         val command = CommandFactory.pskCommandInProgress()
-        val message = MessageFactory.messageWithUrc(listOf("PSK:HSER"), "")
+        val message = MessageFactory.messageWithUrc(listOf("PSK:HSER"))
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }
 

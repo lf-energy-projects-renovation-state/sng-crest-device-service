@@ -32,7 +32,7 @@ class RspCommandResultHandlerTest {
     @Test
     fun handleSuccess() {
         val command = CommandFactory.rspCommandInProgress()
-        val message = MessageFactory.messageWithUrc(listOf(rspCommandResultHandler.successUrc), "")
+        val message = MessageFactory.messageWithUrc(listOf(rspCommandResultHandler.successUrc))
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
@@ -46,7 +46,7 @@ class RspCommandResultHandlerTest {
     @Test
     fun handleFailure() {
         val command = CommandFactory.rspCommandInProgress()
-        val message = MessageFactory.messageWithUrc(listOf("PSK:HSER"), "")
+        val message = MessageFactory.messageWithUrc(listOf("PSK:HSER"))
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }
 

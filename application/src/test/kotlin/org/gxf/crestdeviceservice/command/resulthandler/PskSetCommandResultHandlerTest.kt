@@ -34,7 +34,7 @@ class PskSetCommandResultHandlerTest {
     @Test
     fun handleSuccess() {
         val command = CommandFactory.pskSetCommandInProgress()
-        val message = MessageFactory.messageWithUrc(listOf("PSK:SET"), "")
+        val message = MessageFactory.messageWithUrc(listOf("PSK:SET"))
         justRun { pskService.changeActiveKey(command.deviceId) }
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
@@ -49,7 +49,7 @@ class PskSetCommandResultHandlerTest {
     @Test
     fun handleFailure() {
         val command = CommandFactory.pskSetCommandInProgress()
-        val message = MessageFactory.messageWithUrc(listOf("PSK:EQER"), "")
+        val message = MessageFactory.messageWithUrc(listOf("PSK:EQER"))
         justRun { pskService.setPendingKeyAsInvalid(command.deviceId) }
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendErrorFeedback(any(), any()) }

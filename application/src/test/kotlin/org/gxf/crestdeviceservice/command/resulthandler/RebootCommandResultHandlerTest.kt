@@ -32,7 +32,7 @@ class RebootCommandResultHandlerTest {
     @Test
     fun handleSuccess() {
         val command = CommandFactory.rebootCommandInProgress()
-        val message = MessageFactory.messageWithUrc(listOf("INIT"), "")
+        val message = MessageFactory.messageWithUrc(listOf("INIT"))
         every { commandService.saveCommand(any()) } answers { firstArg() }
         justRun { commandFeedbackService.sendSuccessFeedback(any()) }
 
