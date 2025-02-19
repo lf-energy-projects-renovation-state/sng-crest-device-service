@@ -10,7 +10,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.justRun
 import io.mockk.verify
-import java.io.IOException
 import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
@@ -21,7 +20,6 @@ import org.gxf.crestdeviceservice.command.feedbackgenerator.InfoAlarmsFeedbackGe
 import org.gxf.crestdeviceservice.command.service.AlarmsInfoService
 import org.gxf.crestdeviceservice.command.service.CommandFeedbackService
 import org.gxf.crestdeviceservice.command.service.CommandService
-import org.gxf.crestdeviceservice.model.AlarmsInfo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -59,7 +57,7 @@ class InfoAlarmsResultHandlerTest {
 
     @Test
     fun hasSucceeded() {
-        every { alarmsInfoService.getAlarmsInfo(any()) } returns AlarmsInfo()
+        every { alarmsInfoService.containsResult(any()) } returns true
 
         val result = resultHandler.hasSucceeded(command, message)
 
@@ -68,7 +66,7 @@ class InfoAlarmsResultHandlerTest {
 
     @Test
     fun hasSucceededFails() {
-        every { alarmsInfoService.getAlarmsInfo(any()) } throws IOException()
+        every { alarmsInfoService.containsResult(any()) } returns false
 
         val result = resultHandler.hasSucceeded(command, message)
 
