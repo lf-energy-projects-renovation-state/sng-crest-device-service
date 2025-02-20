@@ -78,11 +78,8 @@ abstract class CommandResultHandler(
 
     companion object {
         private const val URC_FIELD = "URC"
-        private const val DL_FIELD = "DL"
 
+        /** Filters out Text elements from the JSON node. "DL" is in an object, so it won't be in the resulting list */
         fun JsonNode.urcs(): List<String> = this[URC_FIELD].filter { it.isTextual }.map { it.asText() }
-
-        fun JsonNode.downlinks(): List<String> =
-            this[URC_FIELD].first { it.isObject }[DL_FIELD].asText().replace("!", "").split(";")
     }
 }

@@ -4,33 +4,33 @@
 package org.gxf.crestdeviceservice
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.node.TextNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.util.ResourceUtils
 
 object MessageFactory {
     private const val URC_FIELD = "URC"
     private const val DL_FIELD = "DL"
 
-    private val mapper = ObjectMapper()
+    private val mapper = jacksonObjectMapper()
 
     fun messageTemplate(): ObjectNode {
         val messageFile = ResourceUtils.getFile("classpath:message-template.json")
         return mapper.readTree(messageFile) as ObjectNode
     }
 
-    fun messageWithUrc(urcs: List<String>, downlink: String = ""): JsonNode {
-        val urcNodes = urcs.map { urc -> TextNode(urc) }
-        val downlinkNode = ObjectNode(JsonNodeFactory.instance, mapOf(DL_FIELD to TextNode(downlink)))
-
-        val urcFieldValue: ArrayNode = ObjectMapper().valueToTree(urcNodes + listOf(downlinkNode))
+    fun messageWithUrc(urcs: List<String> = listOf(), downlink: String = ""): JsonNode {
+        val downlinkString = """{"$DL_FIELD":"$downlink"}"""
+        val urcObjects =
+            (urcs + downlinkString).map { if (isJsonObject(it)) mapper.readTree(it) else mapper.readValue(""""$it"""") }
+        val arrayNode = mapper.createArrayNode().addAll(urcObjects)
 
         val message = messageTemplate()
-        message.replace(URC_FIELD, urcFieldValue)
+        message.replace(URC_FIELD, arrayNode)
 
         return message
     }
+
+    private fun isJsonObject(it: String) = it.startsWith("{") || it.startsWith("[")
 }
