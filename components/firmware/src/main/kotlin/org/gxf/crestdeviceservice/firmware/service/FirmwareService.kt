@@ -53,6 +53,7 @@ class FirmwareService(
      * @return Downlink command ready to be sent to the device
      */
     fun getPacketForDevice(firmware: Firmware, packetNr: Int, deviceId: String): String {
+        logger.debug { "Finding firmware packet number $packetNr for firmware ${firmware.name}" }
         val packet = firmwarePacketRepository.findByFirmwareAndPacketNumber(firmware, packetNr)
         val deviceSecret = deviceService.getDevice(deviceId).secret
         return firmwareHashService.generateDeviceSpecificPacket(packet, deviceSecret)
