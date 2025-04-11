@@ -6,12 +6,13 @@ package org.gxf.crestdeviceservice.firmware.service
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.apache.commons.codec.digest.DigestUtils
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
-import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.HASH_LENGTH
+import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.HASH_LENGTH_BYTES
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.OTA_DONE
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.OTA_START
 import org.gxf.utilities.Base85
 import org.springframework.stereotype.Service
 
+@OptIn(ExperimentalStdlibApi::class)
 @Service
 class FirmwareHashService {
     private val logger = KotlinLogging.logger {}
@@ -25,47 +26,65 @@ class FirmwareHashService {
      * @return the downlink command ready to be sent to the device
      */
     fun generateDeviceSpecificPacket(firmwarePacket: FirmwarePacket, deviceSecret: String): String {
-        var result = firmwarePacket.packet
+        var firmwareBytes = getFirmwareBytes(firmwarePacket)
+
         if (firmwarePacket.isFirstPacket()) {
-            result = replaceCurrentFirmwareHash(result, deviceSecret)
+            firmwareBytes = replaceCurrentFirmwareHash(firmwareBytes, deviceSecret)
         }
         if (firmwarePacket.isLastPacket()) {
-            result = replaceTargetFirmwareHash(result, deviceSecret)
+            firmwareBytes = replaceTargetFirmwareHash(firmwareBytes, deviceSecret)
         }
-        return result
+        return reAssemble(firmwarePacket, firmwareBytes)
     }
 
-    private fun replaceCurrentFirmwareHash(packet: String, deviceSecret: String): String {
-        val command = OTA_START
-        val currentFirmwareHash = packet.substring(OTA_START.length, OTA_START.length + HASH_LENGTH)
-        val theRest = packet.substring(OTA_START.length + HASH_LENGTH, packet.length)
-
-        logger.info { "=== START HASH ===" }
-        val base85Hash = calculateHash(deviceSecret, currentFirmwareHash)
-
-        return "$command$base85Hash$theRest"
+    /** Decode the Base85 content in the firmware packet to a ByteArray */
+    private fun getFirmwareBytes(firmwarePacket: FirmwarePacket): ByteArray {
+        var base85String = firmwarePacket.packet.substring(OTA_START.length)
+        if (firmwarePacket.isLastPacket()) {
+            base85String = base85String.substring(0, base85String.length - OTA_DONE.length)
+        }
+        return Base85.getRfc1924Decoder().decodeToBytes(base85String)
     }
 
-    private fun replaceTargetFirmwareHash(packet: String, deviceSecret: String): String {
-        val packetLength = packet.length
-        val theStart = packet.substring(0, packetLength - HASH_LENGTH - OTA_DONE.length)
-        val targetFirmwareHash =
-            packet.substring(packetLength - HASH_LENGTH - OTA_DONE.length, packetLength - OTA_DONE.length)
+    /**
+     * Replace the Base85 content of the packet with the newly hashed bytes, preserving the command (`OTA####`) and
+     * optional ending (`:DONE`)
+     *
+     * @return the updated firmware packet
+     */
+    private fun reAssemble(firmwarePacket: FirmwarePacket, firmwareBytes: ByteArray): String {
+        val command = firmwarePacket.packet.substring(0, OTA_START.length)
+        val base85 = Base85.getRfc1924Encoder().encodeToString(firmwareBytes)
+        val endString = if (firmwarePacket.isLastPacket()) OTA_DONE else ""
 
-        logger.info { "=== END HASH ===" }
-        val base85Hash = calculateHash(deviceSecret, targetFirmwareHash)
+        return "$command$base85$endString"
+    }
 
-        return "$theStart$base85Hash:DONE"
+    private fun replaceCurrentFirmwareHash(firmwareBytes: ByteArray, deviceSecret: String): ByteArray {
+        logger.info { "=== CURRENT HASH ===" }
+
+        val currentFirmwareHash = firmwareBytes.take(HASH_LENGTH_BYTES).toByteArray()
+        logger.debug { "Current firmware hash: ${currentFirmwareHash.toHexString(HexFormat.Default)}" }
+
+        val deviceSpecificHash = calculateHash(deviceSecret, currentFirmwareHash)
+        logger.debug { "Device specific current hash: ${deviceSpecificHash.toHexString(HexFormat.Default)}" }
+
+        return deviceSpecificHash + firmwareBytes.drop(HASH_LENGTH_BYTES).toByteArray()
+    }
+
+    private fun replaceTargetFirmwareHash(firmwareBytes: ByteArray, deviceSecret: String): ByteArray {
+        logger.info { "=== TARGET HASH ===" }
+
+        val targetFirmwareHash = firmwareBytes.takeLast(HASH_LENGTH_BYTES).toByteArray()
+        logger.debug { "Target firmware hash: ${targetFirmwareHash.toHexString(HexFormat.Default)}" }
+
+        val deviceSpecificHash = calculateHash(deviceSecret, targetFirmwareHash)
+        logger.debug { "Device specific target hash: ${deviceSpecificHash.toHexString(HexFormat.Default)}" }
+
+        return firmwareBytes.take(firmwareBytes.size - HASH_LENGTH_BYTES).toByteArray() + deviceSpecificHash
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    private fun calculateHash(deviceSecret: String, stringHash: String): String? {
-        val byteHash = Base85.getRfc1924Decoder().decodeToBytes(stringHash)
-        logger.info { "firmware hash (Base85 -> Hex): $stringHash -> ${byteHash.toHexString(HexFormat.UpperCase)}" }
-        val deviceSpecificHash = DigestUtils.sha256(deviceSecret.toByteArray().plus(byteHash))
-        logger.info { "sha56 over secret + hash: ${deviceSpecificHash.toHexString(HexFormat.UpperCase)}" }
-        val base85Hash = Base85.getRfc1924Encoder().encodeToString(deviceSpecificHash)
-        logger.info { "device specific hash encoded to Base85: $base85Hash" }
-        return base85Hash
-    }
+    private fun calculateHash(deviceSecret: String, byteHash: ByteArray): ByteArray =
+        DigestUtils.sha256(deviceSecret.toByteArray().plus(byteHash))
 }
