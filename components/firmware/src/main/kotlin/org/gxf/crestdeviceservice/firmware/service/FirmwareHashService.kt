@@ -49,7 +49,7 @@ class FirmwareHashService {
     private fun getFirmwareBytes(firmwarePacket: FirmwarePacket): ByteArray {
         var base85String = firmwarePacket.packet.drop(OTA_START.length)
         if (firmwarePacket.isLastPacket()) {
-            base85String = base85String.take(base85String.length - OTA_DONE.length)
+            base85String = base85String.dropLast(OTA_DONE.length)
         }
         return Base85.getRfc1924Decoder().decodeToBytes(base85String)
     }
@@ -61,7 +61,7 @@ class FirmwareHashService {
      * @return the updated firmware packet
      */
     private fun reAssemble(firmwarePacket: FirmwarePacket, firmwareBytes: ByteArray): String {
-        val command = firmwarePacket.packet.substring(0, OTA_START.length)
+        val command = firmwarePacket.packet.take(OTA_START.length)
         val base85 = Base85.getRfc1924Encoder().encodeToString(firmwareBytes)
         val endString = if (firmwarePacket.isLastPacket()) OTA_DONE else ""
 
