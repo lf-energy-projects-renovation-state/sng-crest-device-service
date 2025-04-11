@@ -47,9 +47,9 @@ class FirmwareHashService {
      * @return A ByteArray, decoded from the Base85 portion of the firmware packet
      */
     private fun getFirmwareBytes(firmwarePacket: FirmwarePacket): ByteArray {
-        var base85String = firmwarePacket.packet.substring(OTA_START.length)
+        var base85String = firmwarePacket.packet.drop(OTA_START.length)
         if (firmwarePacket.isLastPacket()) {
-            base85String = base85String.substring(0, base85String.length - OTA_DONE.length)
+            base85String = base85String.take(base85String.length - OTA_DONE.length)
         }
         return Base85.getRfc1924Decoder().decodeToBytes(base85String)
     }
