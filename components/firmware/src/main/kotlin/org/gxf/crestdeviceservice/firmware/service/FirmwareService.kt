@@ -13,6 +13,8 @@ import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
+class Simple(ding: String, anders: Int)
+
 @Service
 class FirmwareService(
     private val firmwareRepository: FirmwareRepository,
