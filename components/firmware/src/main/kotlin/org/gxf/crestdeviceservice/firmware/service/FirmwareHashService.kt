@@ -26,6 +26,10 @@ class FirmwareHashService {
      * @return the downlink command ready to be sent to the device
      */
     fun generateDeviceSpecificPacket(firmwarePacket: FirmwarePacket, deviceSecret: String): String {
+        if (!firmwarePacket.isLastPacket() && !firmwarePacket.isLastPacket()) {
+            return firmwarePacket.packet
+        }
+
         var firmwareBytes = getFirmwareBytes(firmwarePacket)
 
         if (firmwarePacket.isFirstPacket()) {

@@ -25,4 +25,13 @@ class FirmwareHashServiceTest {
 
         assertThat(actualPacket).isEqualTo(expectedFirmwarePacket)
     }
+
+    @Test
+    fun `should not change line when not first or last`() {
+        val firmware = Firmware(UUID.randomUUID(), name = "a firmware", version = "1.10")
+        val firmwarePacketThatDoesntNeedChanges = "OTA0005-some-random-stuff-halfway-down-the-firmware-file"
+        val originalPacket = FirmwarePacket(firmware, 0, firmwarePacketThatDoesntNeedChanges)
+        val actualPacket = firmwareHashService.generateDeviceSpecificPacket(originalPacket, "PONMLKJIHGFEDCBA")
+        assertThat(actualPacket).isEqualTo(firmwarePacketThatDoesntNeedChanges)
+    }
 }
