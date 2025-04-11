@@ -7,8 +7,8 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.apache.commons.codec.digest.DigestUtils
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.HASH_LENGTH_BYTES
+import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.OTA_COMMAND_LENGTH
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.OTA_DONE
-import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket.Companion.OTA_START
 import org.gxf.utilities.Base85
 import org.springframework.stereotype.Service
 
@@ -47,7 +47,7 @@ class FirmwareHashService {
      * @return A ByteArray, decoded from the Base85 portion of the firmware packet
      */
     private fun getFirmwareBytes(firmwarePacket: FirmwarePacket): ByteArray {
-        var base85String = firmwarePacket.packet.drop(OTA_START.length)
+        var base85String = firmwarePacket.packet.drop(OTA_COMMAND_LENGTH)
         if (firmwarePacket.isLastPacket()) {
             base85String = base85String.dropLast(OTA_DONE.length)
         }
@@ -61,7 +61,7 @@ class FirmwareHashService {
      * @return the updated firmware packet
      */
     private fun reAssemble(firmwarePacket: FirmwarePacket, firmwareBytes: ByteArray): String {
-        val command = firmwarePacket.packet.take(OTA_START.length)
+        val command = firmwarePacket.packet.take(OTA_COMMAND_LENGTH)
         val base85 = Base85.getRfc1924Encoder().encodeToString(firmwareBytes)
         val endString = if (firmwarePacket.isLastPacket()) OTA_DONE else ""
 
