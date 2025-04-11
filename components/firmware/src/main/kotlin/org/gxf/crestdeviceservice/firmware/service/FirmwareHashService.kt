@@ -106,7 +106,6 @@ class FirmwareHashService {
         return firmwareBytes.take(firmwareBytes.size - HASH_LENGTH_BYTES).toByteArray() + deviceSpecificHash
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun calculateHash(deviceSecret: String, byteHash: ByteArray): ByteArray =
         DigestUtils.sha256(deviceSecret.toByteArray().plus(byteHash))
 }
