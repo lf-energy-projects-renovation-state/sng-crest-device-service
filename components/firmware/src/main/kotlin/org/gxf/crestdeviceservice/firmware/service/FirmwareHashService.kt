@@ -29,15 +29,19 @@ class FirmwareHashService {
         var firmwareBytes = getFirmwareBytes(firmwarePacket)
 
         if (firmwarePacket.isFirstPacket()) {
-            firmwareBytes = replaceCurrentFirmwareHash(firmwareBytes, deviceSecret)
+            firmwareBytes = makeCurrentFirmwareHashDeviceSpecific(firmwareBytes, deviceSecret)
         }
         if (firmwarePacket.isLastPacket()) {
-            firmwareBytes = replaceTargetFirmwareHash(firmwareBytes, deviceSecret)
+            firmwareBytes = makeTargetFirmwareHashDeviceSpecific(firmwareBytes, deviceSecret)
         }
         return reAssemble(firmwarePacket, firmwareBytes)
     }
 
-    /** Decode the Base85 content in the firmware packet to a ByteArray */
+    /**
+     * Decode the Base85 content in the firmware packet to a ByteArray
+     *
+     * @return A ByteArray, decoded from the Base85 portion of the firmware packet
+     */
     private fun getFirmwareBytes(firmwarePacket: FirmwarePacket): ByteArray {
         var base85String = firmwarePacket.packet.substring(OTA_START.length)
         if (firmwarePacket.isLastPacket()) {
@@ -60,7 +64,14 @@ class FirmwareHashService {
         return "$command$base85$endString"
     }
 
-    private fun replaceCurrentFirmwareHash(firmwareBytes: ByteArray, deviceSecret: String): ByteArray {
+    /**
+     * "Sign" the current firmware hash with the device secret to create a device-specific, verifiable hash.
+     *
+     * The first 32 bytes of the Base85 payload contain the hash of the firmware that should be present (current) on the
+     * device. The device secret and this current hash are re-hashed These rehashed bytes replace the first 32 bytes of
+     * the Base85 payload
+     */
+    private fun makeCurrentFirmwareHashDeviceSpecific(firmwareBytes: ByteArray, deviceSecret: String): ByteArray {
         logger.info { "=== CURRENT HASH ===" }
 
         val currentFirmwareHash = firmwareBytes.take(HASH_LENGTH_BYTES).toByteArray()
@@ -72,7 +83,14 @@ class FirmwareHashService {
         return deviceSpecificHash + firmwareBytes.drop(HASH_LENGTH_BYTES).toByteArray()
     }
 
-    private fun replaceTargetFirmwareHash(firmwareBytes: ByteArray, deviceSecret: String): ByteArray {
+    /**
+     * "Sign" the target firmware hash with the device secret to create a device-specific, verifiable hash.
+     *
+     * The last 32 bytes of the Base85 payload contain the hash of the firmware that is being sent (target) to the
+     * device. The device secret and this current hash are re-hashed These rehashed bytes replace the last 32 bytes of
+     * the Base85 payload
+     */
+    private fun makeTargetFirmwareHashDeviceSpecific(firmwareBytes: ByteArray, deviceSecret: String): ByteArray {
         logger.info { "=== TARGET HASH ===" }
 
         val targetFirmwareHash = firmwareBytes.takeLast(HASH_LENGTH_BYTES).toByteArray()
