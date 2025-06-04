@@ -6,4 +6,5 @@ dependencies {
     implementation(libs.springBootStarterDataJpa)
 
     testImplementation(libs.springBootStarterTest)
+    testRuntimeOnly(libs.junitPlatformLauncher)
 }

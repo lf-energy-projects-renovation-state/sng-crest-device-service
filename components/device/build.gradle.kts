@@ -9,4 +9,5 @@ dependencies {
 
     testImplementation(libs.springBootStarterTest)
     testImplementation(libs.mockk)
+    testRuntimeOnly(libs.junitPlatformLauncher)
 }
