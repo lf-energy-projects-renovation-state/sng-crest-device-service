@@ -78,7 +78,12 @@ subprojects {
     }
 
     extensions.configure<StandardDependencyManagementExtension> {
-        imports { mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES) }
+        imports {
+            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+            mavenBom(rootProject.libs.springBootDependencies.get().toString()) {
+                bomProperty("kotlin.version", rootProject.libs.plugins.kotlin.get().version.toString())
+            }
+        }
     }
 
     extensions.configure<KotlinJvmProjectExtension> {
