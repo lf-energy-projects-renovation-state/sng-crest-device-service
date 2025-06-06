@@ -5,7 +5,7 @@ commonsCodec = "1.18.0"
 dependency-management = "1.1.7"
 gradleWrapperUpgrade = "0.12"
 gxf-utils = "2.1.4"
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 kotlin-logging = "7.0.7"
 mockk = "1.14.2"
 springmockk = "4.0.2"
@@ -31,6 +31,7 @@ micrometerPrometheusModule = { group = "io.micrometer", name = "micrometer-regis
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 postgresql = { group = "org.postgresql", name = "postgresql" }
 springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "springmockk" }
+springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "spring-boot" }
 springBootStarterActuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
 springBootStarterTest = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
 springBootStarterThymeleaf = { group = "org.springframework.boot", name = "spring-boot-starter-thymeleaf" }
