@@ -59,7 +59,7 @@ class PayloadServiceTest {
         val deviceId = "device-id"
         val firmwareCommand = CommandFactory.firmwareCommandInProgress()
         val firmwareName = firmwareCommand.commandValue!!
-        val firmware = Firmware(UUID.randomUUID(), firmwareName, "some-hash", null)
+        val firmware = Firmware(UUID.randomUUID(), firmwareName, "some-hash")
         val otaCommand = "OTA0003ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
         justRun { commandResultService.handleMessage(any(), any()) }

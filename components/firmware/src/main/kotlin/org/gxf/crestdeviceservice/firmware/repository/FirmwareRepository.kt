@@ -12,7 +12,5 @@ import org.springframework.stereotype.Repository
 interface FirmwareRepository : CrudRepository<Firmware, UUID> {
     fun findByName(name: String): Firmware?
 
-    fun findByVersion(version: String): Firmware?
-
     override fun findAll(): List<Firmware>
 }
