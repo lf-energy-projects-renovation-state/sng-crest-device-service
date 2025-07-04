@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-package org.gxf.crestdeviceservice.consumer
+package org.gxf.crestdeviceservice.service
 
 import com.alliander.sng.DeviceCredentials
 import io.mockk.every
@@ -20,16 +20,16 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
-class IncomingDeviceCredentialsConsumerTest {
+class DeviceCredentialsServiceTest {
     @MockK private lateinit var deviceService: DeviceService
     @MockK private lateinit var pskService: PskService
     @MockK private lateinit var pskDecryptionService: PskDecryptionService
     @MockK private lateinit var commandService: CommandService
 
-    @InjectMockKs private lateinit var incomingDeviceCredentialsConsumer: IncomingDeviceCredentialsConsumer
+    @InjectMockKs private lateinit var deviceCredentialsService: DeviceCredentialsService
 
     @Test
-    fun handleIncomingDeviceCredentialsChangeInitialPsk() {
+    fun importDeviceCredentialsChangeInitialPsk() {
         val imei = "imei"
         val psk = "encrypted-psk"
         val decryptedPsk = "psk"
@@ -44,9 +44,12 @@ class IncomingDeviceCredentialsConsumerTest {
         justRun { pskService.setInitialKeyForDevice(any(), any()) }
         justRun { pskService.generateNewReadyKeyForDevice(any()) }
         every { pskService.changeInitialPsk() } returns true
-        every { commandService.saveCommands(any(), any()) } answers { args.map { it as Command } }
+        every { commandService.saveCommands(any(Command::class), any(Command::class)) } answers
+            {
+                args as List<Command>
+            }
 
-        incomingDeviceCredentialsConsumer.handleIncomingDeviceCredentials(deviceCredentials)
+        deviceCredentialsService.importDeviceCredentials(deviceCredentials)
 
         verify { deviceService.createDevice(imei, decryptedSecret) }
         verify { pskService.setInitialKeyForDevice(imei, decryptedPsk) }
@@ -55,7 +58,7 @@ class IncomingDeviceCredentialsConsumerTest {
     }
 
     @Test
-    fun handleIncomingDeviceCredentialsWithoutChangingInitialPsk() {
+    fun importDeviceCredentialsWithoutChangingInitialPsk() {
         val imei = "imei"
         val psk = "encrypted-psk"
         val decryptedPsk = "psk"
@@ -67,9 +70,10 @@ class IncomingDeviceCredentialsConsumerTest {
         every { pskDecryptionService.decryptSecret(psk, keyRef) } returns decryptedPsk
         every { pskDecryptionService.decryptSecret(secret, keyRef) } returns decryptedSecret
         every { deviceService.createDevice(any(), any()) } answers { Device(arg(0), arg(1)) }
+        justRun { pskService.setInitialKeyForDevice(any(), any()) }
         every { pskService.changeInitialPsk() } returns false
 
-        incomingDeviceCredentialsConsumer.handleIncomingDeviceCredentials(deviceCredentials)
+        deviceCredentialsService.importDeviceCredentials(deviceCredentials)
 
         verify { deviceService.createDevice(imei, decryptedSecret) }
         verify { pskService.setInitialKeyForDevice(imei, decryptedPsk) }

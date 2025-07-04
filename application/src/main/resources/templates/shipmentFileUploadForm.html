@@ -7,7 +7,7 @@ Copyright 2024 Alliander N.V.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KOD</title>
-    <link href="/web.css" rel="stylesheet" />
+    <link th:href="@{/web.css}" rel="stylesheet" />
 </head>
 <body>
 
@@ -15,8 +15,8 @@ Copyright 2024 Alliander N.V.
 <main class="container">
     <div class="card">
         <div class="mb-3">
-            <h2>File to upload:</h2>
-            <form method="POST" enctype="multipart/form-data" action="/web/firmware">
+            <h2>Shipment file to upload:</h2>
+            <form method="POST" enctype="multipart/form-data" action="/web/shipmentfile">
                 <input type="file" name="file">
                 <br>
                 <button type="submit">Upload</button>

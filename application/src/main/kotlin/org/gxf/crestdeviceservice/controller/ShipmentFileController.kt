@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.controller
 
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.JsonMappingException
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.gxf.crestdeviceservice.firmware.exception.FirmwareException
-import org.gxf.crestdeviceservice.firmware.service.FirmwareService
-import org.gxf.crestdeviceservice.service.FirmwareProducerService
+import org.gxf.crestdeviceservice.service.ShipmentFileService
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
-@Controller
-@RequestMapping("/web/firmware")
-class FirmwareController(val firmwareService: FirmwareService, val firmwareProducerService: FirmwareProducerService) {
+@Controller()
+@RequestMapping("/web/shipmentfile")
+class ShipmentFileController(val shipmentFileService: ShipmentFileService) {
     private val logger = KotlinLogging.logger {}
-    private val redirectUrl = "redirect:/web/firmware"
+    private val redirectUrl = "redirect:/web/shipmentfile"
 
-    @GetMapping fun showUploadForm() = "firmwareUploadForm"
+    @GetMapping fun showUploadForm() = "shipmentFileUploadForm"
 
     @PostMapping
     fun handleFileUpload(@RequestPart("file") file: MultipartFile, redirectAttributes: RedirectAttributes): String {
@@ -37,16 +37,19 @@ class FirmwareController(val firmwareService: FirmwareService, val firmwareProdu
             return redirectUrl
         }
         try {
-            logger.info { "Processing firmware file with name: ${file.originalFilename}" }
+            logger.info { "Processing shipment file with name: ${file.originalFilename}" }
 
-            val savedFirmware = firmwareService.processFirmware(file)
-            firmwareProducerService.sendAllFirmwares()
+            val processedDevices = shipmentFileService.processShipmentFile(file)
 
-            logger.info { "Firmware file successfully processed" }
-            redirectAttributes.setMessage("Successfully processed ${savedFirmware.packets.size} firmware packets")
-        } catch (exception: FirmwareException) {
-            logger.error(exception) { "Failed to process firmware file" }
-            redirectAttributes.setMessage("Failed to process file: ${exception.message}")
+            logger.info { "Shipment file successfully processed" }
+            redirectAttributes.setMessage("Successfully processed $processedDevices devices")
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to process firmware file" }
+            when (e) {
+                is JsonParseException,
+                is JsonMappingException -> redirectAttributes.setMessage("Failed to parse file as JSON")
+                else -> redirectAttributes.setMessage("Failed to process file")
+            }
         }
         return redirectUrl
     }

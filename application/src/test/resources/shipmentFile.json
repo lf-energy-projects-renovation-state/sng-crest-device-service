@@ -1,0 +1,42 @@
+{
+  "shipment": {
+    "version": "1",
+    "shipmentNumber": "12345",
+    "shipmentDate": "2022-04-26T08:14:00Z",
+    "supplier": "Crest",
+    "purchaseOrder": "PO123445"
+  },
+  "devices": [
+    {
+      "rtu": {
+        "rtuId": "869777040008792",
+        "manufacturer": "CREST",
+        "type": "GW1042M-X-QFX-DC24",
+        "productionDate": "2022-04-26",
+        "serialNumber": "00E0C81732FC",
+        "hardwareRevision": "",
+        "firmwareVersion": "",
+        "pskEncrypted": "OqixTadPZgHzUJx3azoqjBbkUtpHGcpBbA5alyjW4BGi8I45i5Cv2mcdXZXIr4d9qHaBy5H1GWkpCs0gTJp3I+RpmnaO3uYc+kwUPo43XRq+xQjtO12oykzCTnF93NAgjXpwR6hpFkYN02Gmb9VgRNKgnT4EnTS8O5qU3yK7jzyAE73WfIh8DcHxKjCaVgFDcwCYABCPInKTxLrK4zw5S/LZK/2TvROvDPYHcfZMxjil6bXgPE8TJDaCCYDHUh7BcvykRFR1X5ojqWJ65Zl3iEBAdN6NYZZVfV6JNk0tCO5HPg3AYG2J1FvSxqwW6OEWS6eKovv9cygX71XeBLHyIg==",
+        "pskChangeSecretEncrypted": "dFLqPcPAF5ko8xRamCNmRK5nSbtdoCOpVWGK2phfYXuqBpUzX1XhC5tWm8AMQGM27XYt14KETqMACznt0jyw067O9YpCSVxdIyFxptcRQCu4oTXvqGHu2zW1MbMY1mU2JLOOf+r5k1twEn4VU7MCP89XrDDqee6fjy56yDA+H8Uhd5Y3yOPuqDLzF2x2N5E92MIcIFz6fnsIFE5ACXxBJz96aSAsElx1OJyX/OE0F7z8OtjT6Ix8KPVPPS8U/m0avaAro3oOaa0+hSUR4Ik8AoWWWD5lQBcsuWgZFO5Ce4uxhUo+dzAQCklFqnLlfCnXq855gXWpPTDhc8sbGvdTYw==",
+        "pskEncryptionKeyRef": "1"
+
+      },
+      "telecomRouter": {
+        "routerId": "869777040008792",
+        "imei": "869777040008792",
+        "serialNumber": "00E0C81732FC",
+        "firmwareVersion": "CPX-25.01.40.028"
+      },
+      "sim": {
+        "simId": "8931080119093818390",
+        "iccId": "8931080119093818390",
+        "imsi": "204080816515118",
+        "msisdn": "3197025168557",
+        "eid": "89033023312170000000005421143542",
+        "user": "869777040008792",
+        "passwordEncrypted": "axDJHSPuq5EDvWv6Rwv3yNkPJEFBvcZXocduwM0E2Swck+meN10JLyrSrtiZgkG7+dtfQvAQk6YLcqbJ9kmuV4VwlbQZ/2dSli4PHwGUgqFB1+6YCy8f6YZ8WNQ9qSH2cwo89e3TzW6NsSEbmwNkf2IZDmfurv2UOb2piWs6ISaEC3arb8rvJGRtDpQqXpMa2GmniSQko0EO1U7Vn/NcBmBBeEVRYTJav+4yO5mAp3U8oUgS2ERKMB1n4lwJVYyqkRcc3Hd2Z6hOlNsapBilLRQJkkYptTVE99YlyvF/DlKlo/3iVad3UhN5cvyzPjvfxpm7by7zBwlcKrfqgVddSg==",
+        "passwordEncryptionKeyRef": "1"
+      }
+    }
+  ]
+}
