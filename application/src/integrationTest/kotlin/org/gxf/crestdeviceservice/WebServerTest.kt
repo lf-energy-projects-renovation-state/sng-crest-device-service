@@ -17,6 +17,8 @@ import org.gxf.crestdeviceservice.psk.repository.PskRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
@@ -47,7 +49,9 @@ class WebServerTest {
     @Autowired private lateinit var pskRepository: PskRepository
 
     companion object {
-        private const val NAME = "RTU#FULL#TO#23.10.txt"
+        private const val FIRMWARE_FILE = "RTU#FULL#TO#23.10.txt"
+        private const val SHIPMENT_FILE = "shipmentFile.json"
+        private const val EMPTY_FILE = "emptyfile.txt"
         private const val NUMBER_OF_PACKETS = 13
         private const val IDENTITY = "1234"
         private const val PRE_SHARED_KEY = "1234567890123456"
@@ -66,28 +70,49 @@ class WebServerTest {
     @Test
     fun firmwareFileUploadTest() {
         // arrange
-        val firmwareFile = ClassPathResource(NAME).file
+        val firmwareFile = ClassPathResource(FIRMWARE_FILE).file
         val consumer = createKafkaConsumer(embeddedKafkaBroker, kafkaProducerProperties.firmware.topic)
 
         // act
-        val response = uploadFile(firmwareFile)
+        val response = uploadFile(firmwareFile, "/web/firmware")
 
         // assert
         assertThat(response.statusCode.value()).isEqualTo(200)
-        assertThat(firmwareRepository.findByName(NAME)).isNotNull
+        assertThat(firmwareRepository.findByName(FIRMWARE_FILE)).isNotNull
         assertThat(firmwarePacketRepository.findAll()).hasSize(NUMBER_OF_PACKETS)
 
         val records = consumer.poll(Duration.ofSeconds(1))
         assertThat(records.records(kafkaProducerProperties.firmware.topic)).hasSize(1)
     }
 
-    fun uploadFile(file: File): ResponseEntity<String> {
+    @Test
+    fun shipmentFileUploadTest() {
+        // arrange
+        val firmwareFile = ClassPathResource(SHIPMENT_FILE).file
+
+        // act
+        val response = uploadFile(firmwareFile, "/web/shipmentfile")
+
+        // assert
+        assertThat(response.statusCode.value()).isEqualTo(200)
+    }
+
+    @ParameterizedTest
+    @CsvSource("/web/shipmentfile", "/web/firmware")
+    fun emptyFileUploadTest(webPath: String) {
+        val firmwareFile = ClassPathResource(EMPTY_FILE).file
+
+        val response = uploadFile(firmwareFile, webPath)
+        assertThat(response.body).containsIgnoringCase("An empty file was provided")
+    }
+
+    private fun uploadFile(file: File, webPath: String): ResponseEntity<String> {
         val headers: HttpHeaders = HttpHeaders().apply { contentType = MediaType.MULTIPART_FORM_DATA }
 
         val body = LinkedMultiValueMap<String, Any>().apply { add("file", FileSystemResource(file)) }
         val requestEntity = HttpEntity(body, headers)
 
-        return this.restTemplate.postForEntity<String>("/web/firmware", requestEntity)
+        return this.restTemplate.postForEntity<String>(webPath, requestEntity)
     }
 
     @Test

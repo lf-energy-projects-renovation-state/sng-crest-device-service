@@ -32,3 +32,18 @@ Communication between the COAP HTTP Proxy and the Crest device service should be
 
 The repositories contain test certificates that can be used for local testing. (they are not included in the jar or docker image)
 They can be also be (re)generated using the [generate_certificates.sh](scripts/generate_certificates.sh) script.
+
+# Web apps
+This service contains two web applications. 
+These web apps run on the port specified by the property `config.web-server.port`.
+For the `dev` profile this is port 9001.
+
+The URL paths to the apps:
+- Firmware upload: `/web/firmware`
+- Shipment file upload: `/web/shipmentfile`
+
+So, for local development, the URLs are:
+- Firmware upload: http://localhost:9001/web/firmware
+- Shipment file upload: http://localhost:9001/web/shipmentfile
+
+(use a browser that supports 'unsafe' (non-https) connections, e.g. Firefox, Brave, etc.)
