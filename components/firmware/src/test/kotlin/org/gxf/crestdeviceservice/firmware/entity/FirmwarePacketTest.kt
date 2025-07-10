@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.entity
 
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import java.util.UUID
 
 class FirmwarePacketTest {
     @ParameterizedTest

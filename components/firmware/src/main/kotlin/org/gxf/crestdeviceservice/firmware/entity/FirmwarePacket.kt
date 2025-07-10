@@ -14,7 +14,8 @@ import jakarta.persistence.ManyToOne
 class FirmwarePacket(
     @ManyToOne @Id val firmware: Firmware,
     @Id val packetNumber: Int,
-    @Column(length = 1024) // without this, the integration test assumes a length of 255
+    // without this, the integration test assumes a length of 255
+    @Column(length = 1024)
     val packet: String,
 ) {
     fun isFirstPacket() = packet.startsWith(OTA_START)

@@ -3,17 +3,17 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.psk.service
 
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.gxf.crestdeviceservice.psk.configuration.PskDecryptionConfiguration
+import org.gxf.crestdeviceservice.psk.exception.UnknownKeyRefException
+import org.junit.jupiter.api.Test
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.PublicKey
 import java.security.interfaces.RSAPrivateKey
 import java.util.Base64
 import javax.crypto.Cipher
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.gxf.crestdeviceservice.psk.configuration.PskDecryptionConfiguration
-import org.gxf.crestdeviceservice.psk.exception.UnknownKeyRefException
-import org.junit.jupiter.api.Test
 
 class PskDecryptionServiceTest {
     @Test
@@ -31,7 +31,7 @@ class PskDecryptionServiceTest {
                 PskDecryptionConfiguration(
                     mapOf(keyRef to keyPair.private as RSAPrivateKey),
                     "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING",
-                )
+                ),
             )
 
         // Decrypt the secret
@@ -55,7 +55,7 @@ class PskDecryptionServiceTest {
                 PskDecryptionConfiguration(
                     mapOf(keyRef to keyPair.private as RSAPrivateKey),
                     "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING",
-                )
+                ),
             )
 
         assertThatThrownBy { decryptionService.decryptSecret(encryptedSecret, "2") }

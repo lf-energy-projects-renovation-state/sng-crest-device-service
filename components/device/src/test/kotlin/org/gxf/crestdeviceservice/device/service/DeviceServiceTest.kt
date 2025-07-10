@@ -7,7 +7,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import java.util.Optional
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.gxf.crestdeviceservice.device.entity.Device
@@ -16,6 +15,7 @@ import org.gxf.crestdeviceservice.device.exception.NoSuchDeviceException
 import org.gxf.crestdeviceservice.device.repository.DeviceRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.util.Optional
 
 @ExtendWith(MockKExtension::class)
 class DeviceServiceTest {

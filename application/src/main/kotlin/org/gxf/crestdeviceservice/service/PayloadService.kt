@@ -44,28 +44,27 @@ class PayloadService(
         deviceMessage: DeviceMessage,
         identity: String,
         downlink: Downlink,
-    ): Command? =
-        deviceMessage
-            .getFotaMessageCounter()
-            .takeIf { it > 0 }
-            ?.let { fotaMessageCounter ->
-                val firmwareCommand =
-                    commandService.getAllCommandsInProgressForDevice(identity).find {
-                        it.type == Command.CommandType.FIRMWARE
-                    }
-
-                if (firmwareCommand != null) {
-                    val firmware = firmwareService.findFirmwareByName(firmwareCommand.getRequiredCommandValue())
-                    val otaCommand = firmwareService.getPacketForDevice(firmware, fotaMessageCounter, identity)
-                    downlink.addIfPossible(otaCommand)
-
-                    firmwareCommand
-                } else {
-                    throw NoMatchingCommandException(
-                        "Device $identity requests FOTA packet $fotaMessageCounter (FMC), but no running FIRMWARE command was found"
-                    )
+    ): Command? = deviceMessage
+        .getFotaMessageCounter()
+        .takeIf { it > 0 }
+        ?.let { fotaMessageCounter ->
+            val firmwareCommand =
+                commandService.getAllCommandsInProgressForDevice(identity).find {
+                    it.type == Command.CommandType.FIRMWARE
                 }
+
+            if (firmwareCommand != null) {
+                val firmware = firmwareService.findFirmwareByName(firmwareCommand.getRequiredCommandValue())
+                val otaCommand = firmwareService.getPacketForDevice(firmware, fotaMessageCounter, identity)
+                downlink.addIfPossible(otaCommand)
+
+                firmwareCommand
+            } else {
+                throw NoMatchingCommandException(
+                    "Device $identity requests FOTA packet $fotaMessageCounter (FMC), but no running FIRMWARE command was found",
+                )
             }
+        }
 
     private fun sendProgress(deviceMessage: DeviceMessage, firmwareCommand: Command) {
         val packet = deviceMessage.getFotaMessageCounter() + 1

@@ -9,7 +9,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.justRun
 import io.mockk.verify
-import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
@@ -21,10 +20,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class PskCommandResultHandlerTest {
     @MockK private lateinit var commandService: CommandService
+
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
     @InjectMockKs private lateinit var pskCommandResultHandler: PskCommandResultHandler
@@ -81,25 +82,23 @@ class PskCommandResultHandlerTest {
 
     companion object {
         @JvmStatic
-        fun hasSucceededTestSource(): Stream<Arguments> =
-            Stream.of(
-                Arguments.of(listOf("PSK:TMP"), "0", true),
-                Arguments.of(listOf("PSK:TMP"), "!PSK:######", true),
-                Arguments.of(listOf("INIT", "WDR"), "0", false),
-                Arguments.of(listOf("PSK:SET"), "0", false),
-                Arguments.of(listOf("PSK:TMP", "PSK:SET"), "0", true),
-            )
+        fun hasSucceededTestSource(): Stream<Arguments> = Stream.of(
+            Arguments.of(listOf("PSK:TMP"), "0", true),
+            Arguments.of(listOf("PSK:TMP"), "!PSK:######", true),
+            Arguments.of(listOf("INIT", "WDR"), "0", false),
+            Arguments.of(listOf("PSK:SET"), "0", false),
+            Arguments.of(listOf("PSK:TMP", "PSK:SET"), "0", true),
+        )
 
         @JvmStatic
-        fun hasFailedTestSource(): Stream<Arguments> =
-            Stream.of(
-                Arguments.of(listOf("PSK:DLER"), "0", true),
-                Arguments.of(listOf("PSK:DLER"), "!PSK:#####", true),
-                Arguments.of(listOf("PSK:HSER"), "0", true),
-                Arguments.of(listOf("PSK:EQER"), "0", false),
-                Arguments.of(listOf("INIT", "WDR"), "0", false),
-                Arguments.of(listOf("PSK:TMP"), "!PSK:######", false),
-                Arguments.of(listOf("PSK:SET"), "!PSK:#####SET", false),
-            )
+        fun hasFailedTestSource(): Stream<Arguments> = Stream.of(
+            Arguments.of(listOf("PSK:DLER"), "0", true),
+            Arguments.of(listOf("PSK:DLER"), "!PSK:#####", true),
+            Arguments.of(listOf("PSK:HSER"), "0", true),
+            Arguments.of(listOf("PSK:EQER"), "0", false),
+            Arguments.of(listOf("INIT", "WDR"), "0", false),
+            Arguments.of(listOf("PSK:TMP"), "!PSK:######", false),
+            Arguments.of(listOf("PSK:SET"), "!PSK:#####SET", false),
+        )
     }
 }

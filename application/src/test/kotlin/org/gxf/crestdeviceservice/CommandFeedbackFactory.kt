@@ -11,12 +11,11 @@ import org.gxf.crestdeviceservice.TestConstants.MESSAGE_RECEIVED
 import org.gxf.crestdeviceservice.TestConstants.timestamp
 
 object CommandFeedbackFactory {
-    fun rebootCommandReceivedFeedback() =
-        CommandFeedback.newBuilder()
-            .setDeviceId(DEVICE_ID)
-            .setCorrelationId(CORRELATION_ID)
-            .setTimestampStatus(timestamp)
-            .setStatus(CommandStatus.Received)
-            .setMessage(MESSAGE_RECEIVED)
-            .build()
+    fun rebootCommandReceivedFeedback() = CommandFeedback.newBuilder()
+        .setDeviceId(DEVICE_ID)
+        .setCorrelationId(CORRELATION_ID)
+        .setTimestampStatus(timestamp)
+        .setStatus(CommandStatus.Received)
+        .setMessage(MESSAGE_RECEIVED)
+        .build()
 }

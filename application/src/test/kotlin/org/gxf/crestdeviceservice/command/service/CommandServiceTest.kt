@@ -8,8 +8,6 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import java.time.Instant
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -23,11 +21,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import java.time.Instant
+import java.util.UUID
 
 @ExtendWith(MockKExtension::class)
 class CommandServiceTest {
     @MockK private lateinit var commandRepository: CommandRepository
-    @MockK(relaxed = true) private lateinit var commandFeedbackService: CommandFeedbackService
+
+    @MockK(relaxed = true)
+    private lateinit var commandFeedbackService: CommandFeedbackService
 
     @InjectMockKs private lateinit var commandService: CommandService
 
@@ -107,17 +109,16 @@ class CommandServiceTest {
 
     companion object {
         @JvmStatic
-        private fun invalidCommandValues() =
-            listOf(
-                "",
-                "0,1250,2500,3750,100",
-                "5:0,1250,2500,3750,100",
-                "L:0,1250,2500,3750,100",
-                "4:bla",
-                "4:0,1.25,2.5,3.75,0.1",
-                "4,0,1250,2500,3750,100",
-                "3:een,twee,drie,vier",
-                "AL6:0,1250,2500,3750,100",
-            )
+        private fun invalidCommandValues() = listOf(
+            "",
+            "0,1250,2500,3750,100",
+            "5:0,1250,2500,3750,100",
+            "L:0,1250,2500,3750,100",
+            "4:bla",
+            "4:0,1.25,2.5,3.75,0.1",
+            "4,0,1250,2500,3750,100",
+            "3:een,twee,drie,vier",
+            "AL6:0,1250,2500,3750,100",
+        )
     }
 }

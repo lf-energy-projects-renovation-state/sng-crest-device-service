@@ -4,14 +4,14 @@
 package org.gxf.crestdeviceservice.controller
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.time.Instant
-import java.util.UUID
 import org.gxf.crestdeviceservice.command.entity.Command
 import org.gxf.crestdeviceservice.command.service.CommandService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.Instant
+import java.util.UUID
 
 @RestController
 class RspController(private val commandService: CommandService) {
@@ -43,7 +43,7 @@ class RspController(private val commandService: CommandService) {
                 type = commandType,
                 status = Command.CommandStatus.PENDING,
                 commandValue = null,
-            )
+            ),
         )
     }
 }

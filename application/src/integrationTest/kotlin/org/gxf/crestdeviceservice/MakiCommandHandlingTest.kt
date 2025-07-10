@@ -6,9 +6,6 @@ package org.gxf.crestdeviceservice
 import com.alliander.sng.Command
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
-import java.time.Duration
-import java.time.Instant
-import java.util.UUID
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
@@ -22,6 +19,9 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.kafka.test.utils.KafkaTestUtils
 import org.springframework.test.annotation.DirtiesContext
+import java.time.Duration
+import java.time.Instant
+import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @EmbeddedKafka(topics = ["\${kafka.consumers.command.topic}", "\${kafka.producers.command-feedback.topic}"])
@@ -35,9 +35,11 @@ class MakiCommandHandlingTest {
 
     @Autowired private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
 
-    @Value("\${kafka.consumers.command.topic}") private lateinit var commandTopic: String
+    @Value("\${kafka.consumers.command.topic}")
+    private lateinit var commandTopic: String
 
-    @Value("\${kafka.producers.command-feedback.topic}") private lateinit var commandFeedbackTopic: String
+    @Value("\${kafka.producers.command-feedback.topic}")
+    private lateinit var commandFeedbackTopic: String
 
     @AfterEach
     fun cleanup() {

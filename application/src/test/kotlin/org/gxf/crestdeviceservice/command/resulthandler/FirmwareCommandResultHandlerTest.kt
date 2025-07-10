@@ -9,7 +9,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.justRun
 import io.mockk.verify
-import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
@@ -21,10 +20,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class FirmwareCommandResultHandlerTest {
     @MockK private lateinit var commandService: CommandService
+
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
 
     @InjectMockKs private lateinit var firmwareCommandResultHandler: FirmwareCommandResultHandler
@@ -82,23 +83,21 @@ class FirmwareCommandResultHandlerTest {
 
     companion object {
         @JvmStatic
-        fun hasSucceededTestSource(): Stream<Arguments> =
-            Stream.of(
-                Arguments.of(listOf("OTA:SUC"), "0", true),
-                Arguments.of(listOf("INIT", "WDR"), "0", false),
-                Arguments.of(listOf("INIT", "WDR", "OTA:SUC"), "0", true),
-            )
+        fun hasSucceededTestSource(): Stream<Arguments> = Stream.of(
+            Arguments.of(listOf("OTA:SUC"), "0", true),
+            Arguments.of(listOf("INIT", "WDR"), "0", false),
+            Arguments.of(listOf("INIT", "WDR", "OTA:SUC"), "0", true),
+        )
 
         @JvmStatic
-        fun hasFailedTestSource(): Stream<Arguments> =
-            Stream.of(
-                Arguments.of(listOf("OTA:SUC"), "0", false),
-                Arguments.of(listOf("INIT", "WDR"), "0", false),
-                Arguments.of(listOf("OTA:CSER"), "0", true),
-                Arguments.of(listOf("OTA:HSER"), "0", true),
-                Arguments.of(listOf("OTA:RST"), "0", true),
-                Arguments.of(listOf("OTA:SWNA"), "0", true),
-                Arguments.of(listOf("OTA:FLER"), "0", true),
-            )
+        fun hasFailedTestSource(): Stream<Arguments> = Stream.of(
+            Arguments.of(listOf("OTA:SUC"), "0", false),
+            Arguments.of(listOf("INIT", "WDR"), "0", false),
+            Arguments.of(listOf("OTA:CSER"), "0", true),
+            Arguments.of(listOf("OTA:HSER"), "0", true),
+            Arguments.of(listOf("OTA:RST"), "0", true),
+            Arguments.of(listOf("OTA:SWNA"), "0", true),
+            Arguments.of(listOf("OTA:FLER"), "0", true),
+        )
     }
 }

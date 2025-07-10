@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
 
-import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.device.entity.Device
 import org.gxf.crestdeviceservice.device.repository.DeviceRepository
@@ -22,6 +21,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
+import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @EmbeddedKafka(topics = ["\${kafka.producers.device-message.topic}"])
@@ -36,6 +36,7 @@ class DeviceCredentialsRetrievalTest {
     @Autowired private lateinit var restTemplate: TestRestTemplate
 
     @Autowired private lateinit var deviceRepository: DeviceRepository
+
     @Autowired private lateinit var pskRepository: PskRepository
 
     @BeforeEach

@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.firmware.service
 
-import java.util.UUID
-import kotlin.io.path.Path
-import kotlin.io.path.readLines
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
 import org.junit.jupiter.api.Test
+import java.util.UUID
+import kotlin.io.path.Path
+import kotlin.io.path.readLines
 
 class FirmwareHashServiceTest {
     private val originalFirmwarePacket = Path("src/test/resources/firmware-oneliner.txt").readLines().first()

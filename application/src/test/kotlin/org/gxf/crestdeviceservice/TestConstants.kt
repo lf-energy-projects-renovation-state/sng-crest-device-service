@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
 
+import org.gxf.crestdeviceservice.model.AlarmsInfo
 import java.time.Instant
 import java.util.UUID
-import org.gxf.crestdeviceservice.model.AlarmsInfo
 
 object TestConstants {
     const val DEVICE_ID = "device-id"

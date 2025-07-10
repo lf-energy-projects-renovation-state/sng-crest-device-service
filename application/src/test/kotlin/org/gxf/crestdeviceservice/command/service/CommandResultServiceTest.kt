@@ -28,13 +28,17 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(MockKExtension::class)
 class CommandResultServiceTest {
     @MockK private lateinit var rebootCommandResultHandler: RebootCommandResultHandler
+
     @MockK private lateinit var rspCommandResultHandler: RspCommandResultHandler
+
     @MockK private lateinit var infoAlarmsResultHandler: InfoAlarmsResultHandler
 
     @MockK private lateinit var infoAlarmsFeedbackGenerator: InfoAlarmsFeedbackGenerator
 
     @MockK private lateinit var commandService: CommandService
+
     @MockK private lateinit var commandResultHandlersByType: Map<Command.CommandType, CommandResultHandler>
+
     @SpykBean private val commandFeedbackGenerators: MutableList<CommandFeedbackGenerator> = mutableListOf()
 
     @InjectMockKs private lateinit var commandResultService: CommandResultService

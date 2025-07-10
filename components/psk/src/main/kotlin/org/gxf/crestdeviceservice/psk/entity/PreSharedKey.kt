@@ -9,8 +9,8 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.IdClass
-import java.time.Instant
 import org.gxf.crestdeviceservice.shared.persistence.DatabaseFieldEncryptor
+import java.time.Instant
 
 @Entity
 @IdClass(PreSharedKeyCompositeKey::class)

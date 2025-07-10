@@ -5,12 +5,12 @@ package org.gxf.crestdeviceservice.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.time.Instant
 import org.apache.avro.specific.SpecificRecordBase
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
 import org.gxf.sng.avro.DeviceMessage
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class MessageProducerService(

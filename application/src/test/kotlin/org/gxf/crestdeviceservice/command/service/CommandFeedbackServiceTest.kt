@@ -24,8 +24,11 @@ import org.springframework.kafka.core.KafkaTemplate
 
 @ExtendWith(MockKExtension::class)
 class CommandFeedbackServiceTest {
-    @MockK(relaxed = true) private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
+    @MockK(relaxed = true)
+    private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
+
     @MockK private lateinit var kafkaProducerProperties: KafkaProducerProperties
+
     @MockK private lateinit var commandFeedbackProperties: KafkaProducerTopicProperties
 
     private lateinit var service: CommandFeedbackService

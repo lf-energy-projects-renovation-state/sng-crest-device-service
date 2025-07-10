@@ -4,11 +4,11 @@
 package org.gxf.crestdeviceservice.service
 
 import io.mockk.mockk
-import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.ShipmentFileFactory
 import org.junit.jupiter.api.Test
 import org.springframework.mock.web.MockMultipartFile
+import java.io.File
 
 class ShipmentFileServiceTest {
     private val deviceCredentialsServiceMock = mockk<DeviceCredentialsService>()

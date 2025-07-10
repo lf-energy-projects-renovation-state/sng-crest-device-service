@@ -28,21 +28,19 @@ class ShipmentFileService(private val deviceCredentialsService: DeviceCredential
     fun mapShipmentFileToDTO(file: MultipartFile): ShipmentFileDTO {
         val fileContent = String(file.inputStream.readBytes())
 
-        logger.debug { "Contents of shipment file:\n${fileContent}" }
+        logger.debug { "Contents of shipment file:\n$fileContent" }
 
         return mapper.readValue<ShipmentFileDTO>(fileContent)
     }
 
-    fun mapDTOToDeviceCredentials(shipmentFile: ShipmentFileDTO): List<DeviceCredentials> {
-        return shipmentFile.devices.map {
-            with(it.rtu) {
-                DeviceCredentials.newBuilder()
-                    .setImei(rtuId)
-                    .setPsk(pskEncrypted)
-                    .setSecret(pskChangeSecretEncrypted)
-                    .setKeyRef(pskEncryptionKeyRef)
-                    .build()
-            }
+    fun mapDTOToDeviceCredentials(shipmentFile: ShipmentFileDTO): List<DeviceCredentials> = shipmentFile.devices.map {
+        with(it.rtu) {
+            DeviceCredentials.newBuilder()
+                .setImei(rtuId)
+                .setPsk(pskEncrypted)
+                .setSecret(pskChangeSecretEncrypted)
+                .setKeyRef(pskEncryptionKeyRef)
+                .build()
         }
     }
 }

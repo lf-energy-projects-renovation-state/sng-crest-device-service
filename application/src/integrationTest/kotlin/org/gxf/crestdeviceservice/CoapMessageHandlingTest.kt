@@ -5,9 +5,6 @@ package org.gxf.crestdeviceservice
 
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus
-import java.time.Duration
-import java.time.Instant
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
 import org.gxf.crestdeviceservice.IntegrationTestHelper.getFileContentAsString
@@ -33,16 +30,19 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.kafka.test.utils.KafkaTestUtils
 import org.springframework.test.annotation.DirtiesContext
+import java.time.Duration
+import java.time.Instant
+import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @EmbeddedKafka(
     topics =
-        [
-            "\${kafka.consumers.command.topic}",
-            "\${kafka.consumers.pre-shared-key.topic}",
-            "\${kafka.producers.command-feedback.topic}",
-            "\${kafka.producers.device-message.topic}",
-        ]
+    [
+        "\${kafka.consumers.command.topic}",
+        "\${kafka.consumers.pre-shared-key.topic}",
+        "\${kafka.producers.command-feedback.topic}",
+        "\${kafka.producers.device-message.topic}",
+    ],
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CoapMessageHandlingTest {
@@ -63,7 +63,8 @@ class CoapMessageHandlingTest {
 
     @Autowired private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
 
-    @Value("\${kafka.producers.command-feedback.topic}") private lateinit var commandFeedbackTopic: String
+    @Value("\${kafka.producers.command-feedback.topic}")
+    private lateinit var commandFeedbackTopic: String
 
     @BeforeEach
     fun setup() {
@@ -90,7 +91,7 @@ class CoapMessageHandlingTest {
                 Command.CommandType.PSK,
                 null,
                 Command.CommandStatus.PENDING,
-            )
+            ),
         )
         commandRepository.save(
             Command(
@@ -101,7 +102,7 @@ class CoapMessageHandlingTest {
                 Command.CommandType.PSK_SET,
                 null,
                 Command.CommandStatus.PENDING,
-            )
+            ),
         )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
@@ -125,7 +126,7 @@ class CoapMessageHandlingTest {
                 Command.CommandType.PSK,
                 null,
                 Command.CommandStatus.IN_PROGRESS,
-            )
+            ),
         )
         commandRepository.save(
             Command(
@@ -136,7 +137,7 @@ class CoapMessageHandlingTest {
                 Command.CommandType.PSK_SET,
                 null,
                 Command.CommandStatus.IN_PROGRESS,
-            )
+            ),
         )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
@@ -165,7 +166,7 @@ class CoapMessageHandlingTest {
                 Command.CommandType.PSK,
                 null,
                 Command.CommandStatus.IN_PROGRESS,
-            )
+            ),
         )
         commandRepository.save(
             Command(
@@ -176,7 +177,7 @@ class CoapMessageHandlingTest {
                 Command.CommandType.PSK_SET,
                 null,
                 Command.CommandStatus.IN_PROGRESS,
-            )
+            ),
         )
 
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }

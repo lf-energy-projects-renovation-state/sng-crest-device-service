@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.service
 
-import com.alliander.sng.Command as ExternalCommand
 import com.alliander.sng.CommandFeedback
 import com.alliander.sng.CommandStatus.Cancelled
 import com.alliander.sng.CommandStatus.Error
@@ -18,6 +17,7 @@ import org.gxf.crestdeviceservice.command.mapper.CommandFeedbackMapper.externalC
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
+import com.alliander.sng.Command as ExternalCommand
 
 @Service
 class CommandFeedbackService(

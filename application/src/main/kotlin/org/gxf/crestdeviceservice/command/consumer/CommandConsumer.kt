@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.consumer
 
-import com.alliander.sng.Command as ExternalCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.crestdeviceservice.command.exception.CommandValidationException
 import org.gxf.crestdeviceservice.command.mapper.CommandMapper
@@ -12,6 +11,7 @@ import org.gxf.crestdeviceservice.command.service.CommandService
 import org.gxf.crestdeviceservice.psk.service.PskService
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
+import com.alliander.sng.Command as ExternalCommand
 
 @Service
 class CommandConsumer(

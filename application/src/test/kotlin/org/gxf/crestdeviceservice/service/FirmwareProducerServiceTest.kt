@@ -7,7 +7,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import java.util.UUID
 import org.apache.avro.specific.SpecificRecordBase
 import org.gxf.crestdeviceservice.FirmwaresFactory
 import org.gxf.crestdeviceservice.TestConstants.COMMAND_FEEDBACK_TOPIC
@@ -24,12 +23,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.kafka.core.KafkaTemplate
+import java.util.UUID
 
 @ExtendWith(MockKExtension::class)
 class FirmwareProducerServiceTest {
-    @MockK(relaxed = true) private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
+    @MockK(relaxed = true)
+    private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
     private lateinit var kafkaProducerProperties: KafkaProducerProperties
+
     @MockK private lateinit var firmwareService: FirmwareService
+
     @MockK private lateinit var firmwareMapper: FirmwareMapper
 
     private lateinit var service: FirmwareProducerService

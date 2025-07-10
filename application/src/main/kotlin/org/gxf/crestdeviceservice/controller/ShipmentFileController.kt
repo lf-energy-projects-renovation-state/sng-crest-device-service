@@ -47,7 +47,8 @@ class ShipmentFileController(val shipmentFileService: ShipmentFileService) {
             logger.error(e) { "Failed to process firmware file" }
             when (e) {
                 is JsonParseException,
-                is JsonMappingException -> redirectAttributes.setMessage("Failed to parse file as JSON")
+                is JsonMappingException,
+                    -> redirectAttributes.setMessage("Failed to parse file as JSON")
                 else -> redirectAttributes.setMessage("Failed to process file")
             }
         }
