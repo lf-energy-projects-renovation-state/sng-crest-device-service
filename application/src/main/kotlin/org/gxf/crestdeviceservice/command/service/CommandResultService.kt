@@ -32,7 +32,7 @@ class CommandResultService(
         val resultHandler =
             commandResultHandlersByType[command.type]
                 ?: throw NoCommandResultHandlerForCommandTypeException(
-                    "No command result handler for command type ${command.type}"
+                    "No command result handler for command type ${command.type}",
                 )
         handleResult(command, resultHandler, message)
     }

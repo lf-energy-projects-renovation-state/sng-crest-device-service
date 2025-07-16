@@ -7,7 +7,6 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verify
-import java.util.UUID
 import org.gxf.crestdeviceservice.FirmwareFileFactory
 import org.gxf.crestdeviceservice.firmware.entity.Firmware
 import org.gxf.crestdeviceservice.firmware.entity.FirmwarePacket
@@ -19,10 +18,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.util.UUID
 
 @WebMvcTest(FirmwareController::class)
 class FirmwareControllerTest {
     @MockkBean private lateinit var firmwareService: FirmwareService
+
     @MockkBean private lateinit var firmwareProducerService: FirmwareProducerService
 
     @Autowired private lateinit var mockMvc: MockMvc

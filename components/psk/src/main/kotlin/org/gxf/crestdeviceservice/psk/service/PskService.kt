@@ -4,8 +4,6 @@
 package org.gxf.crestdeviceservice.psk.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.security.SecureRandom
-import java.time.Instant
 import org.gxf.crestdeviceservice.psk.configuration.PskConfiguration
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKeyStatus
@@ -13,6 +11,8 @@ import org.gxf.crestdeviceservice.psk.exception.InitialKeySetException
 import org.gxf.crestdeviceservice.psk.exception.NoExistingPskException
 import org.gxf.crestdeviceservice.psk.repository.PskRepository
 import org.springframework.stereotype.Service
+import java.security.SecureRandom
+import java.time.Instant
 
 @Service
 class PskService(private val pskRepository: PskRepository, private val pskConfiguration: PskConfiguration) {
@@ -42,9 +42,7 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
 
     fun readyForPskSetCommand(deviceId: String) = isReadyPskPresent(deviceId) && !isPendingPskPresent(deviceId)
 
-    fun isPendingPskPresent(deviceId: String): Boolean {
-        return getCurrentPendingPsk(deviceId) != null
-    }
+    fun isPendingPskPresent(deviceId: String): Boolean = getCurrentPendingPsk(deviceId) != null
 
     private fun isReadyPskPresent(deviceId: String) = getCurrentReadyPsk(deviceId) != null
 
@@ -75,12 +73,11 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
         pskRepository.save(PreSharedKey(deviceId, newVersion, Instant.now(), newKey, PreSharedKeyStatus.READY))
     }
 
-    private fun generatePsk() =
-        secureRandom
-            .ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length)
-            .toArray()
-            .map { ALLOWED_CHARACTERS[it] }
-            .joinToString("")
+    private fun generatePsk() = secureRandom
+        .ints(KEY_LENGTH, 0, ALLOWED_CHARACTERS.length)
+        .toArray()
+        .map { ALLOWED_CHARACTERS[it] }
+        .joinToString("")
 
     @Throws(NoExistingPskException::class)
     fun setPskToPendingForDevice(deviceId: String): PreSharedKey {
@@ -99,7 +96,6 @@ class PskService(private val pskRepository: PskRepository, private val pskConfig
      */
     @Throws(NoExistingPskException::class)
     fun changeActiveKey(deviceId: String) {
-
         val currentPsk = getCurrentActivePsk(deviceId)
         val newPsk =
             getCurrentPendingPsk(deviceId)

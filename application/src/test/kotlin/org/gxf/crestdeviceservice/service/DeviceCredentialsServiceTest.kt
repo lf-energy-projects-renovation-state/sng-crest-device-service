@@ -22,8 +22,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(MockKExtension::class)
 class DeviceCredentialsServiceTest {
     @MockK private lateinit var deviceService: DeviceService
+
     @MockK private lateinit var pskService: PskService
+
     @MockK private lateinit var pskDecryptionService: PskDecryptionService
+
     @MockK private lateinit var commandService: CommandService
 
     @InjectMockKs private lateinit var deviceCredentialsService: DeviceCredentialsService

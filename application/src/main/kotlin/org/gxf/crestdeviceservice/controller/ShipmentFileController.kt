@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller()
 @RequestMapping("/web/shipmentfile")
-class ShipmentFileController(val shipmentFileService: ShipmentFileService) {
+class ShipmentFileController(private val shipmentFileService: ShipmentFileService) {
     private val logger = KotlinLogging.logger {}
     private val redirectUrl = "redirect:/web/shipmentfile"
 
@@ -47,7 +47,8 @@ class ShipmentFileController(val shipmentFileService: ShipmentFileService) {
             logger.error(e) { "Failed to process firmware file" }
             when (e) {
                 is JsonParseException,
-                is JsonMappingException -> redirectAttributes.setMessage("Failed to parse file as JSON")
+                is JsonMappingException,
+                    -> redirectAttributes.setMessage("Failed to parse file as JSON")
                 else -> redirectAttributes.setMessage("Failed to process file")
             }
         }

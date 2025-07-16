@@ -11,7 +11,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.justRun
 import io.mockk.verify
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
@@ -24,13 +23,18 @@ import org.gxf.crestdeviceservice.model.DeviceMessage
 import org.gxf.crestdeviceservice.model.Downlink
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.util.UUID
 
 @ExtendWith(MockKExtension::class)
 class PayloadServiceTest {
     @MockK private lateinit var commandResultService: CommandResultService
+
     @MockK private lateinit var firmwareService: FirmwareService
+
     @MockK private lateinit var commandService: CommandService
-    @MockK(relaxed = true) private lateinit var commandFeedbackService: CommandFeedbackService
+
+    @MockK(relaxed = true)
+    private lateinit var commandFeedbackService: CommandFeedbackService
 
     @InjectMockKs private lateinit var payloadService: PayloadService
 

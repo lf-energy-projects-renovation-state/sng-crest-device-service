@@ -8,7 +8,6 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.FirmwareFactory
 import org.gxf.crestdeviceservice.FirmwareFactory.getFirmwareEntity
@@ -22,13 +21,18 @@ import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.util.UUID
 
 @ExtendWith(MockKExtension::class)
 class FirmwareServiceTest {
     @MockK private lateinit var firmwareRepository: FirmwareRepository
+
     @MockK private lateinit var firmwarePacketRepository: FirmwarePacketRepository
+
     @MockK private lateinit var firmwareMapper: FirmwareMapper
+
     @MockK private lateinit var firmwareHashService: FirmwareHashService
+
     @MockK private lateinit var deviceService: DeviceService
 
     @InjectMockKs private lateinit var firmwareService: FirmwareService

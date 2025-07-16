@@ -44,11 +44,10 @@ class DownlinkService(
     private fun getCommandsToSend(pendingCommands: List<Command>) =
         pendingCommands.filter { command -> commandCanBeSent(command) }
 
-    private fun commandCanBeSent(command: Command) =
-        when (command.type) {
-            Command.CommandType.PSK_SET -> pskService.readyForPskSetCommand(command.deviceId)
-            else -> true
-        }
+    private fun commandCanBeSent(command: Command) = when (command.type) {
+        Command.CommandType.PSK_SET -> pskService.readyForPskSetCommand(command.deviceId)
+        else -> true
+    }
 
     private fun Downlink.fillFromCommands(pendingCommands: List<Command>) {
         logger.info { "Device has pending commands of types: ${getPrintableCommandTypes(pendingCommands)}." }

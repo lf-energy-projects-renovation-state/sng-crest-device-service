@@ -10,7 +10,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.justRun
 import io.mockk.verify
-import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.MessageFactory
@@ -26,13 +25,16 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class InfoAlarmsResultHandlerTest {
     @MockK private lateinit var infoAlarmsFeedbackGenerator: InfoAlarmsFeedbackGenerator
 
     @MockK private lateinit var commandService: CommandService
+
     @MockK private lateinit var commandFeedbackService: CommandFeedbackService
+
     @MockK private lateinit var alarmsInfoService: AlarmsInfoService
 
     @InjectMockKs private lateinit var resultHandler: InfoAlarmsResultHandler
@@ -118,13 +120,12 @@ class InfoAlarmsResultHandlerTest {
 
     companion object {
         @JvmStatic
-        fun hasFailedTestSource(): Stream<Arguments> =
-            Stream.of(
-                Arguments.of(listOf("AL6:SET"), "0", false),
-                Arguments.of(listOf("INIT", "WDR"), "0", false),
-                Arguments.of(listOf("INFO:DLER"), "0", true),
-                Arguments.of(listOf("INFO:ERR"), "0", true),
-                Arguments.of(listOf("INFO:DLNA", "INIT"), "0", true),
-            )
+        fun hasFailedTestSource(): Stream<Arguments> = Stream.of(
+            Arguments.of(listOf("AL6:SET"), "0", false),
+            Arguments.of(listOf("INIT", "WDR"), "0", false),
+            Arguments.of(listOf("INFO:DLER"), "0", true),
+            Arguments.of(listOf("INFO:ERR"), "0", true),
+            Arguments.of(listOf("INFO:DLNA", "INIT"), "0", true),
+        )
     }
 }

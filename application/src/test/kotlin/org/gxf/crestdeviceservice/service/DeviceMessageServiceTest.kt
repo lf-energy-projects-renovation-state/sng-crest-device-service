@@ -9,7 +9,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.TestConstants.DEVICE_ID
 import org.gxf.crestdeviceservice.model.Downlink
 import org.junit.jupiter.api.BeforeEach
@@ -18,9 +18,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 class DeviceMessageServiceTest {
-    @MockK(relaxed = true) private lateinit var messageProducerService: MessageProducerService
-    @MockK(relaxed = true) private lateinit var downlinkService: DownlinkService
-    @MockK(relaxed = true) private lateinit var payloadService: PayloadService
+    @MockK(relaxed = true)
+    private lateinit var messageProducerService: MessageProducerService
+
+    @MockK(relaxed = true)
+    private lateinit var downlinkService: DownlinkService
+
+    @MockK(relaxed = true)
+    private lateinit var payloadService: PayloadService
 
     @InjectMockKs private lateinit var deviceMessageService: DeviceMessageService
 

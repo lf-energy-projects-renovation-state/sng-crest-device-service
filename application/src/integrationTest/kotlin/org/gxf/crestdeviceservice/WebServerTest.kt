@@ -3,9 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice
 
-import java.io.File
-import java.time.Duration
-import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.IntegrationTestHelper.createKafkaConsumer
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
@@ -35,6 +32,9 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.util.LinkedMultiValueMap
+import java.io.File
+import java.time.Duration
+import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(topics = ["\${kafka.producers.firmware.topic}"])
@@ -42,10 +42,15 @@ import org.springframework.util.LinkedMultiValueMap
 @EnableConfigurationProperties(KafkaProducerProperties::class)
 class WebServerTest {
     @Autowired private lateinit var restTemplate: TestRestTemplate
+
     @Autowired private lateinit var firmwareRepository: FirmwareRepository
+
     @Autowired private lateinit var firmwarePacketRepository: FirmwarePacketRepository
+
     @Autowired private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
+
     @Autowired private lateinit var kafkaProducerProperties: KafkaProducerProperties
+
     @Autowired private lateinit var pskRepository: PskRepository
 
     companion object {

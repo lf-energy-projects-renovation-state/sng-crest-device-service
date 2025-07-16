@@ -4,7 +4,6 @@
 package org.gxf.crestdeviceservice.command.generator
 
 import io.mockk.junit5.MockKExtension
-import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.TestConstants.ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_3
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class AnalogAlarmsThresholdCommandGeneratorTest {
@@ -32,10 +32,9 @@ class AnalogAlarmsThresholdCommandGeneratorTest {
 
     companion object {
         @JvmStatic
-        private fun valueTranslations() =
-            Stream.of(
-                Arguments.of(ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_3, ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_3),
-                Arguments.of(ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_4, ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_4),
-            )
+        private fun valueTranslations() = Stream.of(
+            Arguments.of(ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_3, ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_3),
+            Arguments.of(ANALOG_ALARM_THRESHOLDS_MILLIBAR_PORT_4, ANALOG_ALARM_THRESHOLDS_PAYLOAD_PORT_4),
+        )
     }
 }

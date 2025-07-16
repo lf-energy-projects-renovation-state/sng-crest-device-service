@@ -20,7 +20,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @WebMvcTest(PskController::class)
 class PskControllerTest {
     @MockkBean private lateinit var pskService: PskService
-    @MockkBean(relaxed = true) private lateinit var metricService: MetricService
+
+    @MockkBean(relaxed = true)
+    private lateinit var metricService: MetricService
 
     @Autowired private lateinit var mockMvc: MockMvc
 

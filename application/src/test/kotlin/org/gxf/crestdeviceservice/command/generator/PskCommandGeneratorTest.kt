@@ -7,7 +7,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.TestConstants
@@ -19,10 +18,12 @@ import org.gxf.crestdeviceservice.psk.service.PskService
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import java.time.Instant
 
 @ExtendWith(MockKExtension::class)
 class PskCommandGeneratorTest {
     @MockK private lateinit var pskService: PskService
+
     @MockK private lateinit var deviceService: DeviceService
 
     @InjectMockKs private lateinit var generator: PskCommandGenerator
@@ -45,6 +46,6 @@ class PskCommandGeneratorTest {
         val result = generator.generateCommandString(pskCommandPending)
 
         // PSK:[Key]:[Hash]:SET
-        assertThat(result).isEqualTo("PSK:${key}:${expectedHash}")
+        assertThat(result).isEqualTo("PSK:$key:$expectedHash")
     }
 }

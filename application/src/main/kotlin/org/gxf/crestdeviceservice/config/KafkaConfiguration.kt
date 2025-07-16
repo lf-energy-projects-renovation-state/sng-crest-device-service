@@ -30,21 +30,19 @@ class KafkaConfiguration(private val kafkaProperties: KafkaProperties, private v
         }
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, SpecificRecordBase> =
-        DefaultKafkaConsumerFactory(
-            kafkaProperties.buildConsumerProperties(sslBundles),
-            StringDeserializer(),
-            AvroDeserializer(listOf(DeviceCredentials.getClassSchema(), Command.getClassSchema())),
-        )
+    fun consumerFactory(): ConsumerFactory<String, SpecificRecordBase> = DefaultKafkaConsumerFactory(
+        kafkaProperties.buildConsumerProperties(sslBundles),
+        StringDeserializer(),
+        AvroDeserializer(listOf(DeviceCredentials.getClassSchema(), Command.getClassSchema())),
+    )
 
     @Bean
     fun kafkaTemplate(producerFactory: ProducerFactory<String, SpecificRecordBase>) = KafkaTemplate(producerFactory)
 
     @Bean
-    fun producerFactory(): ProducerFactory<String, SpecificRecordBase> =
-        DefaultKafkaProducerFactory(
-            kafkaProperties.buildProducerProperties(sslBundles),
-            StringSerializer(),
-            AvroSerializer(),
-        )
+    fun producerFactory(): ProducerFactory<String, SpecificRecordBase> = DefaultKafkaProducerFactory(
+        kafkaProperties.buildProducerProperties(sslBundles),
+        StringSerializer(),
+        AvroSerializer(),
+    )
 }

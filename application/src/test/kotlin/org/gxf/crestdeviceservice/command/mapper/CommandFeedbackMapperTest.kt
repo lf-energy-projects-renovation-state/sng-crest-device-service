@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.command.mapper
 
-import com.alliander.sng.CommandStatus as ExternalCommandStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.CommandFactory
 import org.gxf.crestdeviceservice.CommandFeedbackFactory
 import org.gxf.crestdeviceservice.ExternalCommandFactory
 import org.gxf.crestdeviceservice.TestConstants.MESSAGE_RECEIVED
 import org.junit.jupiter.api.Test
+import com.alliander.sng.CommandStatus as ExternalCommandStatus
 
 class CommandFeedbackMapperTest {
     private val status = ExternalCommandStatus.Received

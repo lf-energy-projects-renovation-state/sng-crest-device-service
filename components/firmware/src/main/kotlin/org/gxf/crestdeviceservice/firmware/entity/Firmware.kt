@@ -7,9 +7,9 @@ import jakarta.annotation.Generated
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
-import java.util.UUID
 import org.hibernate.annotations.Cascade
 import org.hibernate.annotations.CascadeType
+import java.util.UUID
 
 @Entity
 class Firmware(

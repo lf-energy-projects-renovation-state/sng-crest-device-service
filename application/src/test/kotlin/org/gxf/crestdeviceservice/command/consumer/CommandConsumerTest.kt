@@ -85,10 +85,9 @@ class CommandConsumerTest {
         verify(exactly = 0) { commandService.saveCommand(any<Command>()) }
     }
 
-    private fun contentEquals(command: Command) =
-        (command.deviceId == this.command.deviceId) &&
-            (command.correlationId == this.command.correlationId) &&
-            (command.type == this.command.type) &&
-            (command.commandValue == this.command.commandValue) &&
-            (command.status == this.command.status)
+    private fun contentEquals(command: Command) = (command.deviceId == this.command.deviceId) &&
+        (command.correlationId == this.command.correlationId) &&
+        (command.type == this.command.type) &&
+        (command.commandValue == this.command.commandValue) &&
+        (command.status == this.command.status)
 }

@@ -27,20 +27,19 @@ class Downlink(private val maxSize: Int = 1024) {
      * @param commandToAdd The command you want to add to the downlink
      * @return true if the command was added, false otherwise
      */
-    fun addIfPossible(commandToAdd: String): Boolean =
-        when {
-            isFirmwareUpdate(commandToAdd) && downlink.isNotEmpty() -> {
-                logger.debug { "Not adding OTA, because other commands are already present" }
-                false
-            }
-            isFirmwareUpdate(downlink) -> {
-                logger.debug { "Not adding $downlink because the current downlink contains an OTA" }
-                false
-            }
-            else -> {
-                addIfItFits(commandToAdd, downlink.length)
-            }
+    fun addIfPossible(commandToAdd: String): Boolean = when {
+        isFirmwareUpdate(commandToAdd) && downlink.isNotEmpty() -> {
+            logger.debug { "Not adding OTA, because other commands are already present" }
+            false
         }
+        isFirmwareUpdate(downlink) -> {
+            logger.debug { "Not adding $downlink because the current downlink contains an OTA" }
+            false
+        }
+        else -> {
+            addIfItFits(commandToAdd, downlink.length)
+        }
+    }
 
     private fun addIfItFits(commandToAdd: String, currentSize: Int): Boolean {
         val newCumulative =

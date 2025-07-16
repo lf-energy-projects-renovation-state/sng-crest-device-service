@@ -10,7 +10,8 @@ enum class ErrorUrc(val message: String) {
     DLER("Downlink (syntax) error"),
     HSER("SHA256 hash error"),
     CSER("Checksum error"),
-    ERR("Error processing (downlink) value");
+    ERR("Error processing (downlink) value"),
+    ;
 
     companion object {
         fun getMessageFromCode(code: String): String {

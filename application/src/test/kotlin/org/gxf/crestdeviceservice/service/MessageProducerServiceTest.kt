@@ -23,7 +23,8 @@ import org.springframework.kafka.core.KafkaTemplate
 
 @ExtendWith(MockKExtension::class)
 class MessageProducerServiceTest {
-    @MockK(relaxed = true) private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
+    @MockK(relaxed = true)
+    private lateinit var kafkaTemplate: KafkaTemplate<String, SpecificRecordBase>
     private lateinit var kafkaProducerProperties: KafkaProducerProperties
 
     private lateinit var service: MessageProducerService
@@ -49,7 +50,7 @@ class MessageProducerServiceTest {
                         {
                             "ID": 12345
                         }
-                    """
+                    """,
                 )
 
         service.produceMessage(jsonNode)
