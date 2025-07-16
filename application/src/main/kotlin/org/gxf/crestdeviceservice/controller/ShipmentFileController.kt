@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller()
 @RequestMapping("/web/shipmentfile")
-class ShipmentFileController(val shipmentFileService: ShipmentFileService) {
+class ShipmentFileController(private val shipmentFileService: ShipmentFileService) {
     private val logger = KotlinLogging.logger {}
     private val redirectUrl = "redirect:/web/shipmentfile"
 
