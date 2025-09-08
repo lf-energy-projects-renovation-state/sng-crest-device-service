@@ -34,7 +34,6 @@ springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "
 springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "spring-boot" }
 springBootStarterActuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
 springBootStarterSecurity = { group = "org.springframework.boot", name = "spring-boot-starter-security" }
-springBootStarterSecurityTest = { group = "org.springframework.boot", name = "spring-boot-starter-security-test" }
 springBootStarterTest = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
 springBootStarterThymeleaf = { group = "org.springframework.boot", name = "spring-boot-starter-thymeleaf" }
 springBootStarterWeb = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
@@ -42,6 +41,7 @@ springBootStarterDataJpa = { group = "org.springframework.boot", name = "spring-
 springSecurityCore = { group = "org.springframework.security", name = "spring-security-core" }
 springSecurityConfig = { group = "org.springframework.security", name = "spring-security-config" }
 springSecurityLdap = { group = "org.springframework.security", name = "spring-security-ldap" }
+springSecurityTest = { group = "org.springframework.security", name = "spring-security-test" }
 springSecurityWeb = { group = "org.springframework.security", name = "spring-security-web" }
 springKafka = { group = "org.springframework.kafka", name = "spring-kafka" }
 springKafkaTest = { group = "org.springframework.kafka", name = "spring-kafka-test" }

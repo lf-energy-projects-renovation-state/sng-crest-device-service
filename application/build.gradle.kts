@@ -36,6 +36,7 @@ dependencies {
     runtimeOnly(libs.flyway)
 
     testImplementation(libs.springBootStarterTest)
+    testImplementation(libs.springSecurityTest)
     testImplementation(libs.mockk)
     testImplementation(libs.springmockk)
 
@@ -81,6 +82,9 @@ testing {
                 implementation(project(":components:device"))
                 implementation(project(":components:firmware"))
                 implementation(libs.springBootStarterDataJpa)
+                implementation(libs.springSecurityConfig)
+                implementation(libs.springSecurityCore)
+                implementation(libs.springSecurityWeb)
                 implementation(libs.kafkaAvro)
                 implementation(libs.springKafka)
                 implementation(libs.springBootStarterTest)
