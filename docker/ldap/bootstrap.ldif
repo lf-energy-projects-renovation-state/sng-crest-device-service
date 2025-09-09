@@ -1,0 +1,38 @@
+# admin user
+dn: cn=admin,dc=gxf,dc=org
+changetype: add
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+userPassword: adminpassword
+description: LDAP Administrator
+
+# organisational unit voor OT Hub, generieke OU, geen toegang tot de apps
+dn: ou=OTHUB,dc=gxf,dc=org
+changetype: add
+objectClass: organizationalUnit
+ou: OTHUB
+
+dn: uid=lampjeaan,ou=OTHUB,dc=gxf,dc=org
+changetype: add
+objectClass: inetOrgPerson
+cn: Lampje Aan
+sn: Aan
+uid: lampjeaan
+mail: lampjeaan@gxf.org
+userPassword: password123
+
+# organisational unit voor KOD Beheer, specifieke OU, wel toegang tot de apps
+dn: ou=kodbeheer,dc=gxf,dc=org
+changetype: add
+objectClass: organizationalUnit
+ou: kodbeheer
+
+dn: uid=overdruk,ou=kodbeheer,dc=gxf,dc=org
+changetype: add
+objectClass: inetOrgPerson
+cn: Over Druk
+sn: Druk
+uid: overdruk
+mail: overdruk@gxf.org
+userPassword: password789
