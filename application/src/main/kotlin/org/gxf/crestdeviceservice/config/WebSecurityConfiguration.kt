@@ -41,7 +41,8 @@ class WebSecurityConfiguration {
     fun configure(auth: AuthenticationManagerBuilder) {
         auth.ldapAuthentication()
             .userDnPatterns("uid={0},ou=OTHUB,dc=gxf,dc=org")
-            .groupSearchBase("ou=groups")
+            .groupSearchBase("ou=groups,dc=gxf,dc=org")
+            .groupSearchFilter("member={0}")
             .contextSource().apply {
                 root("dc=gxf,dc=org")
                 url("ldap://localhost:389")

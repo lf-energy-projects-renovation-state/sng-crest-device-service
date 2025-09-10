@@ -1,4 +1,4 @@
-# admin user
+# admin user, added by default, but not needed for this setup
 #dn: cn=admin,dc=gxf,dc=org
 #changetype: add
 #objectClass: simpleSecurityObject
@@ -33,14 +33,20 @@ mail: overdruk@gxf.org
 userPassword: password789
 
 # Groups
-dn: cn=flexovl,ou=OTHUB,dc=gxf,dc=org
+dn: ou=groups,dc=gxf,dc=org
+changetype: add
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: cn=flexovl,ou=groups,dc=gxf,dc=org
 changetype: add
 objectClass: groupOfNames
 objectClass: top
 cn: flexovl
 member: uid=lampjeaan,ou=OTHUB,dc=gxf,dc=org
 
-dn: cn=kod,ou=OTHUB,dc=gxf,dc=org
+dn: cn=kod,ou=groups,dc=gxf,dc=org
 changetype: add
 objectClass: groupOfNames
 objectClass: top
