@@ -11,16 +11,22 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.util.matcher.RequestMatcher
 
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfiguration {
     @Bean
-    fun filterChain(http: HttpSecurity, webAppPortMatcher: RequestMatcher): SecurityFilterChain {
+    fun filterChain(http: HttpSecurity, webServerProperties: WebServerProperties): SecurityFilterChain {
         http {
             authorizeHttpRequests {
-                authorize(webAppPortMatcher, authenticated)
+                authorize(
+                    "/web/**",
+                    hasAnyRole(
+                        roles = webServerProperties.authorizedRoles
+                            .map { it.uppercase() }
+                            .toTypedArray<String>(),
+                    ),
+                )
                 authorize(anyRequest, permitAll)
             }
             formLogin {
@@ -30,11 +36,6 @@ class WebSecurityConfiguration {
             }
         }
         return http.build()
-    }
-
-    @Bean
-    fun webAppPortMatcher(webServerProperties: WebServerProperties): RequestMatcher = RequestMatcher { request ->
-        request.localPort == webServerProperties.port
     }
 
     @Autowired

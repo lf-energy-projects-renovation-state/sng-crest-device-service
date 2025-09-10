@@ -34,16 +34,15 @@ The repositories contain test certificates that can be used for local testing. (
 They can be also be (re)generated using the [generate_certificates.sh](scripts/generate_certificates.sh) script.
 
 # Web apps
-This service contains two web applications. 
-These web apps run on the port specified by the property `config.web-server.port`.
-For the `dev` profile this is port 9001.
+This service contains a web application that runs on the port specified by the property `config.web-server.port`.
+For the `dev` profile this is port 9001, so http://localhost:9001 will get you there.
 
-The URL paths to the apps:
-- Firmware upload: `/web/firmware`
-- Shipment file upload: `/web/shipmentfile`
-
-So, for local development, the URLs are:
-- Firmware upload: http://localhost:9001/web/firmware
-- Shipment file upload: http://localhost:9001/web/shipmentfile
+You have to log in to access the app. There are two users in the LDAP server (provided by `docker-compose.yaml`):
+- `overdruk`/`password789`: part of the group 'kod', which has access
+- `lampjeaan`/`password123`: part of the group 'flexovl', which has _no_ access and can be used to test the access control
 
 (use a browser that supports 'unsafe' (non-https) connections, e.g. Firefox, Brave, etc.)
+
+## LDAP Admin
+If you want to look around in LDAP, enable the `phpldapadmin` service in `docker-compose.yaml` and go to http://localhost:9000.
+Login with `cn=admin,dc=gxf,dc=org` and password `admin`.

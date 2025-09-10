@@ -31,6 +31,8 @@ config:
   # port for web client
   web-server:
     port: 9001
+    authorized-roles:
+      - "kod"
 
 kafka:
   consumers:
