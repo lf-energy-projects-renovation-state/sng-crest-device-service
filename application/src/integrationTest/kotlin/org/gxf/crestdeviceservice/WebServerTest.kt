@@ -6,6 +6,7 @@ package org.gxf.crestdeviceservice
 import org.assertj.core.api.Assertions.assertThat
 import org.gxf.crestdeviceservice.IntegrationTestHelper.createKafkaConsumer
 import org.gxf.crestdeviceservice.config.KafkaProducerProperties
+import org.gxf.crestdeviceservice.device.repository.DeviceRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwarePacketRepository
 import org.gxf.crestdeviceservice.firmware.repository.FirmwareRepository
 import org.gxf.crestdeviceservice.psk.entity.PreSharedKey
@@ -25,6 +26,7 @@ import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.kafka.test.EmbeddedKafkaBroker
@@ -36,7 +38,7 @@ import java.time.Duration
 import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EmbeddedKafka(topics = ["\${kafka.producers.firmware.topic}"])
+@EmbeddedKafka(topics = [$$"${kafka.producers.firmware.topic}"])
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class WebServerTest {
     @Autowired private lateinit var restTemplate: TestRestTemplate
@@ -44,6 +46,8 @@ class WebServerTest {
     @Autowired private lateinit var firmwareRepository: FirmwareRepository
 
     @Autowired private lateinit var firmwarePacketRepository: FirmwarePacketRepository
+
+    @Autowired private lateinit var deviceRepository: DeviceRepository
 
     @Autowired private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
 
@@ -93,11 +97,19 @@ class WebServerTest {
         // arrange
         val firmwareFile = ClassPathResource(SHIPMENT_FILE).file
 
+        // pre-assert
+        assertThat(deviceRepository.findAll()).isEmpty()
+        assertThat(pskRepository.findAll()).hasSize(1)
+
         // act
         val response = uploadFile(firmwareFile, "/web/shipmentfile")
 
         // assert
         assertThat(response.statusCode.value()).isEqualTo(200)
+        assertThat(deviceRepository.findAll()).hasSize(1)
+        assertThat(pskRepository.findAll()).hasSize(3) // Two extra PSKs should be created: one ACTIVE, one READY
+        assertThat(pskRepository.countByIdentityAndStatus("869777040008792", PreSharedKeyStatus.ACTIVE)).isEqualTo(1)
+        assertThat(pskRepository.countByIdentityAndStatus("869777040008792", PreSharedKeyStatus.READY)).isEqualTo(1)
     }
 
     @ParameterizedTest
@@ -115,7 +127,9 @@ class WebServerTest {
         val body = LinkedMultiValueMap<String, Any>().apply { add("file", FileSystemResource(file)) }
         val requestEntity = HttpEntity(body, headers)
 
-        return this.restTemplate.postForEntity<String>(webPath, requestEntity)
+        return restTemplate
+            .withBasicAuth("kod", "kodpass")
+            .postForEntity<String>(webPath, requestEntity)
     }
 
     @Test
@@ -124,8 +138,19 @@ class WebServerTest {
         pskRepository.save(PreSharedKey(IDENTITY, 1, Instant.MIN, "0000111122223333", PreSharedKeyStatus.ACTIVE))
 
         val headers = HttpHeaders().apply { add("x-device-identity", IDENTITY) }
-        val result = restTemplate.exchange("/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
+        val result = restTemplate
+            .withBasicAuth("kod", "kodpass")
+            .exchange("/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
 
         assertThat(result.statusCode.is4xxClientError).isTrue()
+    }
+
+    @ParameterizedTest
+    @CsvSource("/web/shipmentfile", "/web/firmware")
+    fun shouldBlockAccessForOtherRoles(webPath: String) {
+        val result = restTemplate
+            .withBasicAuth("flex", "flexPass")
+            .getForEntity(webPath, String::class.java)
+        assertThat(result.statusCode).isEqualTo(HttpStatus.UNAUTHORIZED)
     }
 }

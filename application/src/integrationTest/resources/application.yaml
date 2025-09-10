@@ -2,6 +2,9 @@
 #
 #SPDX-License-Identifier: Apache-2.0
 spring:
+  profiles:
+    # Load our own Spring Security filter chain without LDAP
+    active: integrationTest
   flyway:
     enabled: false
   datasource:
@@ -29,6 +32,7 @@ config:
   # port for web client
   web-server:
     port: 9001
+    authorized-roles: "kod"
 
 kafka:
   consumers:
