@@ -45,12 +45,12 @@ springSecurityTest = { group = "org.springframework.security", name = "spring-se
 springSecurityWeb = { group = "org.springframework.security", name = "spring-security-web" }
 springKafka = { group = "org.springframework.kafka", name = "spring-kafka" }
 springKafkaTest = { group = "org.springframework.kafka", name = "spring-kafka-test" }
+springLdapCore = { group = "org.springframework.ldap", name = "spring-ldap-core" }
 springWsTest = { group = "org.springframework.ws", name = "spring-ws-test" }
 
 [bundles]
 gxfUtils = ["kafkaAvro", "kafkaAzureOAuth"]
-#springSecurity = ["springSecurityCore", "springSecurityConfig", "springSecurityLdap", "springSecurityWeb"]
-springSecurity = ["springBootStarterSecurity", "springSecurityCore", "springSecurityConfig", "springSecurityWeb"]
+springSecurity = ["springBootStarterSecurity", "springLdapCore", "springSecurityLdap", "springSecurityWeb"]
 
 [plugins]
 avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plugin" }

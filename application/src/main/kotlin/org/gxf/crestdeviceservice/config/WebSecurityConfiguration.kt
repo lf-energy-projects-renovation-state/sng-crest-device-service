@@ -3,8 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.config
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
@@ -18,11 +20,10 @@ class WebSecurityConfiguration {
     fun filterChain(http: HttpSecurity, webAppPortMatcher: RequestMatcher): SecurityFilterChain {
         http {
             authorizeHttpRequests {
-                authorize(webAppPortMatcher, permitAll) // TODO authenticated
+                authorize(webAppPortMatcher, authenticated)
                 authorize(anyRequest, permitAll)
             }
             formLogin {
-                loginPage = "/web/login"
             }
             csrf {
                 disable()
@@ -34,5 +35,23 @@ class WebSecurityConfiguration {
     @Bean
     fun webAppPortMatcher(webServerProperties: WebServerProperties): RequestMatcher = RequestMatcher { request ->
         request.localPort == webServerProperties.port
+    }
+
+    @Autowired
+    fun configure(auth: AuthenticationManagerBuilder) {
+        auth.ldapAuthentication()
+            .userDnPatterns("uid={0},ou=OTHUB,dc=gxf,dc=org")
+            .groupSearchBase("ou=groups")
+            .contextSource().apply {
+                root("dc=gxf,dc=org")
+                url("ldap://localhost:389")
+                managerDn("cn=admin,dc=gxf,dc=org")
+                managerPassword("admin")
+            }
+            .and()
+            .passwordCompare().apply {
+//                passwordEncoder(BCryptPasswordEncoder())
+                passwordAttribute("userPassword")
+            }
     }
 }

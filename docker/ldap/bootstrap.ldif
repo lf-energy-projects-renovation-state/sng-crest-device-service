@@ -1,11 +1,11 @@
 # admin user
-dn: cn=admin,dc=gxf,dc=org
-changetype: add
-objectClass: simpleSecurityObject
-objectClass: organizationalRole
-cn: admin
-userPassword: adminpassword
-description: LDAP Administrator
+#dn: cn=admin,dc=gxf,dc=org
+#changetype: add
+#objectClass: simpleSecurityObject
+#objectClass: organizationalRole
+#cn: admin
+#userPassword: adminpassword
+#description: LDAP Administrator
 
 # organisational unit voor OT Hub, generieke OU, geen toegang tot de apps
 dn: ou=OTHUB,dc=gxf,dc=org
@@ -13,6 +13,7 @@ changetype: add
 objectClass: organizationalUnit
 ou: OTHUB
 
+# Users
 dn: uid=lampjeaan,ou=OTHUB,dc=gxf,dc=org
 changetype: add
 objectClass: inetOrgPerson
@@ -22,13 +23,7 @@ uid: lampjeaan
 mail: lampjeaan@gxf.org
 userPassword: password123
 
-# organisational unit voor KOD Beheer, specifieke OU, wel toegang tot de apps
-dn: ou=kodbeheer,dc=gxf,dc=org
-changetype: add
-objectClass: organizationalUnit
-ou: kodbeheer
-
-dn: uid=overdruk,ou=kodbeheer,dc=gxf,dc=org
+dn: uid=overdruk,ou=OTHUB,dc=gxf,dc=org
 changetype: add
 objectClass: inetOrgPerson
 cn: Over Druk
@@ -36,3 +31,18 @@ sn: Druk
 uid: overdruk
 mail: overdruk@gxf.org
 userPassword: password789
+
+# Groups
+dn: cn=flexovl,ou=OTHUB,dc=gxf,dc=org
+changetype: add
+objectClass: groupOfNames
+objectClass: top
+cn: flexovl
+member: uid=lampjeaan,ou=OTHUB,dc=gxf,dc=org
+
+dn: cn=kod,ou=OTHUB,dc=gxf,dc=org
+changetype: add
+objectClass: groupOfNames
+objectClass: top
+cn: kod
+member: uid=overdruk,ou=OTHUB,dc=gxf,dc=org
