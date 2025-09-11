@@ -28,14 +28,17 @@ To test this flow locally:
 
 
 ## Mutual TLS
-Communication between the COAP HTTP Proxy and the Crest device service should be encrypted using mutual TLS.
+Communication between the CoAP HTTP Proxy and the Crest device service should be encrypted using mutual TLS.
 
 The repositories contain test certificates that can be used for local testing. (they are not included in the jar or docker image)
 They can be also be (re)generated using the [generate_certificates.sh](scripts/generate_certificates.sh) script.
 
 # Web apps
 This service contains a web application that runs on the port specified by the property `config.web-server.port`.
-For the `dev` profile this is port 9001, so http://localhost:9001 will get you there.
+For the `dev` profile this is port 9001. http://localhost:9001/web will get you there.
+
+_'web' is required to distinguish the web app requests from CoAP(S) requests. The pass through the same filter chain._
+
 
 You have to log in to access the app. There are two users in the LDAP server (provided by `docker-compose.yaml`):
 - `overdruk`/`password789`: part of the group 'kod', which has access
