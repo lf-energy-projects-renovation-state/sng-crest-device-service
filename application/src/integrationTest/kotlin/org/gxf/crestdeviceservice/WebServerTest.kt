@@ -34,12 +34,14 @@ import org.springframework.http.ResponseEntity
 import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.util.LinkedMultiValueMap
 import java.io.File
 import java.time.Duration
 import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("webtest")
 @EmbeddedKafka(topics = [$$"${kafka.producers.firmware.topic}"])
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class WebServerTest {
@@ -177,6 +179,15 @@ class WebServerTest {
             .exchange("/psk", HttpMethod.GET, HttpEntity<Unit>(headers), String::class.java)
 
         assertThat(result.statusCode.is4xxClientError).isTrue()
+    }
+
+    @Test
+    fun shouldShowMenuForKodRole() {
+        val result = restTemplate
+            .withBasicAuth("kod", "kodpass")
+            .getForEntity("/web", String::class.java)
+        assertThat(result.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(result.body).contains("Crest Device Service", "Log out")
     }
 
     @ParameterizedTest

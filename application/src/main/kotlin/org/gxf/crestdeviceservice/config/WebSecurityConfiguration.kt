@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.crestdeviceservice.config
 
-import org.springframework.beans.factory.annotation.Autowired
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
@@ -15,10 +15,15 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-@Profile("!integrationTest")
 class WebSecurityConfiguration {
+    private val logger = KotlinLogging.logger {}
+
     @Bean
-    fun filterChain(http: HttpSecurity, webServerProperties: WebServerProperties): SecurityFilterChain {
+    fun filterChain(
+        http: HttpSecurity,
+        webServerProperties: WebServerProperties,
+        env: Environment,
+    ): SecurityFilterChain {
         http {
             authorizeHttpRequests {
                 authorize(
@@ -37,29 +42,14 @@ class WebSecurityConfiguration {
             logout {
                 logoutUrl = "/web/logout"
             }
+            if (env.acceptsProfiles(Profiles.of("webtest"))) {
+                logger.warn { "Enabling HTTP Basic authentication, this should only be enabled for testing" }
+                httpBasic {}
+            }
             csrf {
                 disable()
             }
         }
         return http.build()
-    }
-
-    @Autowired
-    fun configure(auth: AuthenticationManagerBuilder) {
-        auth.ldapAuthentication()
-            .userDnPatterns("uid={0},ou=OTHUB,dc=gxf,dc=org")
-            .groupSearchBase("ou=groups,dc=gxf,dc=org")
-            .groupSearchFilter("member={0}")
-            .contextSource().apply {
-                root("dc=gxf,dc=org")
-                url("ldap://localhost:389")
-                managerDn("cn=admin,dc=gxf,dc=org")
-                managerPassword("admin")
-            }
-            .and()
-            .passwordCompare().apply {
-//                passwordEncoder(BCryptPasswordEncoder())
-                passwordAttribute("userPassword")
-            }
     }
 }

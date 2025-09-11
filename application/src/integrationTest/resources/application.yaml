@@ -2,9 +2,6 @@
 #
 #SPDX-License-Identifier: Apache-2.0
 spring:
-  profiles:
-    # Load our own Spring Security filter chain without LDAP
-    active: integrationTest
   flyway:
     enabled: false
   datasource:
