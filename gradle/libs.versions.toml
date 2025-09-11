@@ -32,6 +32,7 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 postgresql = { group = "org.postgresql", name = "postgresql" }
 springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "springmockk" }
 springBootDependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "spring-boot" }
+springBootDevtools = { group = "org.springframework.boot", name = "spring-boot-devtools" }
 springBootStarterActuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
 springBootStarterSecurity = { group = "org.springframework.boot", name = "spring-boot-starter-security" }
 springBootStarterTest = { group = "org.springframework.boot", name = "spring-boot-starter-test" }

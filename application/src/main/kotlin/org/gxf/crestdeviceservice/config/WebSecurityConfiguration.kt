@@ -32,6 +32,10 @@ class WebSecurityConfiguration {
                 authorize(anyRequest, permitAll)
             }
             formLogin {
+                defaultSuccessUrl("/web", true)
+            }
+            logout {
+                logoutUrl = "/web/logout"
             }
             csrf {
                 disable()

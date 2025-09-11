@@ -42,6 +42,8 @@ dependencies {
 
     testRuntimeOnly(libs.junitPlatformLauncher)
 
+    developmentOnly(libs.springBootDevtools)
+
     // Generate test and integration test reports
     jacocoAggregation(project(":application"))
 }
