@@ -114,11 +114,16 @@ class WebServerTest {
 
     @ParameterizedTest
     @CsvSource("/web/shipmentfile", "/web/firmware")
-    fun emptyFileUploadTest(webPath: String) {
+    fun emptyFileShouldNotStoreAnything(webPath: String) {
         val firmwareFile = ClassPathResource(EMPTY_FILE).file
 
-        val response = uploadFile(firmwareFile, webPath)
-        assertThat(response.body).containsIgnoringCase("An empty file was provided")
+        assertThat(deviceRepository.findAll()).isEmpty()
+        assertThat(pskRepository.findAll()).hasSize(1)
+
+        uploadFile(firmwareFile, webPath)
+
+        assertThat(deviceRepository.findAll()).isEmpty()
+        assertThat(pskRepository.findAll()).hasSize(1)
     }
 
     private fun uploadFile(file: File, webPath: String): ResponseEntity<String> {
