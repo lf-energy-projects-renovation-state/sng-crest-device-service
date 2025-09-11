@@ -21,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.postForEntity
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -115,21 +117,48 @@ class WebServerTest {
     @ParameterizedTest
     @CsvSource("/web/shipmentfile", "/web/firmware")
     fun emptyFileShouldNotStoreAnything(webPath: String) {
+        // arrange
         val firmwareFile = ClassPathResource(EMPTY_FILE).file
 
+        // pre-assert
         assertThat(deviceRepository.findAll()).isEmpty()
         assertThat(pskRepository.findAll()).hasSize(1)
 
-        uploadFile(firmwareFile, webPath)
+        // act
+        val response = uploadFile(firmwareFile, webPath)
 
+        // assert
+        assertThat(response.statusCode.is2xxSuccessful).isTrue
         assertThat(deviceRepository.findAll()).isEmpty()
         assertThat(pskRepository.findAll()).hasSize(1)
     }
 
-    private fun uploadFile(file: File, webPath: String): ResponseEntity<String> {
+    @ParameterizedTest
+    @CsvSource("/web/shipmentfile", "/web/firmware")
+    fun noFileShouldNotStoreAnything(webPath: String) {
+        // arrange
+        val noFile = NoFileResource()
+
+        // pre-assert
+        assertThat(deviceRepository.findAll()).isEmpty()
+        assertThat(pskRepository.findAll()).hasSize(1)
+
+        // act
+        val response = uploadFile(noFile, webPath)
+
+        // assert
+        assertThat(response.statusCode.is2xxSuccessful).isTrue
+        assertThat(deviceRepository.findAll()).isEmpty()
+        assertThat(pskRepository.findAll()).hasSize(1)
+    }
+
+    private fun uploadFile(file: File, webPath: String): ResponseEntity<String> =
+        uploadFile(FileSystemResource(file), webPath)
+
+    private fun uploadFile(file: Resource, webPath: String): ResponseEntity<String> {
         val headers: HttpHeaders = HttpHeaders().apply { contentType = MediaType.MULTIPART_FORM_DATA }
 
-        val body = LinkedMultiValueMap<String, Any>().apply { add("file", FileSystemResource(file)) }
+        val body = LinkedMultiValueMap<String, Any>().apply { add("file", file) }
         val requestEntity = HttpEntity(body, headers)
 
         return restTemplate
@@ -158,4 +187,12 @@ class WebServerTest {
             .getForEntity(webPath, String::class.java)
         assertThat(result.statusCode).isEqualTo(HttpStatus.UNAUTHORIZED)
     }
+}
+
+/**
+ * Class to mimic a file upload with no file selected.
+ * This will trigger the first condition in WebControllerHelper.runAfterFileCheck()
+ */
+class NoFileResource : ByteArrayResource(ByteArray(0), "") {
+    override fun getFilename(): String = ""
 }
