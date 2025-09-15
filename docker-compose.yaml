@@ -39,30 +39,20 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_JMXPORT: 9997
-  ldap:
-    image: osixia/openldap:1.5.0
-    container_name: ldap
-    environment:
-      LDAP_BASE_DN: "dc=gxf,dc=org"
-      LDAP_ORGANISATION: "GXF"
-      LDAP_DOMAIN: "gxf.org"
-      LDAP_ADMIN_PASSWORD: "admin"
-      LDAP_CONFIG_PASSWORD: "config"
-      LDAP_TLS: "false"
+  samba-ad:
+    container_name: samba-ad
+    image: local/samba-ad:latest
+    build: ./docker/samba-ad
     ports:
       - "389:389"
-    volumes:
-      - ./docker/ldap/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-bootstrap.ldif:ro
-    command:
-      - --copy-service
-#  phpldapadmin:
-#    image: osixia/phpldapadmin:latest
-#    container_name: phpldapadmin
-#    environment:
-#      PHPLDAPADMIN_LDAP_HOSTS: ldap
-#      PHPLDAPADMIN_HTTPS: "false"   # deactivate HTTPS
-#    ports:
-#      - "8081:80"
-#    restart: unless-stopped
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ldap
+      PHPLDAPADMIN_HTTPS: "false"   # deactivate HTTPS
+    ports:
+      - "8081:80"
+    restart: unless-stopped
 #    depends_on:
-#      - ldap
+#      - samba-ad

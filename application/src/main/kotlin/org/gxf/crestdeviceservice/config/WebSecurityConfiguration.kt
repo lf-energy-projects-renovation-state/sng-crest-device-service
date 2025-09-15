@@ -28,11 +28,7 @@ class WebSecurityConfiguration {
             authorizeHttpRequests {
                 authorize(
                     "/web/**",
-                    hasAnyRole(
-                        roles = webServerProperties.authorizedRoles
-                            .map { it.uppercase() }
-                            .toTypedArray<String>(),
-                    ),
+                    hasAnyAuthority(authorities = webServerProperties.authorizedRoles.toTypedArray<String>()),
                 )
                 authorize(anyRequest, permitAll)
             }
