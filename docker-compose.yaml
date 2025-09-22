@@ -42,17 +42,14 @@ services:
   samba-ad:
     container_name: samba-ad
     image: local/samba-ad:latest
+    privileged: true
+    hostname: gxf.org
     build: ./docker/samba-ad
+    environment:
+      SMB_ADMIN_PASSWORD: AdminS3cr3t
+      SMB_DOMAIN: GXF-ORG
     ports:
       - "389:389"
-  phpldapadmin:
-    image: osixia/phpldapadmin:latest
-    container_name: phpldapadmin
-    environment:
-      PHPLDAPADMIN_LDAP_HOSTS: ldap
-      PHPLDAPADMIN_HTTPS: "false"   # deactivate HTTPS
-    ports:
-      - "8081:80"
-    restart: unless-stopped
-#    depends_on:
-#      - samba-ad
+    volumes:
+      - ./docker/samba-ad/:/opt/ad-scripts
+      - ./docker/samba-ad/samba-data/:/var/lib/samba

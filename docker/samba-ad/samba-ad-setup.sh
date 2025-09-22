@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 info () {
@@ -22,9 +21,11 @@ samba-tool domain provision\
  --use-rfc2307\
  --dns-backend=SAMBA_INTERNAL\
  --realm=`hostname`\
- --domain=GXF-ORG\
+ --domain=${SMB_DOMAIN}\
  --adminpass=${SMB_ADMIN_PASSWORD}
 
+# Disable strong auth (ldaps) for LDAP
+sed -i '5 a\ \ \ \ \ \ \ \ ldap server require strong auth = false' /etc/samba/smb.conf
 mv /etc/samba/smb.conf /var/lib/samba/private/smb.conf
 
 touch /var/lib/samba/.setup

@@ -1,7 +1,7 @@
 This implementation was created from https://schneide.blog/2022/06/27/running-a-containerized-activedirectory-for-developers/
 
 LDAP Admin:
-cn=Administrator,cn=Users,dc=testing,dc=gxf,dc=org
+cn=Administrator,cn=Users,dc=gxf,dc=org
 AdminS3cr3t
 
 Set up users (passwords have to be entered manually)
