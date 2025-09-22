@@ -33,6 +33,9 @@ config:
     port: 9001
     authorized-roles:
       - "kod"
+  ad:
+    url: "ldap://localhost:389"
+    domain: "gxf.org"
 
 kafka:
   consumers:
