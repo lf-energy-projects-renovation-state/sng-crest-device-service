@@ -16,11 +16,11 @@ class TestWebSecurityConfiguration {
     fun userDetailsService(): InMemoryUserDetailsManager {
         val kodUser = User.withUsername("kod")
             .password("{noop}kodpass")
-            .roles("KOD")
+            .authorities("kod")
             .build()
         val flexUser = User.withUsername("flex")
             .password("{noop}flexpass")
-            .roles("FLEX")
+            .authorities("flex")
             .build()
         return InMemoryUserDetailsManager(kodUser, flexUser)
     }

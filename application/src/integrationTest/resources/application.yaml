@@ -29,7 +29,11 @@ config:
   # port for web client
   web-server:
     port: 9001
-    authorized-roles: "kod"
+    authorized-roles:
+      - "kod"
+  ad:
+    url: "ldap://not-used:389"
+    domain: "not.used.org"
 
 kafka:
   consumers:
