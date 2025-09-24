@@ -13,7 +13,7 @@ import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAu
 @Profile("!webtest")
 class ActiveDirectoryConfiguration {
     @Bean
-    fun authencationProvider(properties: ActiveDirectoryProperties): ActiveDirectoryLdapAuthenticationProvider =
+    fun authenticationProvider(properties: ActiveDirectoryProperties): ActiveDirectoryLdapAuthenticationProvider =
         ActiveDirectoryLdapAuthenticationProvider(properties.domain, properties.url)
 }
 
