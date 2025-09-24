@@ -12,6 +12,7 @@ import org.gxf.crestdeviceservice.service.ShipmentFileService
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
@@ -19,7 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multi
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.stream.Stream
 
-@WebMvcTest(ShipmentFileController::class)
+@WebMvcTest(ShipmentFileController::class, excludeAutoConfiguration = [SecurityAutoConfiguration::class])
 class ShipmentFileControllerTest {
     @MockkBean
     private lateinit var shipmentFileService: ShipmentFileService

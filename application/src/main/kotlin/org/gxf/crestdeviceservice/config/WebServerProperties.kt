@@ -6,4 +6,4 @@ package org.gxf.crestdeviceservice.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "config.web-server")
-data class WebServerProperties(val port: Int)
+data class WebServerProperties(val port: Int, val authorizedRoles: List<String>)

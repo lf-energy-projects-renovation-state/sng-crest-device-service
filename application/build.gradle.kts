@@ -14,8 +14,8 @@ dependencies {
     implementation(libs.springBootStarterWeb)
     implementation(libs.springBootStarterDataJpa)
     implementation(libs.springBootStarterThymeleaf)
-    implementation(libs.springSecurityCore)
     implementation(libs.springKafka)
+    implementation(libs.bundles.springSecurity)
 
     implementation(project(":components:avro"))
     implementation(project(":components:device"))
@@ -36,10 +36,13 @@ dependencies {
     runtimeOnly(libs.flyway)
 
     testImplementation(libs.springBootStarterTest)
+    testImplementation(libs.springSecurityTest)
     testImplementation(libs.mockk)
     testImplementation(libs.springmockk)
 
     testRuntimeOnly(libs.junitPlatformLauncher)
+
+    developmentOnly(libs.springBootDevtools)
 
     // Generate test and integration test reports
     jacocoAggregation(project(":application"))
@@ -81,6 +84,9 @@ testing {
                 implementation(project(":components:device"))
                 implementation(project(":components:firmware"))
                 implementation(libs.springBootStarterDataJpa)
+                implementation(libs.springSecurityConfig)
+                implementation(libs.springSecurityCore)
+                implementation(libs.springSecurityWeb)
                 implementation(libs.kafkaAvro)
                 implementation(libs.springKafka)
                 implementation(libs.springBootStarterTest)

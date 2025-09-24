@@ -39,3 +39,17 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_JMXPORT: 9997
+  samba-ad:
+    container_name: samba-ad
+    image: local/samba-ad:latest
+    privileged: true
+    hostname: gxf.org
+    build: ./docker/samba-ad
+    environment:
+      SMB_ADMIN_PASSWORD: AdminS3cr3t
+      SMB_DOMAIN: GXF-ORG
+    ports:
+      - "389:389"
+    volumes:
+      - ./docker/samba-ad/:/opt/ad-scripts
+      - ./docker/samba-ad/samba-data/:/var/lib/samba

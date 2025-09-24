@@ -28,22 +28,41 @@ To test this flow locally:
 
 
 ## Mutual TLS
-Communication between the COAP HTTP Proxy and the Crest device service should be encrypted using mutual TLS.
+Communication between the CoAP HTTP Proxy and the Crest device service should be encrypted using mutual TLS.
 
 The repositories contain test certificates that can be used for local testing. (they are not included in the jar or docker image)
 They can be also be (re)generated using the [generate_certificates.sh](scripts/generate_certificates.sh) script.
 
-# Web apps
-This service contains two web applications. 
-These web apps run on the port specified by the property `config.web-server.port`.
-For the `dev` profile this is port 9001.
+## Active Directory / LDAP for local development
+The docker-compose file starts Samba in Domain Controller mode, which provides an Active Directory server.
+It cannot be provisioned from build time, so the first time you run it, it will be empty.
+To populate it:
+1. Start the docker-compose services: `docker-compose up -d`
+2. Open a shell in the `samba-ad` container: `docker exec -it samba-ad /bin/bash`
+3. Run the following commands and remember the user passwords you supply:
+```bash
+echo "Creating user 'overdruk'"
+samba-tool user create overdruk --given-name Over --surname Druk
+echo "Creating user 'lampjeaan'"
+samba-tool user create lampjeaan --given-name Lampje --surname Aan 
+samba-tool group create flex 
+samba-tool group create kod 
+samba-tool group addmembers kod overdruk 
+samba-tool group addmembers flex lampjeaan
+```
 
-The URL paths to the apps:
-- Firmware upload: `/web/firmware`
-- Shipment file upload: `/web/shipmentfile`
+If you want to start over with a fresh configuration, simply delete the Samba data folder as root (`sudo rm <source-root>/docker/samba-ad/samba-data`)
 
-So, for local development, the URLs are:
-- Firmware upload: http://localhost:9001/web/firmware
-- Shipment file upload: http://localhost:9001/web/shipmentfile
+## Web apps
+This service contains a web application that runs on the port specified by the property `config.web-server.port`.
+For the `dev` profile this is port 9001. http://localhost:9001/web will get you there.
+
+_'web' is required to distinguish the web app requests from CoAP(S) requests. They pass through the same filter chain._
+
+You have to log in to access the app (using the passwords you supplied to Samba). 
+There are two users in the LDAP server (provided by `docker-compose.yaml`):
+- `overdruk`: part of the group 'kod', which has access
+- `lampjeaan`: part of the group 'flexovl', which has _no_ access and can be used to test the access control
 
 (use a browser that supports 'unsafe' (non-https) connections, e.g. Firefox, Brave, etc.)
+

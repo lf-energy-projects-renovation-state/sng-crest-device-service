@@ -1,0 +1,26 @@
+<!--
+Copyright 2024 Alliander N.V.
+-->
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOD</title>
+    <link href="/web.css" rel="stylesheet" />
+</head>
+<body>
+
+
+<main class="container">
+    <div class="card">
+        <div class="mb-3">
+            <h2>Crest Device Service</h2>
+            <a class="btn" th:href="@{/web/firmware}">Upload firmware files</a>
+            <a class="btn" th:href="@{/web/shipmentfile}">Upload shipment files</a>
+            <a class="btn btn-warn" th:href="@{/web/logout}">Log out</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>
